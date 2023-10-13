@@ -3,7 +3,7 @@ interface User {
     name: string;
     surname: string;
     nickName: string;
-    //password: string;
+    password: string;
     //phone_number: string;
     //photo: string;
 }

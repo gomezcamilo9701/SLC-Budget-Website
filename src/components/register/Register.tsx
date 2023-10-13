@@ -23,6 +23,7 @@ const defaultValues: UserToRegister = {
   name: "",
   surname: "",
   nickName: "",
+  password: "",
 };
 
 type UserToRegister = {
@@ -30,6 +31,7 @@ type UserToRegister = {
   name: string;
   surname: string;
   nickName: string;
+  password: string;
 };
 
 const RegisterForm = () => {
@@ -45,7 +47,7 @@ const RegisterForm = () => {
   } = useForm<UserToRegister>({ defaultValues });
 
   const onSubmit: SubmitHandler<UserToRegister> = async (data) => {
-    const { email, name, surname, nickName } = data;
+    const { email, name, surname, nickName, password } = data;
     try {
       if (data) {
         const user: User = {
@@ -53,6 +55,7 @@ const RegisterForm = () => {
           name,
           surname,
           nickName,
+          password,
         };
         await registerUser(user);
         setAlert({
@@ -191,7 +194,7 @@ const RegisterForm = () => {
                     label="Contraseña"
                     type="password"
                     autoComplete="password"
-                  /* {...register("password", { required: true, minLength: 4 })}*/
+                  {...register("password", { required: true, minLength: 4 })}
                   />
                 </Grid>
               </Grid>
@@ -216,7 +219,7 @@ const RegisterForm = () => {
                   },
 
                 }}
-              /* disabled={!isValid}*/
+              disabled={!isValid}
               >
                 Crear Cuenta
               </Button>

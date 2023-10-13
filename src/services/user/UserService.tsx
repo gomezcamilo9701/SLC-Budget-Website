@@ -13,7 +13,6 @@ export const registerUser = async (user: User) => {
         if (!repoonse.ok) {
             throw new Error('POST request failed');
         }
-        console.log('Post request succeeded');
     } catch (err) {
         console.error('POST request errror',err);
         throw err;
