@@ -2,7 +2,7 @@ import User from "../../models/user/User";
 
 export const registerUser = async (user: User) => {
     try {
-        const repoonse = await fetch(`El tuki endpoint`, {
+        const repoonse = await fetch(`http://localhost:8080/user/create`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

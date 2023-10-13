@@ -1,8 +1,8 @@
 interface User {
-    firstName: string;
-    lastName: string;
     email: string;
-    username: string;
+    name: string;
+    surname: string;
+    nickName: string;
     //password: string;
     //phone_number: string;
     //photo: string;

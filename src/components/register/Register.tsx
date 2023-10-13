@@ -20,17 +20,17 @@ import User from "../../models/user/User";
 const theme = createTheme();
 
 const defaultValues: UserToRegister = {
-  firstName: "",
-  lastName: "",
   email: "",
-  username: "",
+  name: "",
+  surname: "",
+  nickName: "",
 };
 
 type UserToRegister = {
-  firstName: string;
-  lastName: string;
   email: string;
-  username: string;
+  name: string;
+  surname: string;
+  nickName: string;
 };
 
 const RegisterForm = () => {
@@ -46,15 +46,14 @@ const RegisterForm = () => {
   } = useForm<UserToRegister>({ defaultValues });
 
   const onSubmit: SubmitHandler<UserToRegister> = async (data) => {
-    console.log("dataInit", data);
-    const { firstName, lastName, email, username } = data;
+    const { email, name, surname, nickName } = data;
     try {
       if (data) {
         const user: User = {
-          firstName,
-          lastName,
           email,
-          username,
+          name,
+          surname,
+          nickName,
         };
         await registerUser(user);
         setAlert({
@@ -133,12 +132,12 @@ const RegisterForm = () => {
                   <TextField
                     autoComplete="given-name"
                     fullWidth
-                    id="firstName"
+                    id="name"
                     label="First Name"
                     autoFocus
-                    {...register("firstName", { required: true, minLength: 4 })}
-                    error={Boolean(errors.firstName)}
-                    helperText={errors.firstName ? errors.firstName.message : ""}
+                    {...register("name", { required: true, minLength: 4 })}
+                    error={Boolean(errors.name)}
+                    helperText={errors.name ? errors.name.message : ""}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -148,17 +147,17 @@ const RegisterForm = () => {
                     id="last_name"
                     label="Last name"
                     autoComplete="family-name"
-                    {...register("lastName", { required: true, minLength: 4 })}
+                    {...register("surname", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
                     required
                     fullWidth
-                    id="username"
+                    id="nickName"
                     label="Username"
-                    autoComplete="username"
-                    {...register("username", {
+                    autoComplete="nickName"
+                    {...register("nickName", {
                       required: true,
                       minLength: 3,
                     })}
