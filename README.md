@@ -1,3 +1,6 @@
 # SLC-Budget-Website
 Frontend for SLC-Budget-WWW
-tuki por favor
+Pasos para correr Front:
+
+NPM INSTALL
+NPM RUN DEV
