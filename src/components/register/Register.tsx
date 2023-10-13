@@ -9,11 +9,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { Alert } from "@mui/material";
-import {
-  Grid,
-  TextField,
-  Button,
-} from "@mui/material";
+import { Grid, TextField, Button } from "@mui/material";
 import { registerUser } from "../../services/user/UserService";
 import User from "../../models/user/User";
 
@@ -74,26 +70,8 @@ const RegisterForm = () => {
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={{
-            position: "relative",
-            background: `radial-gradient(circle at 10% 20%, rgb(98, 114, 128) 0%, rgb(52, 63, 51) 90.1%);`,
-            backgroundRepeat: "no-repeat",
-            backgroundColor: (t) =>
-              t.palette.mode === "light"
-                ? t.palette.grey[50]
-                : t.palette.grey[900],
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
-          <img
-            src="src/assets/logoTemp.png"
-            alt="SLC Logo"
+        <Grid item xs={false} sm={4} md={7} sx={{ position: "relative" }}>
+          <div
             style={{
               position: "absolute",
               top: 0,
@@ -101,25 +79,46 @@ const RegisterForm = () => {
               width: "100%",
               height: "100%",
               objectFit: "cover",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+
             }}
-          />
+          >
+            <h1 style={{ color: "white", fontSize: "2.5rem", fontWeight: 750 }}>Sing Up to</h1>
+            <h1 style={{ color: "white", fontSize: "2rem", fontWeight: 650 }}>Lorem Ipsum is simply </h1>
+            <p style={{ color: "white" }}>Si aún no tienes una cuenta registrada</p>
+            <p style={{ color: "white" }}>puedes ¡Registrarte aquí!</p>
+          </div>
         </Grid>
 
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+
+        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1} square
+          sx={{
+            position: "absolute",
+            top: 100,
+            right: 150,
+            width: 450,
+            borderRadius: "0.9375rem",
+            background: "rgba(217, 217, 217, 0.10)",
+          }}>
           <Box
             sx={{
-              my: 8,
-              mx: 4,
+              my: 10,
+              mx: 16,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              margin: "50px",
+              gap: "15px",
+
+
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign up
+
+            <Typography component="h1" variant="h5" sx={{ color: "white" }}>
+              ¡Regístrate!
             </Typography>
             <Box
               component="form"
@@ -130,10 +129,11 @@ const RegisterForm = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
+                    className="text-field-custom"
                     autoComplete="given-name"
                     fullWidth
                     id="name"
-                    label="First Name"
+                    label="Primer Nombre"
                     autoFocus
                     {...register("name", { required: true, minLength: 4 })}
                     error={Boolean(errors.name)}
@@ -142,20 +142,33 @@ const RegisterForm = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
+                    className="text-field-custom"
                     required
                     fullWidth
                     id="last_name"
-                    label="Last name"
+                    label="Primer Apellido"
                     autoComplete="family-name"
                     {...register("surname", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    className="text-field-custom"
+                    required
+                    fullWidth
+                    id="email"
+                    label="Correo electrónico"
+                    autoComplete="email"
+                    {...register("email", { required: true, minLength: 4 })}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    className="text-field-custom"
                     required
                     fullWidth
                     id="nickName"
-                    label="Username"
+                    label="Apodo"
                     autoComplete="nickName"
                     {...register("nickName", {
                       required: true,
@@ -165,27 +178,41 @@ const RegisterForm = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
+                    className="text-field-custom"
                     required
                     fullWidth
-                    id="email"
-                    label="Email"
-                    autoComplete="email"
-                    {...register("email", { required: true, minLength: 4 })}
+                    id="password"
+                    label="Contraseña"
+                    autoComplete="password"
+                  /* {...register("password", { required: true, minLength: 4 })}*/
                   />
                 </Grid>
               </Grid>
               <Button
+                className="button-custom"
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{ mt: 3, mb: 2 }}
-                disabled={!isValid}
+                sx={{
+                  mt: 3,
+                  mb: 2,
+                  backgroundColor: "#000",
+                  borderRadius: "10px",
+                  border: '2px solid',
+                  borderImage: 'linear-gradient(to right, #77EBEB, #9A40E0)',
+                  borderImageSlice: 1,
+                  borderImageSource: 'linear-gradient(to right, #77EBEB, #9A40E0)',
+                  padding: '10px',
+                  boxShadow: "0px 4px 61px 0px rgba(77, 71, 195, 0.60)",
+
+                }}
+              /* disabled={!isValid}*/
               >
-                Sign Up
+                Crear Cuenta
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link to="/home">Back</Link>
+                  <Link to="/home">Regresar</Link>
                 </Grid>
               </Grid>
               {alert.type === "success" && (
@@ -198,7 +225,7 @@ const RegisterForm = () => {
           </Box>
         </Grid>
       </Grid>
-    </ThemeProvider>
+    </ThemeProvider >
   );
 };
 
