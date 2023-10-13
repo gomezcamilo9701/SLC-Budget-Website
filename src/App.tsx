@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 //import Home from './components/home/Home.tsx';
-//import RegistrationForm from './components/register/WorkerRegister.tsx';
+import RegisterForm from './components/register/Register';
 
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<Home />} /> 
-        <Route path="/home" element={<Home />} />  */}
-        {/* <Route path="/register" element={<RegistrationForm />} />  */}
+        <Route path="/" element={<RegisterForm />} /> {/* Este ruta es momentanea mientras se hace el home
+        <Route path="/home" element={<Home />} /> */}
+        <Route path="/register" element={<RegisterForm />} />
       </Routes>
     </Router>
   );
