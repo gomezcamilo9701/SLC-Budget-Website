@@ -1,9 +1,7 @@
 import { useState } from "react";
-import Avatar from "@mui/material/Avatar";
 import CssBaseline from "@mui/material/CssBaseline";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -13,7 +11,12 @@ import { Grid, TextField, Button } from "@mui/material";
 import { registerUser } from "../../services/user/UserService";
 import User from "../../models/user/User";
 
-const theme = createTheme();
+
+const theme = createTheme({
+  typography: {
+    fontFamily: 'Roboto, sans-serif',
+  },
+});
 
 const defaultValues: UserToRegister = {
   email: "",
@@ -54,14 +57,14 @@ const RegisterForm = () => {
         await registerUser(user);
         setAlert({
           type: "success",
-          message: "Successful registration as a user.",
+          message: "Registro satisfactorio como usuario.",
         });
       }
       reset();
     } catch (e) {
       setAlert({
         type: "error",
-        message: "Error in registration.",
+        message: "Error en el registro.",
       });
     }
   };
@@ -86,10 +89,14 @@ const RegisterForm = () => {
 
             }}
           >
-            <h1 style={{ color: "white", fontSize: "2.5rem", fontWeight: 750 }}>Sing Up to</h1>
-            <h1 style={{ color: "white", fontSize: "2rem", fontWeight: 650 }}>Lorem Ipsum is simply </h1>
-            <p style={{ color: "white" }}>Si aún no tienes una cuenta registrada</p>
-            <p style={{ color: "white" }}>puedes ¡Registrarte aquí!</p>
+            <img
+              src="src/assets/logo-slc.svg"
+              alt="SLC Logo"
+              style={{
+                width: "500px",
+              }}
+            />
+            <h1 style={{ color: "white", fontSize: "1.2rem", fontWeight: 100, textAlign: "center", lineHeight: "1.7", }}>Regístrate y lleva el control de tus gastos de eventos<br></br> con tus contactos de manera sencilla </h1>
           </div>
         </Grid>
 
@@ -112,8 +119,6 @@ const RegisterForm = () => {
               alignItems: "center",
               margin: "50px",
               gap: "15px",
-
-
             }}
           >
 
@@ -126,9 +131,10 @@ const RegisterForm = () => {
               onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 3 }}
             >
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+              <Grid container spacing={2} >
+                <Grid item xs={12} sm={6} >
                   <TextField
+                    sx={{ color: "white" }}
                     className="text-field-custom"
                     autoComplete="given-name"
                     fullWidth
@@ -183,6 +189,7 @@ const RegisterForm = () => {
                     fullWidth
                     id="password"
                     label="Contraseña"
+                    type="password"
                     autoComplete="password"
                   /* {...register("password", { required: true, minLength: 4 })}*/
                   />
@@ -204,6 +211,9 @@ const RegisterForm = () => {
                   borderImageSource: 'linear-gradient(to right, #77EBEB, #9A40E0)',
                   padding: '10px',
                   boxShadow: "0px 4px 61px 0px rgba(77, 71, 195, 0.60)",
+                  '&:hover': {
+                    backgroundColor: "#211f42"
+                  },
 
                 }}
               /* disabled={!isValid}*/
