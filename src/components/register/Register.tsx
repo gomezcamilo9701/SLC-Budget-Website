@@ -8,7 +8,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { registerUser } from "../../services/user/UserService";
+import { registerUser } from "../../services/register/RegisterService";
 import User from "../../models/user/User";
 
 
@@ -225,7 +225,7 @@ const RegisterForm = () => {
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link to="/home">Regresar</Link>
+                  <Link to="/Login">Regresar</Link>
                 </Grid>
               </Grid>
               {alert.type === "success" && (
