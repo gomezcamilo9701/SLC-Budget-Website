@@ -8,9 +8,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { registerUser } from "../../services/register/RegisterService";
-import User from "../../models/user/User";
-
+import { LoginService } from "../../services/login/LoginService";
 
 const theme = createTheme({
   typography: {
@@ -18,23 +16,18 @@ const theme = createTheme({
   },
 });
 
-const defaultValues: UserToRegister = {
+const defaultValues: UserToLogin = {
   email: "",
-  name: "",
-  surname: "",
-  nickName: "",
   password: "",
 };
 
-type UserToRegister = {
+type UserToLogin = {
   email: string;
-  name: string;
-  surname: string;
-  nickName: string;
   password: string;
 };
 
-const LoginForm = () => {
+
+const LoginForm = ({ setToken }) => {
   const [alert, setAlert] = useState({
     type: "",
     message: "",
@@ -42,32 +35,30 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
-   /* formState: { errors, isValid },*/
     reset,
-  } = useForm<UserToRegister>({ defaultValues });
+  } = useForm<UserToLogin>({ defaultValues });
 
-  const onSubmit: SubmitHandler<UserToRegister> = async (data) => {
-    const { email, name, surname, nickName, password } = data;
+  const onSubmit: SubmitHandler<UserToLogin> = async (data) => {
+    const { email, password } = data;
     try {
-      if (data) {
-        const user: User = {
-          email,
-          name,
-          surname,
-          nickName,
-          password,
-        };
-        await registerUser(user);
+      const userCredentials = {
+        email,
+        password,
+      };
+      const response = await LoginService(userCredentials);
+
+      if (response.success) {
+        setToken(response.token);
+      } else {
         setAlert({
-          type: "success",
-          message: "Ingreso satisfactorio como usuario.",
+          type: "error",
+          message: response.message,
         });
       }
-      reset();
     } catch (e) {
       setAlert({
         type: "error",
-        message: "Error en el Ingreso.",
+        message: "Error en el inicio de sesión.",
       });
     }
   };
