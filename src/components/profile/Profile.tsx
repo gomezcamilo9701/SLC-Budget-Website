@@ -7,6 +7,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import { registerUser } from "../../services/register/RegisterService";
+import Avatar from '@mui/material/Avatar';
 import User from "../../models/user/User";
 
 
@@ -72,7 +73,7 @@ const ProfileForm = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ width:"100%", height: "70vh" }}>
+      <Grid container component="main" sx={{ width: "90%", height: "80vh" }}>
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1} square
           sx={{
             display: "flex",
@@ -92,8 +93,33 @@ const ProfileForm = () => {
               gap: "15px",
             }}
           >
+            <Grid sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}>
+              <Avatar
+                alt="Remy Sharp"
+                src="/static/images/avatar/1.jpg"
+                sx={{ width: 90, height: 90 }}
+              />
+              <Grid sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginLeft: "15px",
+              }}
+              >
+                <Typography sx={{ color: "black"}}>
+                  <b>Santiago Norrea</b>
+                </Typography>
+                <Typography sx={{ color: "gray"}}>
+                  <b>santiago.nor@gmail.com</b>
+                </Typography>
+              </Grid>
+            </Grid>
 
-            <Typography component="h1" variant="h5" sx={{ color: "black" }}>
+            <Typography sx={{ color: "black", marginTop:"15px", alignItems: "left"}}>
               Datos personales
             </Typography>
             <Box
