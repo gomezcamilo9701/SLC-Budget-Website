@@ -1,0 +1,15 @@
+#root, body {
+    width: 1384px;
+    margin: 0;
+    background: linear-gradient(69deg, #060606 11.65%, #0D3231 66.81%, #0A0C0C 103.36%);
+}
+
+.drawer-custom{
+    background-color: black;
+    color: white;
+}
+
+.MuiDrawer-docked, .MuiDrawer-paper, .MuiDrawer-root{
+    background-color: black;
+    color: white;
+}

@@ -12,7 +12,7 @@ import { LoginService } from "../../services/login/LoginService";
 
 const theme = createTheme({
   typography: {
-    fontFamily: 'Roboto, sans-serif',
+    fontFamily: 'Nunito, Arial, sans-serif',
   },
 });
 
