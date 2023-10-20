@@ -34,6 +34,7 @@ function Copyright(props: any) {
       {'.'}
     </Typography>
   );
+};
 
 const drawerWidth: number = 240;
 
@@ -92,7 +93,7 @@ const theme = createTheme({
   },
 });
 
- function Home() {
+function Home() {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -185,7 +186,7 @@ const theme = createTheme({
                   <Chart />
                 </Paper>
               </Grid> */}
-              
+
               {/* Recent Deposits 
               <Grid item xs={12} md={4} lg={3}>
                 <Paper
