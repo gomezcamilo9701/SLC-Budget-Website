@@ -27,27 +27,28 @@ type UserToLogin = {
 };
 
 
-const LoginForm = ({ setToken }) => {
+const LoginForm: React.FC<{ setToken: (token: string) => void }> = ({ setToken }) => {
   const [alert, setAlert] = useState({
     type: "",
     message: "",
   });
   const {
-    register,
+    register, //Hook from useForm
     handleSubmit,
-    reset,
+    formState: { errors, isValid },
   } = useForm<UserToLogin>({ defaultValues });
 
   const onSubmit: SubmitHandler<UserToLogin> = async (data) => {
     const { email, password } = data;
     try {
+      console.log({data});
       const userCredentials = {
         email,
         password,
       };
       const response = await LoginService(userCredentials);
 
-      if (response.success) {
+      if (response.success && response.token !== undefined) {
         setToken(response.token);
       } else {
         setAlert({
@@ -80,7 +81,6 @@ const LoginForm = ({ setToken }) => {
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-
             }}
           >
             <img
@@ -90,13 +90,29 @@ const LoginForm = ({ setToken }) => {
                 width: "500px",
               }}
             />
-            <h1 style={{ color: "white", fontSize: "1.2rem", fontWeight: 100, textAlign: "center", lineHeight: "1.7", }}>Si aún no tienes una cuenta registrada </h1>
+            <h1
+              style={{
+                color: "white",
+                fontSize: "1.2rem",
+                fontWeight: 100,
+                textAlign: "center",
+                lineHeight: "1.7",
+              }}
+            >
+              Si aún no tienes una cuenta registrada{" "}
+            </h1>
             <Link to="/register">¡Regístrate aquí!</Link>
           </div>
         </Grid>
 
-
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1} square
+        <Grid
+          item
+          xs={12}
+          sm={8}
+          md={5}
+          component={Paper}
+          elevation={1}
+          square
           sx={{
             position: "absolute",
             top: 100,
@@ -104,7 +120,8 @@ const LoginForm = ({ setToken }) => {
             width: 450,
             borderRadius: "0.9375rem",
             background: "rgba(217, 217, 217, 0.10)",
-          }}>
+          }}
+        >
           <Box
             sx={{
               my: 10,
@@ -116,7 +133,6 @@ const LoginForm = ({ setToken }) => {
               gap: "15px",
             }}
           >
-
             <Typography component="h1" variant="h5" sx={{ color: "white" }}>
               Iniciar Sesión
             </Typography>
@@ -126,7 +142,7 @@ const LoginForm = ({ setToken }) => {
               onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 3 }}
             >
-              <Grid container spacing={2} >
+              <Grid container spacing={2}>
                 <Grid item xs={12}>
                   <TextField
                     className="text-field-custom"
@@ -136,6 +152,8 @@ const LoginForm = ({ setToken }) => {
                     label="Correo electrónico"
                     autoComplete="email"
                     {...register("email", { required: true, minLength: 4 })}
+                    error={Boolean(errors.email)}
+                    helperText={errors.email ? errors.email.message : ""}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -147,7 +165,9 @@ const LoginForm = ({ setToken }) => {
                     label="Contraseña"
                     type="password"
                     autoComplete="password"
-                  {...register("password", { required: true, minLength: 4 })}
+                    {...register("password", { required: true, minLength: 4 })}
+                    error={Boolean(errors.password)}
+                    helperText={errors.password ? errors.password.message : ""}
                   />
                 </Grid>
               </Grid>
@@ -161,23 +181,22 @@ const LoginForm = ({ setToken }) => {
                   mb: 2,
                   backgroundColor: "#000",
                   borderRadius: "10px",
-                  border: '2px solid',
-                  borderImage: 'linear-gradient(to right, #77EBEB, #9A40E0)',
+                  border: "2px solid",
+                  borderImage: "linear-gradient(to right, #77EBEB, #9A40E0)",
                   borderImageSlice: 1,
-                  borderImageSource: 'linear-gradient(to right, #77EBEB, #9A40E0)',
-                  padding: '10px',
+                  borderImageSource:
+                    "linear-gradient(to right, #77EBEB, #9A40E0)",
+                  padding: "10px",
                   boxShadow: "0px 4px 61px 0px rgba(77, 71, 195, 0.60)",
-                  '&:hover': {
-                    backgroundColor: "#211f42"
+                  "&:hover": {
+                    backgroundColor: "#211f42",
                   },
-
                 }}
-             /* disabled={!isValid}*/
+                disabled={!isValid}
               >
                 Iniciar Sesión
               </Button>
-              <Grid container justifyContent="flex-end">
-              </Grid>
+              <Grid container justifyContent="flex-end"></Grid>
               {alert.type === "success" && (
                 <Alert severity="success">{alert.message}</Alert>
               )}
@@ -188,7 +207,7 @@ const LoginForm = ({ setToken }) => {
           </Box>
         </Grid>
       </Grid>
-    </ThemeProvider >
+    </ThemeProvider>
   );
 };
 
