@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -6,8 +6,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { registerUser } from "../../services/register/RegisterService";
-import User from "../../models/user/User";
+import { registerUser } from '../../services/UserService';
+import { ProfileForEdit, User } from '../../types';
 
 
 const theme = createTheme({
@@ -16,21 +16,13 @@ const theme = createTheme({
   },
 });
 
-const defaultValues: Profile = {
+const defaultValues: ProfileForEdit = {
   email: "",
   name: "",
-  surname: "",
-  nickName: "",
+  lastName: "",
+  username: "",
   password: "",
 };
-
-interface Profile {
-  name: string;
-  surname: string;
-  nickName: string;
-  email: string;
-  password: string;
-}
 
 const ProfileForm = () => {
   const [alert, setAlert] = useState({
@@ -40,20 +32,21 @@ const ProfileForm = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     reset,
-  } = useForm<Profile>({ defaultValues });
+  } = useForm<ProfileForEdit>({ defaultValues });
 
-  const onSubmit: SubmitHandler<Profile> = async (data) => {
-    const { email, name, surname, nickName, password } = data;
+  const onSubmit: SubmitHandler<ProfileForEdit> = async (data) => {
+    const { email, name, lastName, username, password } = data;
     try {
       if (data) {
         const user: User = {
           email,
           name,
-          surname,
-          nickName,
+          lastName,
+          username,
           password,
+          roles: []
         };
         await registerUser(user);
         setAlert({
@@ -123,9 +116,9 @@ const ProfileForm = () => {
                     required
                     fullWidth
                     id="last_name"
-                    label="<surname.usuario>"
+                    label="<lastName.usuario>"
                     autoComplete="family-name"
-                    {...register("surname", { required: true, minLength: 4 })}
+                    {...register("lastName", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -145,10 +138,10 @@ const ProfileForm = () => {
                     className="text-field-custom"
                     required
                     fullWidth
-                    id="nickName"
-                    label="<nickName.usuario>"
-                    autoComplete="nickName"
-                    {...register("nickName", {
+                    id="username"
+                    label="<username.usuario>"
+                    autoComplete="username"
+                    {...register("username", {
                       required: true,
                       minLength: 3,
                     })}

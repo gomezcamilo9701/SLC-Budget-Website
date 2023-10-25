@@ -8,9 +8,9 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { registerUser } from "../../services/register/RegisterService";
-import User from "../../models/user/User";
-
+import { User } from "../../types";
+import { registerUser } from "../../services/UserService";
+import './Register.css'
 
 const theme = createTheme({
   typography: {
@@ -18,21 +18,15 @@ const theme = createTheme({
   },
 });
 
-const defaultValues: UserToRegister = {
+const defaultValues: User = {
   email: "",
   name: "",
-  surname: "",
-  nickName: "",
+  lastName: "",
+  username: "",
   password: "",
+  roles: []
 };
 
-type UserToRegister = {
-  email: string;
-  name: string;
-  surname: string;
-  nickName: string;
-  password: string;
-};
 
 const RegisterForm = () => {
   const [alert, setAlert] = useState({
@@ -44,18 +38,20 @@ const RegisterForm = () => {
     handleSubmit,
     formState: { errors, isValid },
     reset,
-  } = useForm<UserToRegister>({ defaultValues });
+  } = useForm<User>({ defaultValues });
 
-  const onSubmit: SubmitHandler<UserToRegister> = async (data) => {
-    const { email, name, surname, nickName, password } = data;
+  const onSubmit: SubmitHandler<User> = async (data) => {
+    const { email, name, lastName, username, password } = data;
+    const roles = ["USER"];
     try {
       if (data) {
         const user: User = {
           email,
           name,
-          surname,
-          nickName,
+          lastName,
+          username,
           password,
+          roles,
         };
         await registerUser(user);
         setAlert({
@@ -157,7 +153,7 @@ const RegisterForm = () => {
                     id="last_name"
                     label="Primer Apellido"
                     autoComplete="family-name"
-                    {...register("surname", { required: true, minLength: 4 })}
+                    {...register("lastName", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -176,10 +172,10 @@ const RegisterForm = () => {
                     className="text-field-custom"
                     required
                     fullWidth
-                    id="nickName"
+                    id="username"
                     label="Apodo"
-                    autoComplete="nickName"
-                    {...register("nickName", {
+                    autoComplete="username"
+                    {...register("username", {
                       required: true,
                       minLength: 3,
                     })}

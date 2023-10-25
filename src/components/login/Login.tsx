@@ -5,10 +5,13 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { LoginService } from "../../services/login/LoginService";
+import { loginUser } from "../../services/UserService";
+import { LoginUser } from "../../types";
+import './Login.css'
+
 
 const theme = createTheme({
   typography: {
@@ -16,18 +19,13 @@ const theme = createTheme({
   },
 });
 
-const defaultValues: UserToLogin = {
-  email: "",
+const defaultValues: LoginUser = {
+  username: "",
   password: "",
 };
 
-type UserToLogin = {
-  email: string;
-  password: string;
-};
-
-
-const LoginForm: React.FC<{ setToken: (token: string) => void }> = ({ setToken }) => {
+const LoginForm = () => {
+  const navigate = useNavigate();
   const [alert, setAlert] = useState({
     type: "",
     message: "",
@@ -35,26 +33,26 @@ const LoginForm: React.FC<{ setToken: (token: string) => void }> = ({ setToken }
   const {
     register, //Hook from useForm
     handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<UserToLogin>({ defaultValues });
+   /* formState: { errors, isValid },*/
+    reset,
+  } = useForm<LoginUser>({ defaultValues });
 
-  const onSubmit: SubmitHandler<UserToLogin> = async (data) => {
-    const { email, password } = data;
+  const onSubmit: SubmitHandler<LoginUser> = async (data) => {
+    const { username, password } = data;
     try {
-      console.log({data});
-      const userCredentials = {
-        email,
-        password,
-      };
-      const response = await LoginService(userCredentials);
-
-      if (response.success && response.token !== undefined) {
-        setToken(response.token);
-      } else {
+      if (data) {
+        const user: LoginUser = {
+          username,
+          password,
+        };
+        await loginUser(user);
         setAlert({
           type: "error",
           message: response.message,
         });
+        setTimeout(() => {
+          navigate('/home');
+        }, 2000);
       }
     } catch (e) {
       setAlert({
@@ -148,12 +146,10 @@ const LoginForm: React.FC<{ setToken: (token: string) => void }> = ({ setToken }
                     className="text-field-custom"
                     required
                     fullWidth
-                    id="email"
+                    id="username"
                     label="Correo electrónico"
-                    autoComplete="email"
-                    {...register("email", { required: true, minLength: 4 })}
-                    error={Boolean(errors.email)}
-                    helperText={errors.email ? errors.email.message : ""}
+                    autoComplete="username"
+                    {...register("username", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
