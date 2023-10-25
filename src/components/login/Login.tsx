@@ -20,7 +20,7 @@ const theme = createTheme({
 });
 
 const defaultValues: LoginUser = {
-  username: "",
+  email: "",
   password: "",
 };
 
@@ -38,11 +38,11 @@ const LoginForm = () => {
   } = useForm<LoginUser>({ defaultValues });
 
   const onSubmit: SubmitHandler<LoginUser> = async (data) => {
-    const { username, password } = data;
+    const { email, password } = data;
     try {
       if (data) {
         const user: LoginUser = {
-          username,
+          email,
           password,
         };
         await loginUser(user);
@@ -132,10 +132,10 @@ const LoginForm = () => {
                     className="text-field-custom"
                     required
                     fullWidth
-                    id="username"
+                    id="email"
                     label="Correo electrónico"
-                    autoComplete="username"
-                    {...register("username", { required: true, minLength: 4 })}
+                    autoComplete="email"
+                    {...register("email", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
