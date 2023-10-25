@@ -221,7 +221,7 @@ const RegisterForm = () => {
               </Button>
               <Grid container justifyContent="flex-end">
                 <Grid item>
-                  <Link to="/login">Regresar</Link>
+                  <Link to="/Login">Regresar</Link>
                 </Grid>
               </Grid>
               {alert.type === "success" && (
