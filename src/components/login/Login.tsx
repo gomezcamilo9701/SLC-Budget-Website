@@ -8,7 +8,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { loginUser } from "../../services/UserService";
+import { loginUser } from "../../services/user/UserService";
 import { LoginUser } from "../../types";
 import './Login.css'
 

@@ -1,5 +1,5 @@
-import CONSTANTS from "../constants";
-import { LoginUser, User } from "../types";
+import CONSTANTS from "../../constants";
+import { LoginUser, User } from "../../types";
 
 export const registerUser = async (user: User) => {
     try {

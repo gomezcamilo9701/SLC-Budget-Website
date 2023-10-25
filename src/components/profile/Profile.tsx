@@ -6,7 +6,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { registerUser } from '../../services/UserService';
+import { registerUser } from '../../services/user/UserService';
 import { ProfileForEdit, User } from '../../types';
 
 
