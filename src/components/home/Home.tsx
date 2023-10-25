@@ -21,6 +21,8 @@ import { mainListItems, secondaryListItems } from './listItems';
 import Chart from './Chart';
 import Deposits from './Deposits';
 import Orders from './Orders';
+import ProfileForm from '../profile/Profile';
+
 
 
 function Copyright(props: any) {
@@ -99,6 +101,7 @@ function Home() {
     setOpen(!open);
   };
 
+
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
@@ -170,8 +173,23 @@ function Home() {
           }}
         >
           <Toolbar />
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
+          <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
+            <Grid container spacing={3} >
+
+              {/* Profile */}
+              <Grid item xs={12} md={8} lg={9} sx={{}} >
+                <Paper
+                  sx={{
+                    p: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    width: '1150px',
+                  }}
+                >
+                  <ProfileForm />
+                </Paper>
+              </Grid>
 
               {/* Chart 
               <Grid item xs={12} md={8} lg={9}>
