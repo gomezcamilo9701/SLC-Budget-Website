@@ -5,11 +5,12 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { registerUser } from "../../services/register/RegisterService";
-import User from "../../models/user/User";
+import { loginUser } from "../../services/UserService";
+import { LoginUser } from "../../types";
+import './Login.css'
 
 
 const theme = createTheme({
@@ -18,23 +19,13 @@ const theme = createTheme({
   },
 });
 
-const defaultValues: UserToRegister = {
-  email: "",
-  name: "",
-  surname: "",
-  nickName: "",
+const defaultValues: LoginUser = {
+  username: "",
   password: "",
 };
 
-type UserToRegister = {
-  email: string;
-  name: string;
-  surname: string;
-  nickName: string;
-  password: string;
-};
-
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [alert, setAlert] = useState({
     type: "",
     message: "",
@@ -44,24 +35,24 @@ const LoginForm = () => {
     handleSubmit,
    /* formState: { errors, isValid },*/
     reset,
-  } = useForm<UserToRegister>({ defaultValues });
+  } = useForm<LoginUser>({ defaultValues });
 
-  const onSubmit: SubmitHandler<UserToRegister> = async (data) => {
-    const { email, name, surname, nickName, password } = data;
+  const onSubmit: SubmitHandler<LoginUser> = async (data) => {
+    const { username, password } = data;
     try {
       if (data) {
-        const user: User = {
-          email,
-          name,
-          surname,
-          nickName,
+        const user: LoginUser = {
+          username,
           password,
         };
-        await registerUser(user);
+        await loginUser(user);
         setAlert({
           type: "success",
           message: "Ingreso satisfactorio como usuario.",
         });
+        setTimeout(() => {
+          navigate('/home');
+        }, 2000);
       }
       reset();
     } catch (e) {
@@ -141,10 +132,10 @@ const LoginForm = () => {
                     className="text-field-custom"
                     required
                     fullWidth
-                    id="email"
+                    id="username"
                     label="Correo electrónico"
-                    autoComplete="email"
-                    {...register("email", { required: true, minLength: 4 })}
+                    autoComplete="username"
+                    {...register("username", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
