@@ -1,6 +1,12 @@
 # SLC-Budget-Website
 Frontend for SLC-Budget-WWW
-Pasos para correr Front:
 
-NPM INSTALL
-NPM RUN DEV
+## Running the Frontend
+
+Follow these steps to run the frontend:
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   npm run dev
