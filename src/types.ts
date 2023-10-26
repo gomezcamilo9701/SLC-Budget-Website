@@ -1,6 +1,6 @@
 //Type for Login form
 export type LoginUser = {
-  username: string;
+  email: string;
   password: string;
 }
 
