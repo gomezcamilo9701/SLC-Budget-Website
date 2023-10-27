@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import { User } from "../../types";
-import { registerUser } from "../../services/UserService";
+import { registerUser } from "../../services/user/UserService";
 import './Register.css'
 
 const theme = createTheme({
