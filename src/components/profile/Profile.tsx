@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import {  useState } from 'react';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -6,8 +6,9 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { registerUser } from '../../services/user/UserService';
+import { editUser } from '../../services/user/UserService';
 import { ProfileForEdit, User } from '../../types';
+//import { TokenService } from '../../services/user/TokenService';
 
 
 const theme = createTheme({
@@ -23,6 +24,25 @@ const defaultValues: ProfileForEdit = {
   username: "",
   password: "",
 };
+
+console.log(localStorage);
+
+// const getUserInfo =() =>{
+//   let info: string[];
+//   let infoResult: string;
+
+//   infoResult = this.tokenService.getUserInfo();
+//   if(infoResult != undefined && infoResult != null && infoResult != ''){
+//     info = infoResult.split('|');
+
+//     if(info != undefined && info != null && info.length > 0){
+//       this.id = info[0];
+//       this.name = info[1];
+//     } else {
+//       this.name = "";
+//     }
+//   }
+// }
 
 const ProfileForm = () => {
   const [alert, setAlert] = useState({
@@ -48,7 +68,7 @@ const ProfileForm = () => {
           password,
           roles: []
         };
-        await registerUser(user);
+        await editUser(user);
         setAlert({
           type: "success",
           message: "Registro satisfactorio como usuario.",
