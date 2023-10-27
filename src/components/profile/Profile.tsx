@@ -28,23 +28,6 @@ const defaultValues: User = {
 
 console.log(localStorage);
 
-// const getUserInfo =() =>{
-//   let info: string[];
-//   let infoResult: string;
-
-//   infoResult = this.tokenService.getUserInfo();
-//   if(infoResult != undefined && infoResult != null && infoResult != ''){
-//     info = infoResult.split('|');
-
-//     if(info != undefined && info != null && info.length > 0){
-//       this.id = info[0];
-//       this.name = info[1];
-//     } else {
-//       this.name = "";
-//     }
-//   }
-// }
-
 const ProfileForm = () => {
   const [alert, setAlert] = useState({
     type: "",
