@@ -74,22 +74,35 @@ export const editUser = async (editData: User) => {
   }
 }
 
-export const getUser = async (userData: User) => {
-  console.log({userData});
-  console.log(registerUser(userData));
-  try {
-    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_INFO}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(userData)
-    });
-    if(!res.ok){
-      throw new Error('GET request failed');
-    }
-  } catch(err) {
-    console.error('GET request errror',err);
-    throw err;
+export const getUser = async () => {
+  const token = TokenService.getToken();
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
   }
-}
+
+  try {
+    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.USER_INFO}`;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    const requestOptions = {
+      method: "GET",
+      headers: headers,
+    };
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error("GET request failed");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("GET request error:", error);
+    throw error;
+  }
+};

@@ -1,4 +1,4 @@
-import {  useState } from 'react';
+import {  useEffect, useState } from 'react';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -6,8 +6,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { editUser } from '../../services/user/UserService';
-import { ProfileForEdit, User } from '../../types';
+import { editUser, getUser } from '../../services/user/UserService';
+import {  User } from '../../types';
 //import { TokenService } from '../../services/user/TokenService';
 
 
@@ -17,12 +17,13 @@ const theme = createTheme({
   },
 });
 
-const defaultValues: ProfileForEdit = {
+const defaultValues: User = {
   email: "",
   name: "",
   lastName: "",
   username: "",
   password: "",
+  roles: []
 };
 
 console.log(localStorage);
@@ -54,9 +55,23 @@ const ProfileForm = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ProfileForEdit>({ defaultValues });
+  } = useForm<User>({ defaultValues });
 
-  const onSubmit: SubmitHandler<ProfileForEdit> = async (data) => {
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try{
+      const userData = await getUser();
+      reset(userData);
+    } catch (err) {
+      console.log('Error al obetener los datos del tukiUSer', err);
+    }
+  }
+
+  const onSubmit: SubmitHandler<User> = async (data) => {
+    console.log(getUser());
     const { email, name, lastName, username, password } = data;
     try {
       if (data) {
@@ -117,13 +132,14 @@ const ProfileForm = () => {
             >
               <Grid container spacing={2} >
                 <Grid item xs={12} sm={6} >
+                  <Typography variant="subtitle2">Nombre: </Typography>
                   <TextField
                     sx={{ color: "white" }}
                     className="text-field-custom"
                     autoComplete="given-name"
                     fullWidth
                     id="name"
-                    label="<name.usuario>"
+                    label=""
                     autoFocus
                     {...register("name", { required: true, minLength: 4 })}
                     error={Boolean(errors.name)}
@@ -131,35 +147,38 @@ const ProfileForm = () => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2">Apellido: </Typography>
                   <TextField
                     className="text-field-custom"
                     required
                     fullWidth
                     id="last_name"
-                    label="<lastName.usuario>"
+                    label=""
                     autoComplete="family-name"
                     {...register("lastName", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
+                <Typography variant="subtitle2">Correo: </Typography>
                   <TextField
                     className="text-field-custom"
                     required
                     fullWidth
                     id="email"
-                    label="<email.usuario>"
+                    label=""
                     autoComplete="email"
                     disabled
                     {...register("email", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
+                <Typography variant="subtitle2">Apodo: </Typography>
                   <TextField
                     className="text-field-custom"
                     required
                     fullWidth
                     id="username"
-                    label="<username.usuario>"
+                    label=""
                     autoComplete="username"
                     {...register("username", {
                       required: true,
