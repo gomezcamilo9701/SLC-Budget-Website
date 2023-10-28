@@ -1,18 +1,15 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-
-//import LoginForm from './components/login/Login';
-
-import RegisterForm from './components/register/Register';
-import './components/register/Register.css';
+import { Home, Login, Register } from './components';
 
 
 const App = () => {
   return (
     <Router>
       <Routes>
-        {/* <Route path="/" element={<LoginForm />} /> 
-        <Route path="/LoginForm" element={<LoginForm />} />  */}
-        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/" element={<Login />} /> 
+        <Route path="/login" element={<Login />} /> 
+        <Route path="/register" element={<Register />} />
+        <Route path="/home" element={<Home/>} />
       </Routes>
     </Router>
   );

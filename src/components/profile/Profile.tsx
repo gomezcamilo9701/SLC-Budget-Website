@@ -1,16 +1,14 @@
-import { useState } from "react";
-import CssBaseline from "@mui/material/CssBaseline";
+import {  useEffect, useState } from 'react';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
-import { loginUser } from "../../services/user/UserService";
-import { LoginUser } from "../../types";
-import './Login.css'
+import { editUser, getUser } from '../../services/user/UserService';
+import {  User } from '../../types';
+//import { TokenService } from '../../services/user/TokenService';
 
 
 const theme = createTheme({
@@ -19,13 +17,18 @@ const theme = createTheme({
   },
 });
 
-const defaultValues: LoginUser = {
+const defaultValues: User = {
   email: "",
+  name: "",
+  lastName: "",
+  username: "",
   password: "",
+  roles: []
 };
 
-const LoginForm = () => {
-  const navigate = useNavigate();
+console.log(localStorage);
+
+const ProfileForm = () => {
   const [alert, setAlert] = useState({
     type: "",
     message: "",
@@ -33,77 +36,61 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
-   /* formState: { errors, isValid },*/
+    formState: { errors },
     reset,
-  } = useForm<LoginUser>({ defaultValues });
+  } = useForm<User>({ defaultValues });
 
-  const onSubmit: SubmitHandler<LoginUser> = async (data) => {
-    const { email, password } = data;
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try{
+      const userData = await getUser();
+      reset(userData);
+    } catch (err) {
+      console.log('Error al obetener los datos del tukiUSer', err);
+    }
+  }
+
+  const onSubmit: SubmitHandler<User> = async (data) => {
+    console.log(getUser());
+    const { email, name, lastName, username, password } = data;
     try {
       if (data) {
-        const user: LoginUser = {
+        const user: User = {
           email,
+          name,
+          lastName,
+          username,
           password,
+          roles: []
         };
-        await loginUser(user);
+        await editUser(user);
         setAlert({
           type: "success",
-          message: "Ingreso satisfactorio como usuario.",
+          message: "Registro satisfactorio como usuario.",
         });
-        setTimeout(() => {
-          navigate('/home');
-        }, 2000);
       }
       reset();
     } catch (e) {
       setAlert({
         type: "error",
-        message: "Error en el Ingreso.",
+        message: "Error en el registro.",
       });
     }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: "100vh" }}>
-        <CssBaseline />
-        <Grid item xs={false} sm={4} md={7} sx={{ position: "relative" }}>
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-
-            }}
-          >
-            <img
-              src="src/assets/logo-slc.svg"
-              alt="SLC Logo"
-              style={{
-                width: "500px",
-              }}
-            />
-            <h1 style={{ color: "white", fontSize: "1.2rem", fontWeight: 100, textAlign: "center", lineHeight: "1.7", }}>Si aún no tienes una cuenta registrada </h1>
-            <Link to="/register">¡Regístrate aquí!</Link>
-          </div>
-        </Grid>
-
-
+      <Grid container component="main" sx={{ width:"100%", height: "70vh" }}>
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1} square
           sx={{
-            position: "absolute",
-            top: 100,
-            right: 150,
-            width: 450,
+            display: "flex",
             borderRadius: "0.9375rem",
             background: "rgba(217, 217, 217, 0.10)",
+            alignItems: "center",
+            margin: "auto",
           }}>
           <Box
             sx={{
@@ -117,8 +104,8 @@ const LoginForm = () => {
             }}
           >
 
-            <Typography component="h1" variant="h5" sx={{ color: "white" }}>
-              Iniciar Sesión
+            <Typography component="h1" variant="h5" sx={{ color: "black" }}>
+              Datos personales
             </Typography>
             <Box
               component="form"
@@ -127,30 +114,63 @@ const LoginForm = () => {
               sx={{ mt: 3 }}
             >
               <Grid container spacing={2} >
+                <Grid item xs={12} sm={6} >
+                  <Typography variant="subtitle2">Nombre: </Typography>
+                  <TextField
+                    sx={{ color: "white" }}
+                    className="text-field-custom"
+                    autoComplete="given-name"
+                    fullWidth
+                    id="name"
+                    label=""
+                    autoFocus
+                    {...register("name", { required: true, minLength: 4 })}
+                    error={Boolean(errors.name)}
+                    helperText={errors.name ? errors.name.message : ""}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                <Typography variant="subtitle2">Apellido: </Typography>
+                  <TextField
+                    className="text-field-custom"
+                    required
+                    fullWidth
+                    id="last_name"
+                    label=""
+                    autoComplete="family-name"
+                    {...register("lastName", { required: true, minLength: 4 })}
+                  />
+                </Grid>
                 <Grid item xs={12}>
+                <Typography variant="subtitle2">Correo: </Typography>
                   <TextField
                     className="text-field-custom"
                     required
                     fullWidth
                     id="email"
-                    label="Correo electrónico"
+                    label=""
                     autoComplete="email"
+                    disabled
                     {...register("email", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
+                <Typography variant="subtitle2">Apodo: </Typography>
                   <TextField
                     className="text-field-custom"
                     required
                     fullWidth
-                    id="password"
-                    label="Contraseña"
-                    type="password"
-                    autoComplete="password"
-                  {...register("password", { required: true, minLength: 4 })}
+                    id="username"
+                    label=""
+                    autoComplete="username"
+                    {...register("username", {
+                      required: true,
+                      minLength: 3,
+                    })}
                   />
                 </Grid>
               </Grid>
+
               <Button
                 className="button-custom"
                 type="submit"
@@ -172,12 +192,10 @@ const LoginForm = () => {
                   },
 
                 }}
-             /* disabled={!isValid}*/
+              ///  disabled={!isValid} 
               >
-                Iniciar Sesión
+                Guardar Cambios
               </Button>
-              <Grid container justifyContent="flex-end">
-              </Grid>
               {alert.type === "success" && (
                 <Alert severity="success">{alert.message}</Alert>
               )}
@@ -188,8 +206,8 @@ const LoginForm = () => {
           </Box>
         </Grid>
       </Grid>
-    </ThemeProvider >
+    </ThemeProvider>
   );
 };
 
-export default LoginForm;
+export default ProfileForm;
