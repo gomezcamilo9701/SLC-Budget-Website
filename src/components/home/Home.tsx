@@ -96,6 +96,7 @@ const theme = createTheme({
 });
 
 function Home() {
+  const email = localStorage.getItem('email');
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -187,7 +188,7 @@ function Home() {
                     width: '1150px',
                   }}
                 >
-                  <ProfileForm />
+                  <ProfileForm email={email ? email : ''}/>
                 </Paper>
               </Grid>
 

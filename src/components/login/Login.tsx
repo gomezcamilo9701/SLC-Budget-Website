@@ -12,7 +12,6 @@ import { loginUser } from "../../services/user/UserService";
 import { LoginUser } from "../../types";
 import './Login.css'
 
-
 const theme = createTheme({
   typography: {
     fontFamily: 'Nunito, Arial, sans-serif',
@@ -38,6 +37,7 @@ const LoginForm = () => {
   } = useForm<LoginUser>({ defaultValues });
 
   const onSubmit: SubmitHandler<LoginUser> = async (data) => {
+    
     const { email, password } = data;
     try {
       if (data) {
@@ -52,7 +52,7 @@ const LoginForm = () => {
         });
         setTimeout(() => {
           navigate('/home');
-        }, 2000);
+        }, 1000);
       }
       reset();
     } catch (e) {

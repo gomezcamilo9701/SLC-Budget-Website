@@ -5,7 +5,7 @@ export type LoginUser = {
 }
 
 //USER
-export type User = {
+export interface User {
   email: string;
   name: string;
   lastName: string;
@@ -13,13 +13,25 @@ export type User = {
   password: string;
   roles: string[];
   //phone_number: string;
-  //photo: string;
+}
+
+export interface UserToRegister {
+  email: string;
+  name: string;
+  lastName: string;
+  username: string;
+  password: string;
+  roles: string[];
+}
+
+export interface UserWithId extends User {
+  id: string;
+  profileImage: string;
 }
 
 export type ProfileForEdit = {
   name: string;
   lastName: string;
   username: string;
-  email: string;
   password: string;
 }
