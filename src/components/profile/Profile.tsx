@@ -11,6 +11,7 @@ import {  User } from '../../types';
 //import { TokenService } from '../../services/user/TokenService';
 
 
+
 const theme = createTheme({
   typography: {
     fontFamily: 'Nunito, Arial, sans-serif',
@@ -83,7 +84,7 @@ const ProfileForm = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ width:"100%", height: "70vh" }}>
+      <Grid container component="main" sx={{ width: "90%", height: "80vh" }}>
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1} square
           sx={{
             display: "flex",
@@ -103,8 +104,28 @@ const ProfileForm = () => {
               gap: "15px",
             }}
           >
+            <Grid sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}>
+              <Grid sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginLeft: "15px",
+              }}
+              >
+                <Typography sx={{ color: "black"}}>
+                  <b>Santiago Norrea</b>
+                </Typography>
+                <Typography sx={{ color: "gray"}}>
+                  <b>santiago.nor@gmail.com</b>
+                </Typography>
+              </Grid>
+            </Grid>
 
-            <Typography component="h1" variant="h5" sx={{ color: "black" }}>
+            <Typography sx={{ color: "black", marginTop:"15px", alignItems: "left"}}>
               Datos personales
             </Typography>
             <Box
