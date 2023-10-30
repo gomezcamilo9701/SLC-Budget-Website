@@ -1,31 +1,28 @@
-import {  useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useStyles } from './ProfileStyles';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
+import { theme } from '../materialUI-common';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert } from "@mui/material";
-import { Grid,
+import {
+  Grid,
   TextField,
   Button
 } from "@mui/material";
+import Divider from '@mui/material/Divider';
 import { editUser, getProfilePicture, getUser } from '../../services/user/UserService';
-import {  ProfileForEdit, /**User*/ UserWithId } from '../../types';
+import { ProfileForEdit, /**User*/ UserWithId } from '../../types';
 import { useUserActions } from "../../hooks/useUserActions";
 
-
-
-const theme = createTheme({
-  typography: {
-    fontFamily: 'Nunito, Arial, sans-serif',
-  },
-});
 
 interface ProfileFormProps {
   email: string
 }
 
-const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
+const ProfileForm: React.FC<ProfileFormProps> = ({ email }) => {
   const { updateUser } = useUserActions();
   const [profileImage, setProfileImage] = useState<string | null>('');
 
@@ -45,7 +42,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
   }, []);
 
   const fetchUserData = async () => {
-    try{
+    try {
       const userData: UserWithId = await getUser(email);
       reset(userData);
       console.log('user', userData);
@@ -81,64 +78,30 @@ const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
         updateUser(userForPersist);
         setAlert({
           type: "success",
-          message: "Registro satisfactorio como usuario.",
+          message: "Actualización satisfactoria de los datos.",
         });
       }
     } catch (e) {
       setAlert({
         type: "error",
-        message: "Error en el registro.",
+        message: "Error en la modificación de los datos.",
       });
     }
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ width: "90%", height: "80vh" }}>
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1} square
-          sx={{
-            display: "flex",
-            borderRadius: "0.9375rem",
-            background: "rgba(217, 217, 217, 0.10)",
-            alignItems: "center",
-            margin: "auto",
-          }}>
+      <Grid container component="main" sx={{ width: "sm", height: "md" }}>
+        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1}
+          sx={useStyles.paper}>
           <Box
-            sx={{
-              my: 10,
-              mx: 16,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              margin: "50px",
-              gap: "15px",
-            }}
+            sx={useStyles.boxPaper}
           >
-            <Grid sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}>
-              <Grid sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                marginLeft: "15px",
-              }}
-              >
-                <Typography sx={{ color: "black"}}>
-                  <b>Santiago Norrea</b>
-                </Typography>
-                <Typography sx={{ color: "gray"}}>
-                  <b>santiago.nor@gmail.com</b>
-                </Typography>
-              </Grid>
-            </Grid>
-
-            <Typography sx={{ color: "black", marginTop:"15px", alignItems: "left"}}>
+            <Typography variant='h4' sx={useStyles.bodyH2}>
               Datos personales
             </Typography>
-            <img src={profileImage ? profileImage : ''} style={{width: 100, height: 100, borderRadius: '50%'}} />
+            <Divider variant="middle" />
+            <img src={profileImage ? profileImage : ''} style={useStyles.profileImage} />
             <Box
               component="form"
               noValidate
@@ -149,10 +112,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
                 <Grid item xs={12} sm={6} >
                   <Typography variant="subtitle2">Nombre: </Typography>
                   <TextField
-                    sx={{ color: "white" }}
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     autoComplete="given-name"
                     fullWidth
+                    variant='standard'
                     id="name"
                     label=""
                     autoFocus
@@ -162,11 +125,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                <Typography variant="subtitle2">Apellido: </Typography>
+                  <Typography variant="subtitle2">Apellido: </Typography>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     required
                     fullWidth
+                    variant='standard'
                     id="last_name"
                     label=""
                     autoComplete="family-name"
@@ -174,11 +138,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                <Typography variant="subtitle2">Correo: </Typography>
+                  <Typography variant="subtitle2">Correo: </Typography>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textFieldEmail}
                     required
                     fullWidth
+                    variant='standard'
                     id="email"
                     label=""
                     autoComplete="email"
@@ -187,11 +152,12 @@ const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
                   />
                 </Grid>
                 <Grid item xs={12}>
-                <Typography variant="subtitle2">Apodo: </Typography>
+                  <Typography variant="subtitle2">Apodo: </Typography>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     required
                     fullWidth
+                    variant='standard'
                     id="username"
                     label=""
                     autoComplete="username"
@@ -203,43 +169,28 @@ const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
                 </Grid>
                 <Grid item xs={12}>
                   <Typography variant="subtitle2">Contraseña: </Typography>
-                    <TextField
-                      className="text-field-custom"
-                      required
-                      fullWidth
-                      type='password'
-                      id="password"
-                      label=""
-                      autoComplete="password"
-                      {...register("password", {
-                        required: true,
-                        minLength: 4,
-                      })}
-                    />
+                  <TextField
+                    sx={useStyles.textField}
+                    required
+                    fullWidth
+                    variant='standard'
+                    type='password'
+                    id="password"
+                    label=""
+                    autoComplete="password"
+                    {...register("password", {
+                      required: true,
+                      minLength: 4,
+                    })}
+                  />
                 </Grid>
               </Grid>
 
               <Button
-                className="button-custom"
                 type="submit"
                 fullWidth
                 variant="contained"
-                sx={{
-                  mt: 3,
-                  mb: 2,
-                  backgroundColor: "#000",
-                  borderRadius: "10px",
-                  border: '2px solid',
-                  borderImage: 'linear-gradient(to right, #77EBEB, #9A40E0)',
-                  borderImageSlice: 1,
-                  borderImageSource: 'linear-gradient(to right, #77EBEB, #9A40E0)',
-                  padding: '10px',
-                  boxShadow: "0px 4px 61px 0px rgba(77, 71, 195, 0.60)",
-                  '&:hover': {
-                    backgroundColor: "#211f42"
-                  },
-
-                }}
+                sx={useStyles.button}
               ///  disabled={!isValid} 
               >
                 Guardar Cambios
