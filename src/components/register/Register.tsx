@@ -1,23 +1,21 @@
 import { useState } from "react";
-import CssBaseline from "@mui/material/CssBaseline";
+import { useStyles } from './RegisterStyles';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { Alert } from "@mui/material";
+import { Alert, IconButton, InputAdornment } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Grid, TextField, Button } from "@mui/material";
 import { User, UserToRegister } from "../../types";
 import { registerUser } from "../../services/user/UserService";
-import './Register.css'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import { theme } from "../materialUI-common";
 
-const theme = createTheme({
-  typography: {
-    fontFamily: 'Nunito, Arial, sans-serif',
-  },
-});
+
 
 const defaultValues: User = {
   email: "",
@@ -84,60 +82,30 @@ const RegisterForm = () => {
     }
   };
 
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Función que cambia el valor de 'showPassword' al hacer clic en el icono
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: "100vh" }}>
-        <CssBaseline />
-        <Grid item xs={false} sm={4} md={7} sx={{ position: "relative" }}>
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-
-            }}
-          >
-            <img
-              src="src/assets/logo-slc.svg"
-              alt="SLC Logo"
-              style={{
-                width: "500px",
-              }}
-            />
-            <h1 style={{ color: "white", fontSize: "1.2rem", fontWeight: 100, textAlign: "center", lineHeight: "1.7", }}>Regístrate y lleva el control de tus gastos de eventos<br></br> con tus contactos de manera sencilla </h1>
-          </div>
+      <Grid container component="main" sx={useStyles.bodyContainer}>
+        <Grid item xs={12} sm={6} md={7} sx={useStyles.leftContent}>
+          <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
+          <Typography component="h1" variant="h2" sx={useStyles.bodyH2}>
+            ¡Regístrate y lleva el control de tus gastos de eventos<br></br> con tus contactos de manera sencilla!
+          </Typography>
         </Grid>
 
 
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1} square
-          sx={{
-            position: "absolute",
-            top: 100,
-            right: 150,
-            width: 450,
-            borderRadius: "0.9375rem",
-            background: "rgba(217, 217, 217, 0.10)",
-          }}>
+        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={8} sx={useStyles.paper}>
           <Box
-            sx={{
-              my: 10,
-              mx: 16,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              margin: "50px",
-              gap: "15px",
-            }}
+            sx={useStyles.boxPaper}
           >
 
-            <Typography component="h1" variant="h5" sx={{ color: "white" }}>
+            <Typography component="h2" variant="h5">
               ¡Regístrate!
             </Typography>
             <Box
@@ -146,13 +114,14 @@ const RegisterForm = () => {
               onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 3 }}
             >
-              <Grid container spacing={2} >
+              <Grid container xs={12} >
                 <Grid item xs={12} sm={6} >
                   <TextField
-                    sx={{ color: "white" }}
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     autoComplete="given-name"
                     fullWidth
+                    variant='filled'
+                    color="secondary"
                     id="name"
                     label="Primer Nombre"
                     autoFocus
@@ -163,9 +132,11 @@ const RegisterForm = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     required
                     fullWidth
+                    variant='filled'
+                    color="secondary"
                     id="last_name"
                     label="Primer Apellido"
                     autoComplete="family-name"
@@ -174,9 +145,11 @@ const RegisterForm = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     required
                     fullWidth
+                    variant='filled'
+                    color="secondary"
                     id="email"
                     label="Correo electrónico"
                     autoComplete="email"
@@ -185,9 +158,11 @@ const RegisterForm = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     required
                     fullWidth
+                    variant='filled'
+                    color="secondary"
                     id="username"
                     label="Apodo"
                     autoComplete="username"
@@ -199,14 +174,24 @@ const RegisterForm = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     required
                     fullWidth
+                    variant='filled'
+                    color="secondary"
                     id="password"
                     label="Contraseña"
-                    type="password"
-                    autoComplete="password"
-                  {...register("password", { required: true, minLength: 4 })}
+                    type={showPassword ? "text" : "password"}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleClickShowPassword} >
+                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    {...register("password", { required: true, minLength: 4 })}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -227,43 +212,28 @@ const RegisterForm = () => {
                     onChange={handleImageChange}
                   />
                 </Grid>
-              </Grid>
-              <Button
-                className="button-custom"
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 3,
-                  mb: 2,
-                  backgroundColor: "#000",
-                  borderRadius: "10px",
-                  border: '2px solid',
-                  borderImage: 'linear-gradient(to right, #77EBEB, #9A40E0)',
-                  borderImageSlice: 1,
-                  borderImageSource: 'linear-gradient(to right, #77EBEB, #9A40E0)',
-                  padding: '10px',
-                  boxShadow: "0px 4px 61px 0px rgba(77, 71, 195, 0.60)",
-                  '&:hover': {
-                    backgroundColor: "#211f42"
-                  },
-
-                }}
-              disabled={!isValid || (selectedFile == null)}
-              >
-                Crear Cuenta
-              </Button>
-              <Grid container justifyContent="flex-end">
-                <Grid item>
-                  <Link to="/Login">Regresar</Link>
+                <Button
+                  fullWidth
+                  type="submit"
+                  variant="contained"
+                  sx={useStyles.button}
+                  disabled={!isValid || (selectedFile == null)}
+                >
+                  Crear Cuenta
+                </Button>
+                <Grid container justifyContent="flex-end">
+                  <Grid item>
+                    <Link to="/Login">Regresar</Link>
+                  </Grid>
                 </Grid>
+
+                {alert.type === "success" && (
+                  <Alert severity="success">{alert.message}</Alert>
+                )}
+                {alert.type === "error" && (
+                  <Alert severity="error">{alert.message}</Alert>
+                )}
               </Grid>
-              {alert.type === "success" && (
-                <Alert severity="success">{alert.message}</Alert>
-              )}
-              {alert.type === "error" && (
-                <Alert severity="error">{alert.message}</Alert>
-              )}
             </Box>
           </Box>
         </Grid>
