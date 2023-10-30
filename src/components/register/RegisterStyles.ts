@@ -2,23 +2,33 @@ export const useStyles = {
 
     bodyContainer: {
         height: '100vh',
-        width: '100vw',
+        width: '95%',
         display: 'flex',
         justifyContent: "center",
         alignItems: "center",
-        background: "linear-gradient(69deg, #060606 11.65%, #0D3231 66.81%, #0A0C0C 103.36%)",
+        margin: "0",
+        padding: "0",
     },
-    rightContent: {
+    leftContent: {
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        padding: "20px",
     },
     logo: {
         padding: "18px",
-        width: "25rem",
+        width: "30rem",
+        minWidth: "300px",
     },
-    bodyH2: {
+    textContent: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        pb: "20px",
+    },
+    bodyH1: {
         color: "white",
         padding: "20px",
         fontSize: "1.2rem",
@@ -26,21 +36,31 @@ export const useStyles = {
         textAlign: "center",
         lineHeight: "1.7"
     },
-
+    bodyH2: {
+        color: "white",
+        padding: "5px",
+        fontSize: "1.2rem",
+        fontWeight: 100,
+        textAlign: "center",
+        lineHeight: "1.7"
+    },
 
     paper: {
-        height: "90%",
         display: "flex",
         borderRadius: "10px",
         background: "rgba(217, 217, 217, 0.10)",
+        justifyContent: "center",
+        alignItems: "center",  
+        padding: "40px",
      },
     boxPaper: {
         color: "white",
         display: "flex",
+        maxWidth: "380px",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        margin: "70px",
+        margin: "60px",
     },
     textField: {
         borderRadius: "10px",
