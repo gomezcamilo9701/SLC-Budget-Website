@@ -1,15 +1,17 @@
 import CONSTANTS from "../../constants";
-import { LoginUser, User } from "../../types";
+import { LoginUser, ProfileForEdit, UserToRegister } from "../../types";
 import { TokenService } from "./TokenService";
 
-export const registerUser = async (user: User) => {
+export const registerUser = async (user: UserToRegister, profileImage: File) => {
     try {
+        // Cree un objeto FormData para enviar los datos del usuario y la imagen
+        const formData = new FormData();
+        formData.append('createUserDTO', new Blob([JSON.stringify(user)], { type: 'application/json' }));
+        formData.append('profileImage', profileImage);
+
         const repoonse = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_REGISTER}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user)
+            body: formData,
         });
 
         if (!repoonse.ok) {
@@ -42,6 +44,7 @@ export const loginUser = async (loginData: LoginUser) => {
           }
           if(data.token){
             TokenService.saveToken(data.token);
+            localStorage.setItem('email', data.Username);
             console.log('Token almacenado en localStorage:', data.token);
           } else {
             console.error('No se encontró un token en la respuesta JSON.');
@@ -54,14 +57,22 @@ export const loginUser = async (loginData: LoginUser) => {
       }
   };
 
-export const editUser = async (editData: User) => {
-  console.log({editData});
-  console.log(registerUser(editData));
+export const editUser = async (editData: ProfileForEdit, id: string) => {
+  console.log('data', editData);
+  const token = TokenService.getToken();
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+
+  console.log('id', id);
+  console.log('id', typeof id);
   try {
-    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_EDIT}`, {
+    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_EDIT}/${id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
     },
     body: JSON.stringify(editData)
     });
@@ -74,7 +85,7 @@ export const editUser = async (editData: User) => {
   }
 }
 
-export const getUser = async () => {
+export const getUser = async (email: string) => {
   const token = TokenService.getToken();
   if (!token) {
     console.error("No se encontró un token de autenticación");
@@ -82,7 +93,7 @@ export const getUser = async () => {
   }
 
   try {
-    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.USER_INFO}`;
+    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.USER_INFO}/${email}`;
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -101,6 +112,45 @@ export const getUser = async () => {
 
     const data = await response.json();
     return data;
+  } catch (error) {
+    console.error("GET request error:", error);
+    throw error;
+  }
+};
+
+export const getProfilePicture = async (pictureName: string) => {
+  const token = TokenService.getToken();
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+
+  try {
+    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${pictureName}`;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const requestOptions = {
+      method: "GET",
+      headers: headers,
+    };
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error("GET request failed");
+    }
+
+    const blobData = await response.blob(); // Receive the image as a Blob
+
+    if (blobData instanceof Blob) {
+      const imageUrl = URL.createObjectURL(blobData); // Convert Blob to a URL
+      return imageUrl;
+    } else {
+      console.error("Invalid response format");
+      return null;
+    }
   } catch (error) {
     console.error("GET request error:", error);
     throw error;

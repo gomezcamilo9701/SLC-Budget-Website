@@ -37,6 +37,7 @@ const LoginForm = () => {
   } = useForm<LoginUser>({ defaultValues });
 
   const onSubmit: SubmitHandler<LoginUser> = async (data) => {
+    
     const { email, password } = data;
     try {
       if (data) {
@@ -51,7 +52,7 @@ const LoginForm = () => {
         });
         setTimeout(() => {
           navigate('/home');
-        }, 2000);
+        }, 1000);
       }
       reset();
     } catch (e) {

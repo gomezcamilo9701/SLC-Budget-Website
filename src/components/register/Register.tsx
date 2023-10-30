@@ -10,10 +10,10 @@ import { Alert, IconButton, InputAdornment } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Grid, TextField, Button } from "@mui/material";
-import { User } from "../../types";
+import { User, UserToRegister } from "../../types";
 import { registerUser } from "../../services/user/UserService";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { theme } from "../materialUI-common";
-
 
 
 
@@ -23,11 +23,12 @@ const defaultValues: User = {
   lastName: "",
   username: "",
   password: "",
-  roles: []
+  roles: [],
 };
 
-
 const RegisterForm = () => {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   const [alert, setAlert] = useState({
     type: "",
     message: "",
@@ -39,12 +40,22 @@ const RegisterForm = () => {
     reset,
   } = useForm<User>({ defaultValues });
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    } else {
+      setSelectedFile(null);
+    }
+  };
+
+
   const onSubmit: SubmitHandler<User> = async (data) => {
     const { email, name, lastName, username, password } = data;
     const roles = ["USER"];
     try {
       if (data) {
-        const user: User = {
+        const user: UserToRegister = {
           email,
           name,
           lastName,
@@ -52,7 +63,11 @@ const RegisterForm = () => {
           password,
           roles,
         };
-        await registerUser(user);
+        if (selectedFile) {
+          await registerUser(user, selectedFile);
+        } else {
+          console.error('No seleccionó imagen')
+        }
         setAlert({
           type: "success",
           message: "Registro satisfactorio como usuario.",
@@ -179,14 +194,30 @@ const RegisterForm = () => {
                     {...register("password", { required: true, minLength: 4 })}
                   />
                 </Grid>
-
-
+                <Grid item xs={12}>
+                  <label htmlFor="image-upload">
+                    <Button
+                      component="span"
+                      variant="contained"
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      {selectedFile ? selectedFile?.name : "Subir Imagen de Perfil"}
+                    </Button>
+                  </label>
+                  <input
+                    type="file"
+                    id="image-upload"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={handleImageChange}
+                  />
+                </Grid>
                 <Button
                   fullWidth
                   type="submit"
                   variant="contained"
                   sx={useStyles.button}
-                  disabled={!isValid}
+                  disabled={!isValid || (selectedFile == null)}
                 >
                   Crear Cuenta
                 </Button>

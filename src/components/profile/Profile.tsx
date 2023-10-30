@@ -5,10 +5,13 @@ import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert } from "@mui/material";
-import { Grid, TextField, Button } from "@mui/material";
-import { editUser, getUser } from '../../services/user/UserService';
-import {  User } from '../../types';
-//import { TokenService } from '../../services/user/TokenService';
+import { Grid,
+  TextField,
+  Button
+} from "@mui/material";
+import { editUser, getProfilePicture, getUser } from '../../services/user/UserService';
+import {  ProfileForEdit, /**User*/ UserWithId } from '../../types';
+import { useUserActions } from "../../hooks/useUserActions";
 
 
 
@@ -18,18 +21,14 @@ const theme = createTheme({
   },
 });
 
-const defaultValues: User = {
-  email: "",
-  name: "",
-  lastName: "",
-  username: "",
-  password: "",
-  roles: []
-};
+interface ProfileFormProps {
+  email: string
+}
 
-console.log(localStorage);
+const ProfileForm: React.FC<ProfileFormProps> = ({email}) => {
+  const { updateUser } = useUserActions();
+  const [profileImage, setProfileImage] = useState<string | null>('');
 
-const ProfileForm = () => {
   const [alert, setAlert] = useState({
     type: "",
     message: "",
@@ -39,7 +38,7 @@ const ProfileForm = () => {
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<User>({ defaultValues });
+  } = useForm<UserWithId>();
 
   useEffect(() => {
     fetchUserData();
@@ -47,33 +46,44 @@ const ProfileForm = () => {
 
   const fetchUserData = async () => {
     try{
-      const userData = await getUser();
+      const userData: UserWithId = await getUser(email);
       reset(userData);
+      console.log('user', userData);
+      const picture = await getProfilePicture(userData.profileImage)
+      console.log('pic', typeof picture);
+      setProfileImage(picture);
     } catch (err) {
-      console.log('Error al obetener los datos del tukiUSer', err);
+      console.log('Error al obetener los datos del servidor', err);
     }
   }
 
-  const onSubmit: SubmitHandler<User> = async (data) => {
-    console.log(getUser());
-    const { email, name, lastName, username, password } = data;
+  const onSubmit: SubmitHandler<UserWithId> = async (data) => {
+    const { id, name, lastName, username, password, email, roles } = data;
     try {
       if (data) {
-        const user: User = {
+        const userToEdit: ProfileForEdit = {
+          name,
+          lastName,
+          username,
+          password,
+        };
+        const userForPersist: UserWithId = {
+          id,
           email,
           name,
           lastName,
           username,
           password,
-          roles: []
-        };
-        await editUser(user);
+          roles,
+          profileImage: ''
+        }
+        await editUser(userToEdit, id);
+        updateUser(userForPersist);
         setAlert({
           type: "success",
           message: "Registro satisfactorio como usuario.",
         });
       }
-      reset();
     } catch (e) {
       setAlert({
         type: "error",
@@ -128,6 +138,7 @@ const ProfileForm = () => {
             <Typography sx={{ color: "black", marginTop:"15px", alignItems: "left"}}>
               Datos personales
             </Typography>
+            <img src={profileImage ? profileImage : ''} style={{width: 100, height: 100, borderRadius: '50%'}} />
             <Box
               component="form"
               noValidate
@@ -189,6 +200,22 @@ const ProfileForm = () => {
                       minLength: 3,
                     })}
                   />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2">Contraseña: </Typography>
+                    <TextField
+                      className="text-field-custom"
+                      required
+                      fullWidth
+                      type='password'
+                      id="password"
+                      label=""
+                      autoComplete="password"
+                      {...register("password", {
+                        required: true,
+                        minLength: 4,
+                      })}
+                    />
                 </Grid>
               </Grid>
 
