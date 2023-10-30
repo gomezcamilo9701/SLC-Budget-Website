@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { theme } from '../materialUI-common';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
@@ -11,40 +12,41 @@ import LayersIcon from '@mui/icons-material/Layers';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 
 export const mainListItems = (
+  
   <React.Fragment>
-    <ListItemButton>
+    <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}>
       <ListItemIcon>
-        <DashboardIcon />
+        <DashboardIcon sx={{color: theme.palette.primary.light}}/>
       </ListItemIcon>
       <ListItemText primary="Inicio" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}>
       <ListItemIcon>
-        <ShoppingCartIcon />
+        <ShoppingCartIcon sx={{color: theme.palette.primary.light}}/>
       </ListItemIcon>
       <ListItemText primary="Mi Perfil" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}>
       <ListItemIcon>
-        <PeopleIcon />
+        <PeopleIcon sx={{color: theme.palette.primary.light}}/>
       </ListItemIcon>
       <ListItemText primary="Contactos" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}>
       <ListItemIcon>
-        <BarChartIcon />
+        <BarChartIcon sx={{color: theme.palette.primary.light}}/>
       </ListItemIcon>
       <ListItemText primary="Eventos" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}>
       <ListItemIcon>
-        <LayersIcon />
+        <LayersIcon sx={{color: theme.palette.primary.light}}/>
       </ListItemIcon>
       <ListItemText primary="Actividades" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}>
       <ListItemIcon>
-        <LayersIcon />
+        <LayersIcon sx={{color: theme.palette.primary.light}}/>
       </ListItemIcon>
       <ListItemText primary="Saldos" />
     </ListItemButton>
@@ -56,15 +58,15 @@ export const secondaryListItems = (
     <ListSubheader component="div" inset>
       Eventos recientes
     </ListSubheader>
-    <ListItemButton>
+    <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.secondary.main}}}>
       <ListItemIcon>
-        <AssignmentIcon />
+        <AssignmentIcon sx={{color: theme.palette.primary.light}}/>
       </ListItemIcon>
       <ListItemText primary="Mes actual" />
     </ListItemButton>
-    <ListItemButton>
+    <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.secondary.main}}}>
       <ListItemIcon>
-        <AssignmentIcon />
+        <AssignmentIcon sx={{color: theme.palette.primary.light}}/>
       </ListItemIcon>
       <ListItemText primary="Último trimestre" />
     </ListItemButton>

@@ -1,5 +1,7 @@
 import * as React from 'react';
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
+import { styled, ThemeProvider } from '@mui/material/styles';
+import { theme } from '../materialUI-common';
+import { useStyles } from './HomeStyles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
@@ -22,6 +24,8 @@ import { mainListItems, secondaryListItems } from './listItems';
 // import Deposits from './Deposits';
 // import Orders from './Orders';
 import ProfileForm from '../profile/Profile';
+import Button from '@mui/material/Button';
+import { Stack } from '@mui/material';
 
 
 
@@ -68,6 +72,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
       position: 'relative',
       whiteSpace: 'nowrap',
       width: drawerWidth,
+      backgroundColor: theme.palette.primary.dark,
       transition: theme.transitions.create('width', {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
@@ -88,12 +93,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-// TODO remove, this demo shouldn't need to reset the theme.
-const theme = createTheme({
-  typography: {
-    fontFamily: 'Nunito, Arial, sans-serif',
-  },
-});
 
 function Home() {
   const email = localStorage.getItem('email');
@@ -107,10 +106,11 @@ function Home() {
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar position="absolute" open={open}>
+        <AppBar position="absolute" sx={{ color: theme.palette.primary.light, backgroundColor: theme.palette.secondary.dark }} open={open}>
           <Toolbar
             sx={{
               pr: '24px', // keep right padding when drawer closed
+
             }}
           >
             <IconButton
@@ -134,61 +134,52 @@ function Home() {
             >
               Página de Inicio
             </Typography>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
+            <Stack direction="row" spacing={3}>
+              <IconButton color="inherit">
+                <Badge badgeContent={4} color="secondary">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <Button variant='outlined'>
+                Cerrar sesión
+              </Button>
+            </Stack>
           </Toolbar>
         </AppBar>
+
         <Drawer variant="permanent" open={open}>
-          <Toolbar
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              px: [1],
-            }}
-          >
-            <IconButton onClick={toggleDrawer}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </Toolbar>
-          <Divider />
-          <List component="nav">
-            {mainListItems}
-            <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
-          </List>
+          <Box sx={useStyles.boxDrawer}>
+            <Toolbar
+              sx={useStyles.toolbarDrawer}
+            >
+              <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
+              <IconButton onClick={toggleDrawer} sx={{ color: "#FFF" }}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </Toolbar>
+            <Divider />
+            <List component="nav">
+              {mainListItems}
+              <Divider sx={{ my: 1 }} />
+              {secondaryListItems}
+            </List>
+          </Box>
         </Drawer>
+
         <Box
           component="main"
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-          }}
+          sx={useStyles.boxMain}
         >
           <Toolbar />
-          <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3} >
+          <Container maxWidth="xl" sx={{ mt: 4, mb: 4, }}>
+            <Grid item >
 
               {/* Profile */}
-              <Grid item xs={12} md={8} lg={9} sx={{}} >
+              <Grid item xs={12} md={8} lg={9} >
                 <Paper
-                  sx={{
-                    p: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    width: '1150px',
-                  }}
+                  sx={useStyles.paper}
                 >
-                  <ProfileForm email={email ? email : ''}/>
+                  <ProfileForm email={email ? email : ''} />
                 </Paper>
               </Grid>
 
@@ -227,7 +218,7 @@ function Home() {
                 </Paper>
               </Grid> */}
             </Grid>
-            <Copyright sx={{ pt: 4 }} />
+            <Copyright sx={{ pt: 4, color: "white" }} />
           </Container>
         </Box>
       </Box>
