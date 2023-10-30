@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useStyles } from './RegisterStyles';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -12,7 +13,7 @@ import { Grid, TextField, Button } from "@mui/material";
 import { User } from "../../types";
 import { registerUser } from "../../services/user/UserService";
 import { theme } from "../materialUI-common";
-import { useStyles } from './RegisterStyles';
+
 
 
 
@@ -76,20 +77,10 @@ const RegisterForm = () => {
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={useStyles.bodyContainer}>
-        <Grid
-          item
-          xs={false}
-          sm={4}
-          md={7}
-          sx={useStyles.rightContent}
-        >
-          <img
-            src="src/assets/logo-slc.svg"
-            alt="SLC Logo"
-            style={useStyles.logo}
-          />
-          <Typography component="h2" variant="h2" sx={useStyles.bodyH2}>
-            Regístrate y lleva el control de tus gastos de eventos<br></br> con tus contactos de manera sencilla
+        <Grid item xs={12} sm={6} md={7} sx={useStyles.leftContent}>
+          <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
+          <Typography component="h1" variant="h2" sx={useStyles.bodyH2}>
+            ¡Regístrate y lleva el control de tus gastos de eventos<br></br> con tus contactos de manera sencilla!
           </Typography>
         </Grid>
 
@@ -99,7 +90,7 @@ const RegisterForm = () => {
             sx={useStyles.boxPaper}
           >
 
-            <Typography component="h1" variant="h5">
+            <Typography component="h2" variant="h5">
               ¡Regístrate!
             </Typography>
             <Box

@@ -1,13 +1,4 @@
 #root, body {
-    width: 1384px;
-    margin: 0;
     background: linear-gradient(69deg, #060606 11.65%, #0D3231 66.81%, #0A0C0C 103.36%);
-  }
-
-  .text-field-custom{
-    background-color: aliceblue;
-    color: #8e8adb;
-    border: 2px solid #8e8adb;
-    border-radius: 8px;
-    
-  }
+  } 
+  /*necesito este css, ya que sin él el background se deja de cargar, aiuda :(*/
