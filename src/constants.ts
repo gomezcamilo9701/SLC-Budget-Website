@@ -4,7 +4,8 @@ const CONSTANTS = {
     USER_LOGIN: '/login',
     USER_EDIT: '/user/update',
     USER_INFO: '/user/email',
-    PROFILE_PICTURE: '/media'
+    PROFILE_PICTURE: '/media',
+    ADD_CONTACT: '/user/users',
   };
   
   export default CONSTANTS;
