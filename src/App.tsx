@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Home, Login, Register } from './components';
+import { Contacts, Home, Login, Register } from './components';
 
 const App = () => {
   return (
@@ -9,6 +9,7 @@ const App = () => {
         <Route path="/login" element={<Login />} /> 
         <Route path="/register" element={<Register />} />
         <Route path="/home" element={<Home/>} />
+        <Route path="/contacts" element={<Contacts/>} />
       </Routes>
     </Router>
   );
