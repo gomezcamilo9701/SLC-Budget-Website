@@ -95,7 +95,6 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 
 function Home() {
-  const email = localStorage.getItem('email');
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -179,7 +178,7 @@ function Home() {
                 <Paper
                   sx={useStyles.paper}
                 >
-                  <ProfileForm email={email ? email : ''} />
+                  <ProfileForm />
                 </Paper>
               </Grid>
 

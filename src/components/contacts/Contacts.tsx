@@ -7,7 +7,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { TContactState, IUserWithId } from '../../types';
 import { getContactsByUserId, getUserByEmail } from '../../services/user/UserService';
 import CONSTANTS from '../../constants';
-import LoadingScreen from '../splash_screen/LoadingScreen';
+import LoadingScreen from '../loading_screen/LoadingScreen';
 import CloseIcon from '@mui/icons-material/Close';
 
 function Contacts () {
