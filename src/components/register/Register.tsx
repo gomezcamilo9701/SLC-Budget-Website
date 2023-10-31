@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { Alert, IconButton, InputAdornment } from "@mui/material";
+import { Alert, IconButton, InputAdornment, Stack } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Grid, TextField, Button } from "@mui/material";
@@ -118,104 +118,109 @@ const RegisterForm = () => {
               onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 3 }}
             >
+
               <Grid container xs={12} >
-                <Grid item xs={12} sm={6} >
-                  <TextField
-                    sx={useStyles.textField}
-                    autoComplete="given-name"
-                    fullWidth
-                    variant='filled'
-                    color="secondary"
-                    id="name"
-                    label="Primer Nombre"
-                    autoFocus
-                    {...register("name", { required: true, minLength: 4 })}
-                    error={Boolean(errors.name)}
-                    helperText={errors.name ? errors.name.message : ""}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    sx={useStyles.textField}
-                    required
-                    fullWidth
-                    variant='filled'
-                    color="secondary"
-                    id="last_name"
-                    label="Primer Apellido"
-                    autoComplete="family-name"
-                    {...register("lastName", { required: true, minLength: 4 })}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    sx={useStyles.textField}
-                    required
-                    fullWidth
-                    variant='filled'
-                    color="secondary"
-                    id="email"
-                    label="Correo electrónico"
-                    autoComplete="email"
-                    {...register("email", { required: true, minLength: 4 })}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    sx={useStyles.textField}
-                    required
-                    fullWidth
-                    variant='filled'
-                    color="secondary"
-                    id="username"
-                    label="Apodo"
-                    autoComplete="username"
-                    {...register("username", {
-                      required: true,
-                      minLength: 3,
-                    })}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    sx={useStyles.textField}
-                    required
-                    fullWidth
-                    variant='filled'
-                    color="secondary"
-                    id="password"
-                    label="Contraseña"
-                    type={showPassword ? "text" : "password"}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={handleClickShowPassword} >
-                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                    {...register("password", { required: true, minLength: 4 })}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <label htmlFor="image-upload">
-                    <Button
-                      component="span"
-                      variant="contained"
-                      startIcon={<CloudUploadIcon />}
-                    >
-                      {selectedFile ? selectedFile?.name : "Subir Imagen de Perfil"}
-                    </Button>
-                  </label>
-                  <input
-                    type="file"
-                    id="image-upload"
-                    accept="image/*"
-                    style={{ display: 'none' }}
-                    onChange={handleImageChange}
-                  />
-                </Grid>
+                <Stack spacing={1}>
+                  <Stack direction="row" spacing={1}>
+                    <Grid item xs={12} sm={6} >
+                      <TextField
+                        sx={useStyles.textField}
+                        autoComplete="given-name"
+                        fullWidth
+                        variant='filled'
+                        color="secondary"
+                        id="name"
+                        label="Primer Nombre"
+                        autoFocus
+                        {...register("name", { required: true, minLength: 4 })}
+                        error={Boolean(errors.name)}
+                        helperText={errors.name ? errors.name.message : ""}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        sx={useStyles.textField}
+                        required
+                        fullWidth
+                        variant='filled'
+                        color="secondary"
+                        id="last_name"
+                        label="Primer Apellido"
+                        autoComplete="family-name"
+                        {...register("lastName", { required: true, minLength: 4 })}
+                      />
+                    </Grid>
+                  </Stack>
+                  <Grid item xs={12}>
+                    <TextField
+                      sx={useStyles.textField}
+                      required
+                      fullWidth
+                      variant='filled'
+                      color="secondary"
+                      id="email"
+                      label="Correo electrónico"
+                      autoComplete="email"
+                      {...register("email", { required: true, minLength: 4 })}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      sx={useStyles.textField}
+                      required
+                      fullWidth
+                      variant='filled'
+                      color="secondary"
+                      id="username"
+                      label="Apodo"
+                      autoComplete="username"
+                      {...register("username", {
+                        required: true,
+                        minLength: 3,
+                      })}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      sx={useStyles.textField}
+                      required
+                      fullWidth
+                      variant='filled'
+                      color="secondary"
+                      id="password"
+                      label="Contraseña"
+                      type={showPassword ? "text" : "password"}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton onClick={handleClickShowPassword} >
+                              {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                      {...register("password", { required: true, minLength: 4 })}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <label htmlFor="image-upload">
+                      <Button
+                        component="span"
+                        variant="contained"
+                        startIcon={<CloudUploadIcon />}
+                      >
+                        {selectedFile ? selectedFile?.name : "Subir Imagen de Perfil"}
+                      </Button>
+                    </label>
+                    <input
+                      type="file"
+                      id="image-upload"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={handleImageChange}
+                    />
+                  </Grid>
+                </Stack>
                 <Button
                   fullWidth
                   type="submit"

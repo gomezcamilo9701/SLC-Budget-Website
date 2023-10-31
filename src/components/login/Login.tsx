@@ -8,7 +8,7 @@ import { theme } from "../materialUI-common";
 import InputAdornment from "@mui/material/InputAdornment";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import { IconButton } from "@mui/material";
+import { IconButton, Stack } from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "@mui/material";
@@ -70,7 +70,7 @@ const LoginForm = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={useStyles.bodyContainer}>
+      <Grid container component="main"  sx={useStyles.bodyContainer}>
         <Grid item xs={12} sm={6} md={7} sx={useStyles.leftContent}>
           <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
           <Typography component="h2" variant="h2" sx={useStyles.bodyH2}>
@@ -80,10 +80,10 @@ const LoginForm = () => {
         </Grid>
 
 
-        <Grid item xs={12} sm={10} md={5} component={Paper} elevation={8} sx={useStyles.paper}>
+        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={8} sx={useStyles.paper}>
           <Box sx={useStyles.boxPaper}>
 
-            <Typography component="h1" variant="h5" sx={{ color: "white" }}>
+            <Typography component="h2" variant="h5">
               Iniciar Sesión
             </Typography>
             <Box
@@ -92,7 +92,8 @@ const LoginForm = () => {
               onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 3 }}
             >
-              <Grid container >
+              <Grid container xs={12}>
+                <Stack spacing={2}>
                 <Grid item xs={12}>
                   <TextField
                     sx={useStyles.textField}
@@ -129,6 +130,7 @@ const LoginForm = () => {
                     {...register("password", { required: true, minLength: 4 })}
                   />
                 </Grid>
+                </Stack>
               </Grid>
               <Button fullWidth type="submit" variant="contained" sx={useStyles.button}>
                 Iniciar Sesión

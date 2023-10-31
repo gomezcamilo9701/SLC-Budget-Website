@@ -56,17 +56,16 @@ export const useStyles = {
     boxPaper: {
         color: "white",
         display: "flex",
-        maxWidth: "380px",
+        maxWidth: "420px",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        margin: "60px",
+        margin: "40px",
     },
     textField: {
         borderRadius: "10px",
         border: "1px solid #8e8adb",
         background: "white ",
-        margin: "6px",
     },
     button: {
         mt: 5,
