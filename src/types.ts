@@ -1,21 +1,11 @@
 //Type for Login form
-export type LoginUser = {
+export type TLoginUser = {
   email: string;
   password: string;
 }
 
 //USER
-export interface User {
-  email: string;
-  name: string;
-  lastName: string;
-  username: string;
-  password: string;
-  roles: string[];
-  //phone_number: string;
-}
-
-export interface UserToRegister {
+export interface IUser {
   email: string;
   name: string;
   lastName: string;
@@ -24,14 +14,22 @@ export interface UserToRegister {
   roles: string[];
 }
 
-export interface UserWithId extends User {
+export interface IUserWithId extends IUser {
   id: string;
   profileImage: string;
 }
 
-export type ProfileForEdit = {
+export type TProfileForEdit = {
   name: string;
   lastName: string;
   username: string;
   password: string;
+}
+
+//Componente Contacts
+export type TContactState = {
+  loading: boolean;
+  email: string;
+  contactInfo: IUserWithId | null;
+  modalOpen: boolean;
 }

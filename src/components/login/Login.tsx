@@ -14,11 +14,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import { loginUser } from "../../services/user/UserService";
-import { LoginUser } from "../../types";
+import { TLoginUser } from "../../types";
 import "../login/Login.css"
 
 
-const defaultValues: LoginUser = {
+const defaultValues: TLoginUser = {
   email: "",
   password: "",
 };
@@ -34,14 +34,14 @@ const LoginForm = () => {
     handleSubmit,
     /* formState: { errors, isValid },*/
     reset,
-  } = useForm<LoginUser>({ defaultValues });
+  } = useForm<TLoginUser>({ defaultValues });
 
-  const onSubmit: SubmitHandler<LoginUser> = async (data) => {
+  const onSubmit: SubmitHandler<TLoginUser> = async (data) => {
     
     const { email, password } = data;
     try {
       if (data) {
-        const user: LoginUser = {
+        const user: TLoginUser = {
           email,
           password,
         };

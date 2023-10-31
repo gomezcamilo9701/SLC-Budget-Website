@@ -10,14 +10,14 @@ import { Alert, IconButton, InputAdornment, Stack } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Grid, TextField, Button } from "@mui/material";
-import { User, UserToRegister } from "../../types";
+import { IUser } from "../../types";
 import { registerUser } from "../../services/user/UserService";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { theme } from "../materialUI-common";
 
 
 
-const defaultValues: User = {
+const defaultValues: IUser = {
   email: "",
   name: "",
   lastName: "",
@@ -38,7 +38,7 @@ const RegisterForm = () => {
     handleSubmit,
     formState: { errors, isValid },
     reset,
-  } = useForm<User>({ defaultValues });
+  } = useForm<IUser>({ defaultValues });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -50,12 +50,12 @@ const RegisterForm = () => {
   };
 
 
-  const onSubmit: SubmitHandler<User> = async (data) => {
+  const onSubmit: SubmitHandler<IUser> = async (data) => {
     const { email, name, lastName, username, password } = data;
     const roles = ["USER"];
     try {
       if (data) {
-        const user: UserToRegister = {
+        const user: IUser = {
           email,
           name,
           lastName,
@@ -64,7 +64,10 @@ const RegisterForm = () => {
           roles,
         };
         if (selectedFile) {
-          await registerUser(user, selectedFile);
+          const fileExtension = selectedFile.name.split('.').pop();
+          const newFileName = `${email}.${fileExtension}`;
+          const renamedFile = new File([selectedFile], newFileName);
+          await registerUser(user, renamedFile);
         } else {
           console.error('No seleccionó imagen')
         }
@@ -74,6 +77,7 @@ const RegisterForm = () => {
         });
       }
       reset();
+      setSelectedFile(null);
     } catch (e) {
       setAlert({
         type: "error",

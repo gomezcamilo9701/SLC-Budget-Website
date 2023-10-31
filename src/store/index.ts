@@ -1,29 +1,18 @@
-import { configureStore, type Middleware } from "@reduxjs/toolkit";
-import userReducer from './user/slice';
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import userReducer from './user/Userslice';
+import contactsReducer from './contacts/contactsSlice'
+import contactsMiddleware from "./contacts/contactsMiddleware";
+import UserMiddleware, { userLocalStorageMiddleware } from "./user/UserMiddleware";
 
-const persistanceLocalStorageMiddleware: Middleware = store => next => action => {
-  next(action);
-  localStorage.setItem("__redux__user__", JSON.stringify(store.getState()));
-}
+const rootReducer = combineReducers({
+  user: userReducer,
+  contacts: contactsReducer,
+});
 
-const synchWithDatabaseMiddleware: Middleware = store => next => async action => {
-  const { type, payload } = action;
-  console.log({type, payload})
-  console.log(store.getState())
-  next(action);
-  
-  if (type === 'user/readUser') {
-    //await getUser(payload); 
-    console.log('logrado');
-  }
-
-}
 
 export const store = configureStore({
-  reducer: {
-    user: userReducer
-  },
-  middleware: [persistanceLocalStorageMiddleware, synchWithDatabaseMiddleware]
+  reducer: rootReducer,
+  middleware: [contactsMiddleware, UserMiddleware, userLocalStorageMiddleware]
 })
 
 export type RootState = ReturnType<typeof store.getState>

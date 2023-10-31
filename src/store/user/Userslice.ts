@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { IUserWithId } from "../../types";
 
-const DEFAULT_STATE = {
+export const DEFAULT_USER_STATE = {
   id: "",
   email: "",
   name: "",
@@ -10,8 +11,10 @@ const DEFAULT_STATE = {
   roles: []
 }
 
-const persistedState = localStorage.getItem("__redux__user__");
-const initialState = persistedState ? JSON.parse(persistedState) : DEFAULT_STATE;
+const initialState: IUserWithId = (() => {
+	const persistedState = localStorage.getItem("__redux__user__");
+	return persistedState ? JSON.parse(persistedState).user : DEFAULT_USER_STATE;
+})();
 
 export const userSlice = createSlice({
   name: 'user',
