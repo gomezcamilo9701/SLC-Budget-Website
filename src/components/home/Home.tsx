@@ -49,9 +49,18 @@ function Home() {
                 <Paper
                   sx={useStyles.paper}
                 >
-                  <ProfileForm />
+                  <Contacts/>
                 </Paper>
               </Grid>
+
+              {/* Profile 
+              <Grid item xs={12} md={8} lg={9} >
+                <Paper
+                  sx={useStyles.paper}
+                >
+                  <ProfileForm />
+                </Paper>
+              </Grid>*/}
 
               {/* Chart 
               <Grid item xs={12} md={8} lg={9}>

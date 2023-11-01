@@ -121,7 +121,7 @@ export const NavBar: React.FC = () => {
             <Toolbar
               sx={useStyles.toolbarDrawer}
             >
-              <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
+              <img src="../../assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
               <IconButton onClick={toggleDrawer} sx={{ color: "#FFF" }}>
                 <ChevronLeftIcon />
               </IconButton>
