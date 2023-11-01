@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Avatar, Badge, Button, Card, CardContent, CardHeader, Grid, Modal, Alert, Table, TableBody, TableCell, TableHead, TableRow, TextField } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardContent, CardHeader, Grid, Modal, Alert, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography, Stack, Divider } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useAppSelector } from '../../hooks/store'
 import { useContactsActions } from '../../store/contacts/useContactsActions'
@@ -9,9 +9,13 @@ import { getContactsByUserId, getUserByEmail } from '../../services/user/UserSer
 import CONSTANTS from '../../constants';
 import LoadingScreen from '../loading_screen/LoadingScreen';
 import CloseIcon from '@mui/icons-material/Close';
+import { Box, Paper } from '@mui/material';
+import { useStyles } from './ContactsStyles';
+import { ThemeProvider } from '@mui/material/styles';
+import { theme } from '../materialUI-common';
 
-function Contacts () {
-  
+function Contacts() {
+
   // Slices recuperados de la store
   const contacts = useAppSelector((state) => state.contacts)
   const user = useAppSelector((state) => state.user)
@@ -86,135 +90,161 @@ function Contacts () {
   return (
     <>
       {contactState.loading ? (
-          <LoadingScreen />
-        ) : (
-          <Grid container >
-            <Grid item xs={12} md={6} lg={6}>
-              <TextField
-                sx={{backgroundColor: 'whitesmoke'}}
-                label="Correo electrónico del amigo"
-                value={contactState.email}
-                onChange={(e) => 
+        <LoadingScreen />
+      ) : (
+        <ThemeProvider theme={theme}>
+          <Grid container component="main" /*justifyContent={'space-between'} */ sx={{ width: "sm", height: "md" }}>
+            <Grid item xs={12} sm={4} md={5} component={Paper} elevation={1}
+              sx={useStyles.paperLeft}>
+              <Box
+                sx={useStyles.boxPaperLeft}
+              >
+                <Typography variant="h6" component="h2" sx={useStyles.bodyH2}>
+                  Nuevo contacto
+                </Typography>
+                <Typography variant="body2" component="p" sx={useStyles.bodyP}>
+                  Ingresa el correo electrónico de tu amigo para agregarlo a tu lista de contactos
+                </Typography>
+
+                <Grid item xs={12}>
+                  <TextField
+                    sx={useStyles.textField}
+                    fullWidth
+                    variant='standard'
+                    label="Correo electrónico a buscar"
+                    value={contactState.email}
+                    onChange={(e) =>
+                      setContactState({
+                        ...contactState,
+                        email: e.target.value,
+                      })
+                    }
+                  />
+                </Grid>
+                <Button variant="contained" sx={useStyles.button} onClick={handleSearch}>
+                  Buscar contacto
+                </Button>
+
+                <Modal open={contactState.modalOpen} onClose={() =>
                   setContactState({
                     ...contactState,
-                    email: e.target.value,
-                  })
-                }
-              />
-              <Button variant="contained" onClick={handleSearch}>
-                Buscar amigo
-              </Button>
-              <Modal open={contactState.modalOpen} onClose={() => 
-                setContactState({
-                  ...contactState,
-                  modalOpen: false,
-                })}>
-                <Card style={{ width: 400, margin: 'auto', marginTop: 100, padding: 16 }}>
-                  <CardHeader title="Información del amigo" />
-                  {contactState.contactInfo && (
-                    <CardContent>
-                      <Avatar
-                        sx={{
-                          width: 64,
-                          height: 64,
-                          borderRadius: '50%',
-                          marginRight: 2,
-                        }}
-                        src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contactState.contactInfo.profileImage}`}
-                        alt={contactState.contactInfo.name}
-                      />
-                      <p>Nombre: {contactState.contactInfo.name}</p>
-                      <p>Apellido: {contactState.contactInfo.lastName}</p>
-                      <p>Correo electrónico: {contactState.contactInfo.email}</p>
-                      <Button variant="contained" onClick={
-                        () => {
-                          setAlert({
-                            type: "success",
-                            message: "Usuario agregado"
-                          })
-                          addContact(contactState.contactInfo)
+                    modalOpen: false,
+                  })}>
+                  <Card style={{ width: 400, margin: 'auto', marginTop: 100, padding: 16, textAlign: "center" }}>
+
+                    <CardHeader title="Información de contacto" />
+                    {contactState.contactInfo && (
+                      <CardContent>
+                        <Avatar
+                          sx={{
+                            width: 64,
+                            height: 64,
+                            borderRadius: '50%',
+                            marginRight: 2,
+                          }}
+                          src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contactState.contactInfo.profileImage}`}
+                          alt={contactState.contactInfo.name}
+                        />
+                        <p>Nombre: {contactState.contactInfo.name}</p>
+                        <p>Apellido: {contactState.contactInfo.lastName}</p>
+                        <p>Correo electrónico: {contactState.contactInfo.email}</p>
+                        <Button variant="contained" onClick={
+                          () => {
+                            setAlert({
+                              type: "success",
+                              message: "Usuario agregado"
+                            })
+                            addContact(contactState.contactInfo)
+                            setContactState({
+                              ...contactState,
+                              modalOpen: false,
+                            })
+                          }}>
+                          <PersonAddIcon />
+                        </Button>
+                        <Button variant="contained" onClick={() =>
                           setContactState({
                             ...contactState,
                             modalOpen: false,
-                          })
-                        }}>
-                        <PersonAddIcon />
-                      </Button>
-                      <Button variant="contained" onClick={() => 
-                      setContactState({
-                        ...contactState,
-                        modalOpen: false,
-                      })}>
-                        <CloseIcon />
-                      </Button>
-                    </CardContent>
-                  )}  
-                </Card>
-              </Modal>
-              {alert.type === "success" && (
-                <Alert severity="success">{alert.message}</Alert>
-              )}
-              {alert.type === "error" && (
-                <Alert severity="error">{alert.message}</Alert>
-              )}
-            </Grid>
-            
-            <Grid item xs={12} md={6} lg={6}>
-              <Card>
-                <CardHeader
-                  title={
-                    <>
-                      Contactos
-                      <Badge badgeContent={contacts.length} color="primary">
-                        {contacts.length}
-                      </Badge>
-                    </>
-                  }
-                />
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Id</TableCell>
-                      <TableCell>Nombre</TableCell>
-                      <TableCell>Email</TableCell>
-                      <TableCell>Acciones</TableCell>
-                    </TableRow>
-                  </TableHead>
+                          })}>
+                          <CloseIcon />
+                        </Button>
+                      </CardContent>
+                    )}
+                  </Card>
+                </Modal>
 
-                  <TableBody>
-                    {contacts.map((item, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{item.id}</TableCell>
-                        <TableCell>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Avatar
-                              sx={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: '50%',
-                                marginRight: 1,
-                              }}
-                              src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                              alt={item.name}
-                            />
-                            {item.name}
-                          </div>
-                        </TableCell>
-                        <TableCell>{item.email}</TableCell>
-                        <TableCell>
-                          <Button variant="outlined" onClick={() => null}>
-                            <DeleteIcon />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Card>
+                {alert.type === "success" && (
+                  <Alert severity="success">{alert.message}</Alert>
+                )}
+                {alert.type === "error" && (
+                  <Alert severity="error">{alert.message}</Alert>
+                )}
+              </Box>
             </Grid>
-            
+
+
+
+            <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1}
+              sx={useStyles.paperRight}>
+              <Box
+                sx={useStyles.boxPaperRight}
+              >
+                <Card >
+                  <CardHeader
+                    title={
+                      <>
+                        Contactos
+                        <Badge badgeContent={contacts.length} color="secondary" sx={{ ml: 2 }}>
+                        </Badge>
+                      </>
+                    }
+                  />
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Id</TableCell>
+                        <TableCell>Nombre</TableCell>
+                        <TableCell>Email</TableCell>
+                        <TableCell>Acciones</TableCell>
+                      </TableRow>
+                    </TableHead>
+
+                    <TableBody>
+                      {contacts.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{item.id}</TableCell>
+                          <TableCell>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <Avatar
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '50%',
+                                  marginRight: 1,
+                                }}
+                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
+                                alt={item.name}
+                              />
+                              {item.name}
+                            </div>
+                          </TableCell>
+                          <TableCell>{item.email}</TableCell>
+                          <TableCell>
+                            <Button variant="outlined" onClick={() => null}>
+                              <DeleteIcon />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </Card>
+              </Box>
+            </Grid>
           </Grid>
-        )}
+        </ThemeProvider>
+      )}
     </>
   )
 }
