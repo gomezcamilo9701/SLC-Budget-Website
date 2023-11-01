@@ -26,6 +26,12 @@ export type TProfileForEdit = {
   password: string;
 }
 
+export type TEditUser = {
+  editForm: TProfileForEdit;
+  id: string;
+  profileImage: File | null;
+}
+
 //Componente Contacts
 export type TContactState = {
   loading: boolean;

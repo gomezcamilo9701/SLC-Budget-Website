@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useState} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -16,8 +16,9 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { MainListItems } from './MainListItems';
 import { SecondaryListItems } from './SecondaryListItems';
 import { useStyles } from './ResponsiveDrawerStyles';
-import { Outlet } from 'react-router-dom';
-
+import { Outlet, useNavigate } from 'react-router-dom';
+import { useAuthActions } from '../../store/auth/useAuthActions';
+import { useAppSelector } from '../../hooks/store';
 
 const drawerWidth = 240;
 
@@ -29,7 +30,7 @@ function Copyright(props: any) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">
+      <Link color="inherit" href="https://www.youtube.com/watch?v=_6XzJPyAJDI">
         SLC Budget
       </Link>{' '}
       {new Date().getFullYear()}
@@ -40,17 +41,25 @@ function Copyright(props: any) {
 
 export default function ResponsiveDrawer(props: Props) {
   const { window } = props;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const container = window !== undefined ? () => window().document.body : undefined;
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+  const { logoutUser } = useAuthActions();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleLogout = () => {
+    logoutUser();
+    navigate('/login');
   };
 
   const drawer = (
     <div>
       <Toolbar
         sx={useStyles.toolbarDrawer}
-      >
+        >
         <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
         <IconButton onClick={handleDrawerToggle} sx={{ color: "#FFF" }}>
           <ChevronLeftIcon />
@@ -64,8 +73,6 @@ export default function ResponsiveDrawer(props: Props) {
       </List>
     </div>
   );
-
-  const container = window !== undefined ? () => window().document.body : undefined;
 
   return (
     <Box sx={{ display: 'flex' }}>
@@ -107,7 +114,7 @@ export default function ResponsiveDrawer(props: Props) {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <Button variant='outlined'>
+            <Button variant='outlined' onClick={handleLogout}>
               Cerrar sesión
             </Button>
           </Stack>

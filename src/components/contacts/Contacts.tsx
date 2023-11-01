@@ -15,7 +15,6 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../materialUI-common';
 
 function Contacts() {
-
   // Slices recuperados de la store
   const contacts = useAppSelector((state) => state.contacts)
   const user = useAppSelector((state) => state.user)
