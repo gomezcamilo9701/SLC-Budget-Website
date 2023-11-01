@@ -1,6 +1,6 @@
 import CONSTANTS from "../../constants";
-import { TLoginUser, TProfileForEdit, IUser } from "../../types";
-import { TokenService } from "./TokenService";
+import { TLoginUser, IUser, TEditUser } from "../../types";
+import { TokenService } from "../token/TokenService";
 
 export const registerUser = async (user: IUser, profileImage: File) => {
     try {
@@ -55,21 +55,25 @@ export const loginUser = async (loginData: TLoginUser) => {
       }
   };
 
-export const editUser = async (editData: TProfileForEdit, id: string) => {
+export const editUser = async (editData: TEditUser) => {
   const token = TokenService.getToken();
+  const formData = new FormData();
+  formData.append('updatedUser', new Blob([JSON.stringify(editData.editForm)], { type: 'application/json' }));
+  if (editData.profileImage) {
+    formData.append('profileImage', editData.profileImage);
+  }
   if (!token) {
     console.error("No se encontró un token de autenticación");
     return null;
   }
 
   try {
-    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_EDIT}/${id}`, {
+    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_EDIT}/${editData.id}`, {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify(editData)
+      body: formData,
     });
     if(!res.ok){
       throw new Error('PATCH request failed');

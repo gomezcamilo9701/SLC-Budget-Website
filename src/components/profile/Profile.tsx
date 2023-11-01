@@ -14,18 +14,30 @@ import {
 } from "@mui/material";
 import Divider from '@mui/material/Divider';
 import { editUser, getUserByEmail } from '../../services/user/UserService';
-import { TProfileForEdit, /**User*/ IUserWithId } from '../../types';
+import { IUserWithId, TEditUser } from '../../types';
 import { useUserActions } from "../../store/user/useUserActions";
 import CONSTANTS from '../../constants';
 import { useAppSelector } from '../../hooks/store';
 import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from '../loading_screen/LoadingScreen';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const ProfileForm: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
 
   // Slice recuperados de la store de user
   const user = useAppSelector((state) => state.user)
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    } else {
+      setSelectedFile(null);
+    }
+  };
 
   // Actions para actualizar slice user en la store
   const { updateUser } = useUserActions();
@@ -49,9 +61,10 @@ const ProfileForm: React.FC = () => {
     try {
       const email = localStorage.getItem('email');
       const userData: IUserWithId = email ? await getUserByEmail(email) : DEFAULT_USER_STATE;
-      updateUser(userData);
+      const userWithoutPassword = { ...userData, password: '' };
+      updateUser(userWithoutPassword);
       setLoading(false);
-      reset(userData);
+      reset(userWithoutPassword);
     } catch (err) {
       console.error('Error al obetener los datos del servidor', err);
       setLoading(false);
@@ -66,12 +79,6 @@ const ProfileForm: React.FC = () => {
     const { id, name, lastName, username, password, email, roles, profileImage } = data;
     try {
       if (data) {
-        const userToEdit: TProfileForEdit = {
-          name,
-          lastName,
-          username,
-          password,
-        };
         const userForPersist: IUserWithId = {
           id,
           email,
@@ -82,7 +89,23 @@ const ProfileForm: React.FC = () => {
           roles,
           profileImage,
         }
-        await editUser(userToEdit, id);
+        let renamedFile = null;
+        if (selectedFile) {
+          const fileExtension = selectedFile.name.split('.').pop();
+          const newFileName = `${email}.${fileExtension}`;
+          renamedFile = new File([selectedFile], newFileName);
+        }
+        const editData: TEditUser = {
+          editForm: {
+            name,
+            lastName,
+            username,
+            password,
+          },
+          id: id,
+          profileImage: renamedFile,
+        }
+        await editUser(editData);
         updateUser(userForPersist);
         setAlert({
           type: "success",
@@ -117,7 +140,25 @@ const ProfileForm: React.FC = () => {
                       sx={useStyles.profileImage}
                       src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${user.profileImage}`}
                       alt={'Imagen de perfil'}
+                  />
+                  <Grid item xs={12}>
+                    <label htmlFor="image-upload">
+                      <Button
+                        component="span"
+                        variant="contained"
+                        startIcon={<CloudUploadIcon />}
+                      >
+                        {selectedFile ? selectedFile?.name : "Cambiar Imagen de Perfil"}
+                      </Button>
+                    </label>
+                    <input
+                      type="file"
+                      id="image-upload"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      onChange={handleImageChange}
                     />
+                  </Grid>
                   <Box
                     component="form"
                     noValidate
@@ -193,7 +234,6 @@ const ProfileForm: React.FC = () => {
                           type='password'
                           id="password"
                           label=""
-                          autoComplete="password"
                           {...register("password", {
                             required: true,
                             minLength: 4,
