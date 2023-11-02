@@ -1,4 +1,26 @@
 import { Box, styled} from '@mui/material';
+import { createTheme } from '@mui/material/styles';
+
+export const theme = createTheme({
+  typography: {
+    fontFamily: 'Nunito, Arial, sans-serif',
+  },
+  palette: {
+    primary: {
+      main: '#77EBEB',
+      light: '#FFFFFF',
+      dark: '#060606',
+    },
+    secondary: {
+      main: '#9A40E0',
+      light: '#F5EBFF',
+      dark: '#0F3E3C',
+    },
+    background: {
+      default: '#060606',
+    },
+  },
+});
 
 export const Root = styled(Box)({
   minHeight: '100vh',

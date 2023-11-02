@@ -1,25 +1,41 @@
 //Type for Login form
-export type LoginUser = {
+export type TLoginUser = {
   email: string;
   password: string;
 }
 
 //USER
-export type User = {
+export interface IUser {
   email: string;
   name: string;
   lastName: string;
   username: string;
   password: string;
   roles: string[];
-  //phone_number: string;
-  //photo: string;
 }
 
-export type ProfileForEdit = {
+export interface IUserWithId extends IUser {
+  id: string;
+  profileImage: string;
+}
+
+export type TProfileForEdit = {
   name: string;
   lastName: string;
   username: string;
-  email: string;
   password: string;
+}
+
+export type TEditUser = {
+  editForm: TProfileForEdit;
+  id: string;
+  profileImage: File | null;
+}
+
+//Componente Contacts
+export type TContactState = {
+  loading: boolean;
+  email: string;
+  contactInfo: IUserWithId | null;
+  modalOpen: boolean;
 }

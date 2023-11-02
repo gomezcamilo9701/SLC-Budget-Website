@@ -1,15 +1,16 @@
 import CONSTANTS from "../../constants";
-import { LoginUser, User } from "../../types";
-import { TokenService } from "./TokenService";
+import { TLoginUser, IUser, TEditUser } from "../../types";
+import { TokenService } from "../token/TokenService";
 
-export const registerUser = async (user: User) => {
+export const registerUser = async (user: IUser, profileImage: File) => {
     try {
+        const formData = new FormData();
+        formData.append('createUserDTO', new Blob([JSON.stringify(user)], { type: 'application/json' }));
+        formData.append('profileImage', profileImage);
+
         const repoonse = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_REGISTER}`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(user)
+            body: formData,
         });
 
         if (!repoonse.ok) {
@@ -23,7 +24,7 @@ export const registerUser = async (user: User) => {
     }
 };
 
-export const loginUser = async (loginData: LoginUser) => {
+export const loginUser = async (loginData: TLoginUser) => {
     try {
         const response = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_LOGIN}`, {
           method: 'POST',
@@ -42,7 +43,7 @@ export const loginUser = async (loginData: LoginUser) => {
           }
           if(data.token){
             TokenService.saveToken(data.token);
-            console.log('Token almacenado en localStorage:', data.token);
+            localStorage.setItem('email', data.Username);
           } else {
             console.error('No se encontró un token en la respuesta JSON.');
           }
@@ -54,16 +55,25 @@ export const loginUser = async (loginData: LoginUser) => {
       }
   };
 
-export const editUser = async (editData: User) => {
-  console.log({editData});
-  console.log(registerUser(editData));
+export const editUser = async (editData: TEditUser) => {
+  const token = TokenService.getToken();
+  const formData = new FormData();
+  formData.append('updatedUser', new Blob([JSON.stringify(editData.editForm)], { type: 'application/json' }));
+  if (editData.profileImage) {
+    formData.append('profileImage', editData.profileImage);
+  }
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+
   try {
-    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_EDIT}`, {
+    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_EDIT}/${editData.id}`, {
       method: 'PATCH',
       headers: {
-        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
     },
-    body: JSON.stringify(editData)
+      body: formData,
     });
     if(!res.ok){
       throw new Error('PATCH request failed');
@@ -74,7 +84,7 @@ export const editUser = async (editData: User) => {
   }
 }
 
-export const getUser = async () => {
+export const getUserByEmail = async (email: string) => {
   const token = TokenService.getToken();
   if (!token) {
     console.error("No se encontró un token de autenticación");
@@ -82,7 +92,105 @@ export const getUser = async () => {
   }
 
   try {
-    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.USER_INFO}`;
+    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.USER_INFO}/${email}`;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    const requestOptions = {
+      method: "GET",
+      headers: headers,
+    };
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error("GET request failed");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("GET request error:", error);
+    throw error;
+  }
+};
+
+export const getProfilePicture = async (pictureName: string) => {
+  const token = TokenService.getToken();
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+
+  try {
+    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${pictureName}`;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+
+    const requestOptions = {
+      method: "GET",
+      headers: headers,
+    };
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error("GET request failed");
+    }
+
+    const blobData = await response.blob(); // Receive the image as a Blob
+
+    if (blobData instanceof Blob) {
+      const imageUrl = URL.createObjectURL(blobData); // Convert Blob to a URL
+      return imageUrl;
+    } else {
+      console.error("Invalid response format");
+      return null;
+    }
+  } catch (error) {
+    console.error("GET request error:", error);
+    throw error;
+  }
+};
+
+export const addContact = async (contactId: string, userId: string) => {
+  const contactData = { contactId: contactId };
+  const token = TokenService.getToken();
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+
+  try {
+    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}/add-contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+    },
+    body: JSON.stringify(contactData)
+    });
+    if(!res.ok){
+      throw new Error('POST request failed');
+    }
+  } catch(err) {
+    console.error('POST request errror',err);
+    throw err;
+  }
+}
+
+export const getContactsByUserId = async (userId: string) => {
+  const token = TokenService.getToken();
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+
+  try {
+    const url = `http://localhost:8080/user/users/${userId}/contacts`;
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",

@@ -10,3 +10,5 @@ Follow these steps to run the frontend:
    ```bash
    npm install
    npm run dev
+   
+   npm install sonner

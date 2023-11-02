@@ -1,30 +1,31 @@
 import { useState } from "react";
-import CssBaseline from "@mui/material/CssBaseline";
+import { useStyles } from '../register/RegisterStyles';
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
+import { theme } from "../materialUI-common";
+import InputAdornment from "@mui/material/InputAdornment";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { IconButton, Stack } from "@mui/material";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { Alert } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import { loginUser } from "../../services/user/UserService";
-import { LoginUser } from "../../types";
-import './Login.css'
+import { TLoginUser } from "../../types";
+import "../login/Login.css"
+import { useAuthActions } from "../../store/auth/useAuthActions";
 
 
-const theme = createTheme({
-  typography: {
-    fontFamily: 'Nunito, Arial, sans-serif',
-  },
-});
-
-const defaultValues: LoginUser = {
+const defaultValues: TLoginUser = {
   email: "",
   password: "",
 };
 
 const LoginForm = () => {
+  const { loginUserState } = useAuthActions();
   const navigate = useNavigate();
   const [alert, setAlert] = useState({
     type: "",
@@ -33,26 +34,28 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
-   /* formState: { errors, isValid },*/
+    /* formState: { errors, isValid },*/
     reset,
-  } = useForm<LoginUser>({ defaultValues });
+  } = useForm<TLoginUser>({ defaultValues });
 
-  const onSubmit: SubmitHandler<LoginUser> = async (data) => {
+  const onSubmit: SubmitHandler<TLoginUser> = async (data) => {
+    
     const { email, password } = data;
     try {
       if (data) {
-        const user: LoginUser = {
+        const user: TLoginUser = {
           email,
           password,
         };
-        await loginUser(user);
+        const { token } = await loginUser(user);
+        loginUserState(token);
         setAlert({
           type: "success",
           message: "Ingreso satisfactorio como usuario.",
         });
         setTimeout(() => {
-          navigate('/home');
-        }, 2000);
+          navigate('/');
+        }, 1000);
       }
       reset();
     } catch (e) {
@@ -63,61 +66,28 @@ const LoginForm = () => {
     }
   };
 
+
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <ThemeProvider theme={theme}>
-      <Grid container component="main" sx={{ height: "100vh" }}>
-        <CssBaseline />
-        <Grid item xs={false} sm={4} md={7} sx={{ position: "relative" }}>
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              objectFit: "cover",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-
-            }}
-          >
-            <img
-              src="src/assets/logo-slc.svg"
-              alt="SLC Logo"
-              style={{
-                width: "500px",
-              }}
-            />
-            <h1 style={{ color: "white", fontSize: "1.2rem", fontWeight: 100, textAlign: "center", lineHeight: "1.7", }}>Si aún no tienes una cuenta registrada </h1>
-            <Link to="/register">¡Regístrate aquí!</Link>
-          </div>
+      <Grid container component="main"  sx={useStyles.bodyContainer}>
+        <Grid item xs={12} sm={6} md={7} sx={useStyles.leftContent}>
+          <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
+          <Typography component="h2" variant="h2" sx={useStyles.bodyH2}>
+            Si aún no tienes una cuenta registrada
+          </Typography>
+          <Link to="/register">¡Regístrate aquí!</Link>
         </Grid>
 
 
-        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={1} square
-          sx={{
-            position: "absolute",
-            top: 100,
-            right: 150,
-            width: 450,
-            borderRadius: "0.9375rem",
-            background: "rgba(217, 217, 217, 0.10)",
-          }}>
-          <Box
-            sx={{
-              my: 10,
-              mx: 16,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              margin: "50px",
-              gap: "15px",
-            }}
-          >
+        <Grid item xs={12} sm={8} md={5} component={Paper} elevation={8} sx={useStyles.paper}>
+          <Box sx={useStyles.boxPaper}>
 
-            <Typography component="h1" variant="h5" sx={{ color: "white" }}>
+            <Typography component="h2" variant="h5">
               Iniciar Sesión
             </Typography>
             <Box
@@ -126,12 +96,15 @@ const LoginForm = () => {
               onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 3 }}
             >
-              <Grid container spacing={2} >
+              <Grid container xs={12}>
+                <Stack spacing={2}>
                 <Grid item xs={12}>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     required
                     fullWidth
+                    variant="filled"
+                    color="secondary"
                     id="email"
                     label="Correo electrónico"
                     autoComplete="email"
@@ -140,44 +113,32 @@ const LoginForm = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <TextField
-                    className="text-field-custom"
+                    sx={useStyles.textField}
                     required
                     fullWidth
+                    variant="filled"
+                    color="secondary"
                     id="password"
                     label="Contraseña"
-                    type="password"
                     autoComplete="password"
-                  {...register("password", { required: true, minLength: 4 })}
+                    type={showPassword ? "text" : "password"}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={handleClickShowPassword}>
+                            {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                    {...register("password", { required: true, minLength: 4 })}
                   />
                 </Grid>
+                </Stack>
               </Grid>
-              <Button
-                className="button-custom"
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 3,
-                  mb: 2,
-                  backgroundColor: "#000",
-                  borderRadius: "10px",
-                  border: '2px solid',
-                  borderImage: 'linear-gradient(to right, #77EBEB, #9A40E0)',
-                  borderImageSlice: 1,
-                  borderImageSource: 'linear-gradient(to right, #77EBEB, #9A40E0)',
-                  padding: '10px',
-                  boxShadow: "0px 4px 61px 0px rgba(77, 71, 195, 0.60)",
-                  '&:hover': {
-                    backgroundColor: "#211f42"
-                  },
-
-                }}
-             /* disabled={!isValid}*/
-              >
+              <Button fullWidth type="submit" variant="contained" sx={useStyles.button}>
                 Iniciar Sesión
               </Button>
-              <Grid container justifyContent="flex-end">
-              </Grid>
               {alert.type === "success" && (
                 <Alert severity="success">{alert.message}</Alert>
               )}
