@@ -18,7 +18,6 @@ import { SecondaryListItems } from './SecondaryListItems';
 import { useStyles } from './ResponsiveDrawerStyles';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthActions } from '../../store/auth/useAuthActions';
-import { useAppSelector } from '../../hooks/store';
 
 const drawerWidth = 240;
 

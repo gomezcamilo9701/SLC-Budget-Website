@@ -26,7 +26,7 @@ export const contactsSlice = createSlice({
 				state.push(action.payload)
 			}
 		},
-    updateContacts: (state, action: PayloadAction<IUserWithId[]>) => {
+    updateContacts: (_state, action: PayloadAction<IUserWithId[]>) => {
       return action.payload;
     },
 	},

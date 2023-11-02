@@ -20,7 +20,7 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    editUser: (state, action) => {
+    editUser: (_state, action) => {
       return {
         ...action.payload,
       }

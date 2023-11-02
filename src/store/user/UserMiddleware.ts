@@ -5,11 +5,11 @@ export const userLocalStorageMiddleware: Middleware = store => next => action =>
   localStorage.setItem("__redux__user__", JSON.stringify(store.getState()));
 }
 
-const UserMiddleware: Middleware = store => next => action => {
-	const { type, payload } = action
-	next(action)
-	if (type === 'user/editUser') {
-	}
-}
+// const UserMiddleware: Middleware = store => next => action => {
+// 	const { type, payload } = action
+// 	next(action)
+// 	if (type === 'user/editUser') {
+// 	}
+// }
 
-export default UserMiddleware;
+// export default UserMiddleware;
