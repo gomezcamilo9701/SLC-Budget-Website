@@ -1,5 +1,5 @@
 const CONSTANTS = {
-    BASE_URL: 'http://localhost:8080',
+    BASE_URL: 'http://ec2-54-221-52-14.compute-1.amazonaws.com',
     USER_REGISTER: '/user/signup',
     USER_LOGIN: '/login',
     USER_EDIT: '/user/update',
