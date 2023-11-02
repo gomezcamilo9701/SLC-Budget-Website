@@ -16,6 +16,7 @@ import { Grid, TextField, Button } from "@mui/material";
 import { loginUser } from "../../services/user/UserService";
 import { TLoginUser } from "../../types";
 import "../login/Login.css"
+import { useAuthActions } from "../../store/auth/useAuthActions";
 
 
 const defaultValues: TLoginUser = {
@@ -24,6 +25,7 @@ const defaultValues: TLoginUser = {
 };
 
 const LoginForm = () => {
+  const { loginUserState } = useAuthActions();
   const navigate = useNavigate();
   const [alert, setAlert] = useState({
     type: "",
@@ -45,13 +47,14 @@ const LoginForm = () => {
           email,
           password,
         };
-        await loginUser(user);
+        const { token } = await loginUser(user);
+        loginUserState(token);
         setAlert({
           type: "success",
           message: "Ingreso satisfactorio como usuario.",
         });
         setTimeout(() => {
-          navigate('/home');
+          navigate('/');
         }, 1000);
       }
       reset();
@@ -62,6 +65,7 @@ const LoginForm = () => {
       });
     }
   };
+
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => {

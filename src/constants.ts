@@ -6,6 +6,7 @@ const CONSTANTS = {
     USER_INFO: '/user/email',
     PROFILE_PICTURE: '/media',
     ADD_CONTACT: '/user/users',
+    VALIDATE_TOKEN: '/auth/validateToken?token='
   };
   
   export default CONSTANTS;
