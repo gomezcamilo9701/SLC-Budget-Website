@@ -38,7 +38,7 @@ export const MainListItems = () => {
       </ListItemButton>
   
       <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/')}>
+      onClick={() => navigate('/events')}>
         <ListItemIcon>
           <BarChartIcon sx={{color: theme.palette.primary.light}}/>
         </ListItemIcon>

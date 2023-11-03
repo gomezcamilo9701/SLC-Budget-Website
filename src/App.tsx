@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Contacts, Login, Profile, Register, ResponsiveDrawer } from './components';
-import Events from './components/events/Events';
+import { Contacts, Events, Login, Profile, Register, ResponsiveDrawer } from './components';
 import ProtectedRoute from './utils/ProtectedRoute';
 
 const App = () => {
