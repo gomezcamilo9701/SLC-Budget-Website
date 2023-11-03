@@ -32,7 +32,7 @@ const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
   const eventTypes = ['Evento tipo 1', 'Evento tipo 2', 'Evento tipo 3'];
 
   return (
-    <TextField select value={value} onChange={onChange} sx={useStyles.textField}
+    <TextField select value={value} onChange={onChange} sx={{backgroundColor: "white", borderRadius: "10px"}}
       required
       fullWidth
       variant='standard'
@@ -147,10 +147,22 @@ const EventsForm: React.FC = () => {
     };
   */
 
+    /*Configuración del textfield de tipo select option*/
   const [selectedEvent, setSelectedEvent] = useState('');
 
   const handleEventChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedEvent(event.target.value);
+  };
+
+    /*Configuración del textfield multiline de descripción */
+  const [rows, setRows] = useState(1);
+
+  const handleFocus = () => {
+    setRows(3);
+  };
+
+  const handleBlur = () => {
+    setRows(1);
   };
 
   return (
@@ -199,6 +211,7 @@ const EventsForm: React.FC = () => {
                     component="span"
                     variant="contained"
                     startIcon={<CloudUploadIcon />}
+                    sx={{mt: 2}}
                   >
                     Imagen del Evento
                   </Button>
@@ -222,7 +235,7 @@ const EventsForm: React.FC = () => {
                   <Grid item xs={12}>
                     <Typography variant="subtitle2">Nombre del evento </Typography>
                     <TextField
-                      sx={useStyles.textField}
+                      sx={{backgroundColor: "white", borderRadius: "10px"}}
                       required
                       fullWidth
                       variant='standard'
@@ -236,13 +249,17 @@ const EventsForm: React.FC = () => {
                   <Grid item xs={12}>
                     <Typography variant="subtitle2">Descripción del evento </Typography>
                     <TextField
-                      sx={useStyles.textField}
+                      sx={{backgroundColor: "white", borderRadius: "10px"}}
                       required
                       fullWidth
+                      multiline
+                      rows={rows}
                       variant='standard'
-                      id="username"
+                      id="description"
                       label=""
-                      autoComplete="username"
+                      autoComplete=""
+                      onFocus={handleFocus}
+                      onBlur={handleBlur}
                     /*   {...register("username", {
                          required: true,
                          minLength: 3,
@@ -266,14 +283,14 @@ const EventsForm: React.FC = () => {
                 </Button>
               </Box>
 
-              <Grid item xs={12} width={"100%"} mt={1}>
+              <Grid item xs={12} width={"100%"} mt={4}>
                 <Stack  flexDirection={"row"} justifyContent={"space-between"}>
 
-                  <Button variant="outlined" sx={useStyles.button} >
+                  <Button variant="outlined" sx={{}} >
                     Buscar Contacto
                   </Button>
 
-                  <Button variant="outlined" sx={useStyles.button} >
+                  <Button variant="outlined" color='secondary' sx={{}} >
                     Crear Actividad
                   </Button>
                 </Stack>
@@ -315,7 +332,7 @@ const EventsForm: React.FC = () => {
                   <CardHeader
                     title={
                       <>
-                        Contactos agregados al evento
+                        Contactos del evento
                         <Badge badgeContent={/*contacts.length*/ 1} color="secondary" sx={{ ml: 2 }}>
                         </Badge>
                       </>
@@ -384,7 +401,7 @@ const EventsForm: React.FC = () => {
                   <CardHeader
                     title={
                       <>
-                        Actividades credas para el evento
+                        Actividades del evento
                         <Badge badgeContent={/*contacts.length*/ 1} color="secondary" sx={{ ml: 2 }}>
                         </Badge>
                       </>
@@ -450,7 +467,7 @@ const EventsForm: React.FC = () => {
                   <CardHeader
                     title={
                       <>
-                        Invitaciones pendientes
+                        Invitaciones pendientes   
                         <Badge badgeContent={/*contacts.length*/ 1} color="secondary" sx={{ ml: 2 }}>
                         </Badge>
                       </>
