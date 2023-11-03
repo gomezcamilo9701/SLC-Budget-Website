@@ -49,7 +49,14 @@ export const useStyles = {
     profileImage: {
         width: 100, 
         height: 100, 
-        borderRadius: '50%'
+        borderRadius: '50%',
+    },
+    profileButton: {
+        mt: 2,
+        '&:hover': {
+            backgroundColor: "#211f42",
+            color: "white",
+        }
     },
     textField: {
         backgroundColor: "white", 
@@ -63,7 +70,7 @@ export const useStyles = {
         borderImage: 'linear-gradient(to right, #77EBEB, #9A40E0)',
         borderImageSlice: 1,
         borderImageSource: 'linear-gradient(to right, #77EBEB, #9A40E0)',
-        padding: '10px',
+        padding: '8px 10px 8px 10px',
         '&:hover': {
             backgroundColor: "#211f42"
         }
