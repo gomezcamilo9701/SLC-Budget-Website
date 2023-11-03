@@ -97,7 +97,7 @@ const RegisterForm = () => {
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={useStyles.bodyContainer}>
         <Grid item xs={12} sm={6} md={7} sx={useStyles.leftContent}>
-          <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
+          <img src="src/images/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
           <Typography component="h1" variant="h2" sx={useStyles.bodyH2}>
             ¡Regístrate y lleva el control de tus gastos de eventos<br></br> con tus contactos de manera sencilla!
           </Typography>

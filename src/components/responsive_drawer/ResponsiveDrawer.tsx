@@ -59,7 +59,7 @@ export default function ResponsiveDrawer(props: Props) {
       <Toolbar
         sx={useStyles.toolbarDrawer}
         >
-        <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
+        <img src="src/images/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
         <IconButton onClick={handleDrawerToggle} sx={{ color: "#FFF" }}>
           <ChevronLeftIcon />
         </IconButton>
