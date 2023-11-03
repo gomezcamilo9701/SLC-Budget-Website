@@ -62,6 +62,10 @@ function Contacts() {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    console.log('store,', contacts);
+  }, [contacts]);
+
   const handleSearch = async () => {
     try {
       const foundContact: IUserWithId = await getUserByEmail(contactState.email);

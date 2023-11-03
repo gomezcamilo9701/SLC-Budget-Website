@@ -3,6 +3,7 @@ import userReducer from './user/Userslice';
 import contactsReducer from './contacts/contactsSlice';
 import authReducer from './auth/authSlice';
 import eventReducer from './event/eventSlice';
+import invitationReducer from './invitations/invitationsSlice';
 import contactsMiddleware from "./contacts/contactsMiddleware";
 import { userLocalStorageMiddleware } from "./user/UserMiddleware";
 import authLocalStorageMiddleware from "./auth/authMiddleware";
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   contacts: contactsReducer,
   auth: authReducer,
   event: eventReducer,
+  invitations: invitationReducer,
 });
 
 

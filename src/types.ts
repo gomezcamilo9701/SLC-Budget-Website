@@ -73,6 +73,20 @@ export type TEventDataEdit = {
   picture: File | null;
 };
 
+// Invitation
+
+export type TInvitationCreate = {
+  eventId: string,
+  contactId: string,
+}
+
+export type TInvitationData = {
+  invitation_id: string,
+  eventId: IEventWithId,
+  contactId: IUserWithId,
+  invitation_state: string;
+}
+
 // Pagination
 export type EventPaginationResponse = {
   content: {
@@ -138,7 +152,6 @@ export type ContactPaginationResponse = {
   first: boolean;
   empty: boolean;
 };
-
 
 // //Edit Event
 // export type TEventForEdit = {
