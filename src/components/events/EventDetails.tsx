@@ -710,13 +710,13 @@ const EventDetails: React.FC = () => {
                                         borderRadius: '50%',
                                         marginRight: 1,
                                       }}
-                                      src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${invitation?.contact?.profileImage}`}
-                                      alt={invitation?.contact?.name}
+                                      src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${invitation?.contactId?.profileImage}`}
+                                      alt={invitation?.contactId?.name}
                                     />
-                                    {invitation?.contact?.name}
+                                    {invitation?.contactId?.name}
                                   </div>
                                 </TableCell>
-                                <TableCell>{invitation?.contact?.email}</TableCell>
+                                <TableCell>{invitation?.contactId?.email}</TableCell>
                                 <TableCell>{invitation?.invitation_state}</TableCell>
                               </TableRow>
                             ))}
