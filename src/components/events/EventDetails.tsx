@@ -21,6 +21,8 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  TableContainer,
+  TablePagination,
 } from "@mui/material";
 // import DeleteIcon from '@mui/icons-material/Delete';
 import { Grid, TextField, Button } from "@mui/material";
@@ -29,21 +31,28 @@ import Divider from "@mui/material/Divider";
 // import { IUserWithId, TEditUser } from '../../types';
 // import { useUserActions } from "../../store/user/useUserActions";
 // import CONSTANTS from '../../constants';
-// import { useAppSelector } from '../../hooks/store';
 // import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from "../loading_screen/LoadingScreen";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { IEvent } from "../../types";
+import { IEvent, IEventWithId, TEventDataEdit } from "../../types";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useAppSelector } from "../../hooks/store";
+import { useEventActions } from "../../store/event/useEventActions";
+import { editEvent, getEventById } from "../../services/event/EventService";
+import { DEFAULT_EVENT_STATE } from "../../store/event/eventSlice";
+import CONSTANTS from "../../constants";
 
 /*Configuración del textfield de tipo select option*/
 interface EventSelectProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
-const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
-  const eventTypes = ["VIAJE", "HOGAR", "PAREJA", "COMIDA", "OTRO"];
 
+const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
+  const event = useAppSelector((state) => state.event);
+  console.log(event.event_id)
+  
+  const eventTypes = ["VIAJE", "HOGAR", "PAREJA", "COMIDA", "OTRO"];
   return (
     <TextField
       select
@@ -67,7 +76,17 @@ const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
     </TextField>
   );
 };
-const EventsForm: React.FC = () => {
+
+const EventDetails: React.FC = () => {
+  //Configuración de paginación para las tablas
+  const [page, setPage] = useState(0);
+  /*Configuración del textfield de tipo select option*/
+  const [selectedEvent, setSelectedEvent] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(2);
+  /*Configuración del LoaderScreen*/
+  const [loading, setLoading] = useState<boolean>(true);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [alert, setAlert] = useState({
     type: "",
     message: "",
@@ -75,12 +94,14 @@ const EventsForm: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid},
+    formState: {isValid},
     reset,
   } = useForm<IEvent>();
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  //STORE
+  const event = useAppSelector((state) => state.event)
+  const { updateEvent } = useEventActions();
+
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -98,8 +119,6 @@ const EventsForm: React.FC = () => {
     }
   };
 
-  /*Configuración del LoaderScreen*/
-  const [loading, setLoading] = useState<boolean>(true);
   useEffect(() => {
     // Simula una carga de datos con un retraso
     const timer = setTimeout(() => {
@@ -110,100 +129,59 @@ const EventsForm: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  /*Configuración de paginación para las tablas
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(2);
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 2));
-    setPage(0);
-  };
-
-  // Ejemplo de datos recuperados de la bd de contactos
-  const contacts = Array.from({ length: 100 }, (_, i) => ({ id: i + 1, name: `Contacto ${i + 1}`, email: `contacto${i + 1}@ejemplo.com`, profileImage: '' })); */
-
-  /*
-    // Slice recuperados de la store de user
-    const user = useAppSelector((state) => state.user)
-  
-    
-  
-    // Actions para actualizar slice user en la store
-    const { updateUser } = useUserActions();
-  
-    // State para manejar alertas
-    const [alert, setAlert] = useState({
-      type: "",
-      message: "",
-    });
-  
-    // React-hook-form
-    const {
-      register,
-      handleSubmit,
-      formState: { errors },
-      reset,
-    } = useForm<IUserWithId>();
-  
-      // Fetch para recuperar de la bd y actualizar la store
-    const fetchUserData = async () => {
-      try {
-        const email = localStorage.getItem('email');
-        const userData: IUserWithId = email ? await getUserByEmail(email) : DEFAULT_USER_STATE;
-        const userWithoutPassword = { ...userData, password: '' };
-        updateUser(userWithoutPassword);
-        setLoading(false);
-        reset(userWithoutPassword);
-      } catch (err) {
-        console.error('Error al obetener los datos del servidor', err);
-        setLoading(false);
-      }
+  const fetchUserData = async () => {
+    try {
+      const eventData: IEventWithId = await getEventById(event.event_id);
+      console.log('eventData', eventData);
+      updateEvent(eventData);
+      setLoading(false);
+      setSelectedEvent(event.type);
+      reset(eventData);
+    } catch (err) {
+      console.error('Error al obtener los datos de evento desde el servidor', err);
+      setLoading(false);
     }
-    useEffect(() => {
-      fetchUserData();
-    }, []);
-    */
-
-  // botón Guardar Cambios, se edita en la bd y se actualiza el user en la store
+  }
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+  
+  // botón Guardar Cambios, se edita en la bd y se actualiza el event en la store
   const onSubmit: SubmitHandler<IEvent> = async (data) => {
-    const { name, description, type, owner_id, imagen_url } = data;
+    const { name, description, type } = data;
     try {
       if (data) {
-        const event: IEvent = {
-          name,
-          description,
-          type,
-          owner_id,
-          imagen_url,
-        };
         let renamedFile = null;
         if (selectedFile) {
           const fileExtension = selectedFile.name.split(".").pop();
-          const newFileName = `${name}.${fileExtension}`;
+          const newFileName = `${name}${type}.${fileExtension}`;
           renamedFile = new File([selectedFile], newFileName);
-          await createEvent(event, renamedFile); //Del service
         } else {
           console.error("No se seleccionó una imagen para tu evento");
         }
+        const eventDataEdit: TEventDataEdit = {
+          editForm: {
+            name,
+            description,
+            type: selectedEvent,
+          },
+          eventId: event.event_id,
+          picture: renamedFile,
+        }
+        const responseEventEdited: IEventWithId = await editEvent(eventDataEdit);
+        updateEvent(responseEventEdited);
         setAlert({
           type: "success",
-          message: "Actualización satisfactoria de los datos.",
+          message: "Actualización satisfactoria del evento.",
         });
       }
     } catch (e) {
       setAlert({
         type: "error",
-        message: "Error en la creación del evento",
+        message: "Error en la edición del evento",
       });
     }
   };
-
-  /*Configuración del textfield de tipo select option*/
-  const [selectedEvent, setSelectedEvent] = useState("");
 
   const handleEventChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedEvent(event.target.value);
@@ -216,9 +194,6 @@ const EventsForm: React.FC = () => {
     setRows(3);
   };
 
-  const handleBlur = () => {
-    setRows(1);
-  };
 
   return (
     <>
@@ -244,10 +219,6 @@ const EventsForm: React.FC = () => {
               sx={useStyles.paper}
             >
               <Box
-                component="form"
-                noValidate
-                onSubmit={handleSumbit(onSubmit)}
-                // sx={{ mt: 3 }}
                 sx={useStyles.boxPaper}
               >
                 <Typography variant="h4" sx={useStyles.bodyH2}>
@@ -257,9 +228,9 @@ const EventsForm: React.FC = () => {
                 <Divider variant="middle" />
                 <Avatar
                   sx={useStyles.profileImage}
-                  src={previewImage || ""}
-                  alt={"Imagen del evento"}
-                />
+                  src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${event.picture}`}
+                  alt={'Imagen del evento'}
+                  />
                 <Grid item xs={12}>
                   <label htmlFor="image-upload">
                     <Button
@@ -283,13 +254,13 @@ const EventsForm: React.FC = () => {
                 <Box
                   component="form"
                   noValidate
-                  /*  onSubmit={handleSubmit(onSubmit)}*/
+                  onSubmit={handleSubmit(onSubmit)}
                   sx={{ mt: 3 }}
                 >
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <Typography variant="subtitle2">
-                        Nombre del evento{" "}
+                        Nombre del evento
                       </Typography>
                       <TextField
                         sx={{
@@ -302,8 +273,7 @@ const EventsForm: React.FC = () => {
                         id="event-name"
                         label=""
                         autoComplete=""
-
-                        /*   {...register("email", { required: true, minLength: 4 })}*/
+                        {...register("name", { required: true, minLength: 4 })}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -324,11 +294,10 @@ const EventsForm: React.FC = () => {
                         label=""
                         autoComplete=""
                         onFocus={handleFocus}
-                        onBlur={handleBlur}
-                        /*   {...register("username", {
+                        {...register("description", {
                            required: true,
                            minLength: 3,
-                         })}*/
+                         })}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -348,7 +317,7 @@ const EventsForm: React.FC = () => {
                     fullWidth
                     variant="contained"
                     sx={useStyles.button}
-                    ///  disabled={!isValid}
+                    disabled={!isValid}
                   >
                     Crear evento
                   </Button>
@@ -409,44 +378,57 @@ const EventsForm: React.FC = () => {
                         </>
                       }
                     />
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Id</TableCell>
-                          <TableCell>Nombre</TableCell>
-                          <TableCell>Email</TableCell>
-                          <TableCell>Acciones</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {/*contacts.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{item.id}</TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                              <Avatar
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '50%',
-                                  marginRight: 1,
-                                }}
-                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                                alt={item.name}
-                              />
-                              {item.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>{item.email}</TableCell>
-                          <TableCell>
-                            <Button variant="outlined" onClick={() => null}>
-                              <DeleteIcon />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                            ))*/}
-                      </TableBody>
-                    </Table>
+                    <TableContainer component={Paper}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Id</TableCell>
+                            <TableCell>Nombre</TableCell>
+                            <TableCell>Email</TableCell>
+                            <TableCell>Acciones</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {/*contacts.map((item, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{item.id}</TableCell>
+                            <TableCell>
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Avatar
+                                  sx={{
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '50%',
+                                    marginRight: 1,
+                                  }}
+                                  src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
+                                  alt={item.name}
+                                />
+                                {item.name}
+                              </div>
+                            </TableCell>
+                            <TableCell>{item.email}</TableCell>
+                            <TableCell>
+                              <Button variant="outlined" onClick={() => null}>
+                                <DeleteIcon />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                              ))*/}
+                        </TableBody>
+                      </Table>
+                      {/* <TablePagination
+                        component="div"
+                        count={contacts.length}
+                        page={page}
+                        onPageChange={(_, newPage) => setPage(newPage)}
+                        rowsPerPage={rowsPerPage}
+                        onRowsPerPageChange={(e) => {
+                          setRowsPerPage(parseInt(e.target.value, 10));
+                          setPage(0);
+                        }}
+                      /> */}
+                    </TableContainer>
                   </Card>
                 </Box>
               </Grid>
@@ -586,4 +568,4 @@ const EventsForm: React.FC = () => {
   );
 };
 
-export default EventsForm;
+export default EventDetails;

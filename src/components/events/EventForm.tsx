@@ -7,10 +7,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../materialUI-common";
 import {
   Alert,
-  Avatar,
   CssBaseline,
   MenuItem,
-  Stack
 } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
@@ -21,7 +19,7 @@ import { useAppSelector } from "../../hooks/store";
 import { useEventActions } from "../../store/event/useEventActions";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { createEvent } from "../../services/event/EventService";
-import CONSTANTS from "../../constants";
+import { useNavigate } from "react-router-dom";
 
 /*Configuración del textfield de tipo select option*/
 interface EventSelectProps {
@@ -56,6 +54,8 @@ const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
 };
 
 const EventForm: React.FC = () => {
+  const navigate = useNavigate();
+  
   // Imagen
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,6 +95,7 @@ const EventForm: React.FC = () => {
 
   // Slice recuperados de la store de event y user
   const user = useAppSelector((state) => state.user);
+  const event = useAppSelector((state) => state.event);
 
   // Actions para actualizar slice event en la store
   const { updateEvent } = useEventActions();
@@ -109,9 +110,13 @@ const EventForm: React.FC = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { isValid },
     reset,
   } = useForm<IEvent>();
+
+  useEffect(() => {
+    console.log('eventStore', event);
+  }, [event])
 
   // botón Guardar Cambios, se edita en la bd y se actualiza el event en la store
   const onSubmit: SubmitHandler<IEvent> = async (data) => {
@@ -138,14 +143,18 @@ const EventForm: React.FC = () => {
           updateEvent(response);
           setAlert({
             type: "success",
-            message: "Actualización satisfactoria de los datos.",
+            message: "Creación de evento satisfactoria.",
           });
           reset();
+          setSelectedFile(null);
+          setTimeout(() => {
+            navigate('/event-details')
+          }, 1000)
         } catch (e) {
           console.error(e);
           setAlert({
             type: "error",
-            message: "Error en la modificación de los datos.",
+            message: "Error en la creación del evento.",
           });
         }
 
@@ -153,7 +162,7 @@ const EventForm: React.FC = () => {
     } catch (e) {
       setAlert({
         type: "error",
-        message: "Error en la modificación de los datos.",
+        message: "Error en la creación del evento.",
       });
     }
   };
@@ -186,11 +195,11 @@ const EventForm: React.FC = () => {
                 </Typography>
 
                 <Divider variant="middle" />
-                <Avatar
+                {/* <Avatar
                   sx={useStyles.profileImage}
                   src={`eqios`}
                   alt={"Imagen del evento"}
-                />
+                /> */}
                 <Grid item xs={12}>
                   <label htmlFor="image-upload">
                     <Button
@@ -278,7 +287,7 @@ const EventForm: React.FC = () => {
                     fullWidth
                     variant="contained"
                     sx={useStyles.button}
-                    // disabled={!isValid}
+                    disabled={!isValid}
                   >
                     Crear evento
                   </Button>
@@ -289,22 +298,6 @@ const EventForm: React.FC = () => {
                 {alert.type === "error" && (
                   <Alert severity="error">{alert.message}</Alert>
                 )}
-
-                <Grid item xs={12} width={"100%"} mt={4}>
-                  <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                    <Button variant="outlined" sx={useStyles.button3}>
-                      Buscar Contacto
-                    </Button>
-
-                    <Button
-                      variant="outlined"
-                      color="secondary"
-                      sx={useStyles.button2}
-                    >
-                      Crear Actividad
-                    </Button>
-                  </Stack>
-                </Grid>
               </Box>
             </Grid>
           </Grid>
