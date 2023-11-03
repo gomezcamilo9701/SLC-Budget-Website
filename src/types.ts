@@ -58,7 +58,7 @@ export interface IEvent {
 
 export interface IEventWithId extends IEvent {
   event_id: string;
-  imageUrl: string;
+  picture: string;
 }
 
 export type TEventForEdit = {
@@ -109,6 +109,36 @@ export type EventPaginationResponse = {
   first: boolean;
   empty: boolean;
 };
+
+export type ContactPaginationResponse = {
+  content: IUserWithId[] | null;
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      empty: boolean;
+      unsorted: boolean;
+      sorted: boolean;
+    };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    unsorted: boolean;
+    sorted: boolean;
+  };
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
+};
+
 
 // //Edit Event
 // export type TEventForEdit = {
