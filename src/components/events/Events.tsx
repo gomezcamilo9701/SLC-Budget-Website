@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from '../materialUI-common';
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Alert, Avatar, Badge, Card, CardContent, CardHeader, MenuItem, Modal, Stack, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { Alert, Avatar, Badge, Card, CardContent, CardHeader, CssBaseline, MenuItem, Modal, Stack, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Grid,
@@ -32,7 +32,8 @@ const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
   const eventTypes = ['Evento tipo 1', 'Evento tipo 2', 'Evento tipo 3'];
 
   return (
-    <TextField select value={value} onChange={onChange} sx={{backgroundColor: "white", borderRadius: "10px"}}
+    <TextField select value={value} onChange={onChange}
+      sx={useStyles.textField}
       required
       fullWidth
       variant='standard'
@@ -147,14 +148,14 @@ const EventsForm: React.FC = () => {
     };
   */
 
-    /*Configuración del textfield de tipo select option*/
+  /*Configuración del textfield de tipo select option*/
   const [selectedEvent, setSelectedEvent] = useState('');
 
   const handleEventChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedEvent(event.target.value);
   };
 
-    /*Configuración del textfield multiline de descripción */
+  /*Configuración del textfield multiline de descripción */
   const [rows, setRows] = useState(1);
 
   const handleFocus = () => {
@@ -170,30 +171,14 @@ const EventsForm: React.FC = () => {
       {/*loading ? (
                 <LoadingScreen />
            ) : (*/}
+      <CssBaseline />
       <ThemeProvider theme={theme}>
         <Grid container component="main" flexDirection='row' sx={{ width: "sm", height: "md" }}>
           {/*Left Content*/}
           <Grid item xs={8} sm={8} md={5} component={Paper} elevation={1}
-            sx={{
-              width: "100%",
-              display: "flex",
-              borderRadius: "10px",
-              background: "rgba(217, 217, 217, 0.10)",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "10px",
-              margin: " 0 auto"
-            }}>
+            sx={useStyles.paper}>
             <Box
-              sx={{
-                color: "white",
-                display: "flex",
-                width: "100%",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                margin: "20px",
-              }}
+              sx={useStyles.boxPaper}
             >
               <Typography variant='h4' sx={useStyles.bodyH2}>
                 Crear evento
@@ -211,7 +196,7 @@ const EventsForm: React.FC = () => {
                     component="span"
                     variant="contained"
                     startIcon={<CloudUploadIcon />}
-                    sx={{mt: 2}}
+                    sx={{ mt: 2 }}
                   >
                     Imagen del Evento
                   </Button>
@@ -235,13 +220,13 @@ const EventsForm: React.FC = () => {
                   <Grid item xs={12}>
                     <Typography variant="subtitle2">Nombre del evento </Typography>
                     <TextField
-                      sx={{backgroundColor: "white", borderRadius: "10px"}}
+                      sx={useStyles.textField}
                       required
                       fullWidth
                       variant='standard'
                       id="event-name"
                       label=""
-                      autoComplete="email"
+                      autoComplete=""
 
                     /*   {...register("email", { required: true, minLength: 4 })}*/
                     />
@@ -249,7 +234,7 @@ const EventsForm: React.FC = () => {
                   <Grid item xs={12}>
                     <Typography variant="subtitle2">Descripción del evento </Typography>
                     <TextField
-                      sx={{backgroundColor: "white", borderRadius: "10px"}}
+                      sx={useStyles.textField}
                       required
                       fullWidth
                       multiline
@@ -284,13 +269,12 @@ const EventsForm: React.FC = () => {
               </Box>
 
               <Grid item xs={12} width={"100%"} mt={4}>
-                <Stack  flexDirection={"row"} justifyContent={"space-between"}>
-
-                  <Button variant="outlined" sx={{}} >
+                <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                  <Button variant="outlined" sx={useStyles.button3} >
                     Buscar Contacto
                   </Button>
 
-                  <Button variant="outlined" color='secondary' sx={{}} >
+                  <Button variant="outlined" color='secondary' sx={useStyles.button2} >
                     Crear Actividad
                   </Button>
                 </Stack>
@@ -300,34 +284,12 @@ const EventsForm: React.FC = () => {
           </Grid>
 
           {/*Right Content*/}
-          <Grid item xs={12} sm={8} md={5} component={Paper} sx={{
-            
-            width: "100%",
-            display: "flex",
-            borderRadius: "10px",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "10px",
-            margin: " 0 auto",
-            flexDirection: "column",
-            background: "none"
-          }}>
+          <Grid item xs={12} sm={8} md={5} component={Paper} sx={useStyles.paper2}>
 
-            <Grid item xs={12} component={Paper} elevation={1} sx={{
-            width: "100%",
-            display: "flex",
-            borderRadius: "10px",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "10px",
-            margin: " 0 auto",
-            background: "rgba(217, 217, 217, 0.10)",
-            mb: 2,
-          }}>
+            <Grid item xs={12} component={Paper} elevation={1} sx={useStyles.paper3}>
               <Box
                 sx={useStyles.boxPaper}
               >
-
                 <Card >
                   <CardHeader
                     title={
@@ -384,16 +346,7 @@ const EventsForm: React.FC = () => {
             </Grid>
 
             <Grid item xs={12} component={Paper} elevation={1}
-              sx={{            
-              width: "100%",
-              display: "flex",
-              borderRadius: "10px",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "10px",
-              margin: " 0 auto",
-              background: "rgba(217, 217, 217, 0.10)",
-              mb: 2,}}>
+              sx={useStyles.paper3}>
               <Box
                 sx={useStyles.boxPaper}
               >
@@ -450,16 +403,7 @@ const EventsForm: React.FC = () => {
               </Box>
             </Grid>
 
-            <Grid item xs={12} component={Paper} elevation={1} sx={{
-            width: "100%",
-            display: "flex",
-            borderRadius: "10px",
-            justifyContent: "center",
-            alignItems: "center",
-            padding: "10px",
-            margin: " 0 auto",
-            background: "rgba(217, 217, 217, 0.10)",
-          }}>
+            <Grid item xs={12} component={Paper} elevation={1} sx={useStyles.paper3}>
               <Box
                 sx={useStyles.boxPaper}
               >
@@ -467,7 +411,7 @@ const EventsForm: React.FC = () => {
                   <CardHeader
                     title={
                       <>
-                        Invitaciones pendientes   
+                        Invitaciones pendientes
                         <Badge badgeContent={/*contacts.length*/ 1} color="secondary" sx={{ ml: 2 }}>
                         </Badge>
                       </>
