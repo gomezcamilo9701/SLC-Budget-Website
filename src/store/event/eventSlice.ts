@@ -7,7 +7,7 @@ export const DEFAULT_EVENT_STATE: IEventWithId = {
   description: "",
   type: "",
   owner_id: "",
-  imageUrl: "",
+  picture: "",
 }
 
 const initialState: IEventWithId = (() => {

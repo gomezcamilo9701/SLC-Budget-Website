@@ -7,6 +7,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../materialUI-common";
 import {
   Alert,
+  Avatar,
   CssBaseline,
   MenuItem,
 } from "@mui/material";
@@ -58,12 +59,20 @@ const EventForm: React.FC = () => {
   
   // Imagen
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
     if (file) {
       setSelectedFile(file);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPreviewImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
     } else {
       setSelectedFile(null);
+      setPreviewImage(null);
     }
   };
 
@@ -195,11 +204,11 @@ const EventForm: React.FC = () => {
                 </Typography>
 
                 <Divider variant="middle" />
-                {/* <Avatar
+                <Avatar
                   sx={useStyles.profileImage}
-                  src={`eqios`}
+                  src={previewImage || ""}
                   alt={"Imagen del evento"}
-                /> */}
+                />
                 <Grid item xs={12}>
                   <label htmlFor="image-upload">
                     <Button
