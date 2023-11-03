@@ -35,7 +35,7 @@ const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
 
   return (
     <TextField select value={value} onChange={onChange}
-      sx={useStyles.textField}
+    sx={{ ...useStyles.textField, '& .MuiInputBase-input': { paddingLeft: '10px' } }}
       required
       fullWidth
       variant='standard'
@@ -228,7 +228,7 @@ const EventsForm: React.FC = () => {
                       component="span"
                       variant="contained"
                       startIcon={<CloudUploadIcon />}
-                      sx={{ mt: 2 }}
+                      sx={useStyles.profileButton}
                     >
                       Imagen del Evento
                     </Button>
@@ -252,7 +252,7 @@ const EventsForm: React.FC = () => {
                     <Grid item xs={12}>
                       <Typography variant="subtitle2">Nombre del evento </Typography>
                       <TextField
-                        sx={useStyles.textField}
+                        sx={{ ...useStyles.textField, '& .MuiInputBase-input': { paddingLeft: '10px' } }}
                         required
                         fullWidth
                         variant='standard'
@@ -266,7 +266,7 @@ const EventsForm: React.FC = () => {
                     <Grid item xs={12}>
                       <Typography variant="subtitle2">Descripción del evento </Typography>
                       <TextField
-                        sx={useStyles.textField}
+                        sx={{ ...useStyles.textField, '& .MuiInputBase-input': { paddingLeft: '10px' } }}
                         required
                         fullWidth
                         multiline

@@ -38,18 +38,21 @@ export const useStyles = {
         height: 100, 
         borderRadius: '50%'
     },
+    profileButton: {
+        mt: 2,
+        '&:hover': {
+            backgroundColor: "#211f42",
+            color: "white",
+        }
+    },
     textField: {
-        borderRadius: "10px",
-        border: "1px solid #8e8adb",
-        background: "white ",
-        height: "40px",
+        backgroundColor: "white", 
+        borderRadius: "10px" 
         
     },
     textFieldEmail: {
         borderRadius: "10px",
-        border: "1px solid #8e8adb",
         background: "#BFBFBF",
-        height: "40px",
     },
     button: {
         mt: 3,

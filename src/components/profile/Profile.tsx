@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from '../materialUI-common';
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Alert, Avatar } from "@mui/material";
+import { Alert, Avatar, CssBaseline } from "@mui/material";
 import {
   Grid,
   TextField,
@@ -23,7 +23,19 @@ import LoadingScreen from '../loading_screen/LoadingScreen';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const ProfileForm: React.FC = () => {
+  
+  /*Configuración del LoaderScreen*/
   const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    // Simula una carga de datos con un retraso
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1400); // 1.4 segundos
+
+    // Limpia el temporizador al desmontar el componente
+    return () => clearTimeout(timer);
+  }, []);
+  
 
   // Slice recuperados de la store de user
   const user = useAppSelector((state) => state.user)
@@ -122,6 +134,7 @@ const ProfileForm: React.FC = () => {
 
   return (
     <>
+    <CssBaseline />
       {loading ? (
           <LoadingScreen />
         ) : (
@@ -135,7 +148,7 @@ const ProfileForm: React.FC = () => {
                   <Typography variant='h4' sx={useStyles.bodyH2}>
                     Datos personales
                   </Typography>
-                  <Divider variant="middle" />
+                  <Divider variant="middle"/>
                   <Avatar
                       sx={useStyles.profileImage}
                       src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${user.profileImage}`}
@@ -147,6 +160,7 @@ const ProfileForm: React.FC = () => {
                         component="span"
                         variant="contained"
                         startIcon={<CloudUploadIcon />}
+                        sx={useStyles.profileButton}
                       >
                         {selectedFile ? selectedFile?.name : "Cambiar Imagen de Perfil"}
                       </Button>
@@ -169,7 +183,7 @@ const ProfileForm: React.FC = () => {
                       <Grid item xs={12} sm={6} >
                         <Typography variant="subtitle2">Nombre: </Typography>
                         <TextField
-                          sx={useStyles.textField}
+                          sx={{ ...useStyles.textField, '& .MuiInputBase-input': { paddingLeft: '10px' } }}
                           autoComplete="given-name"
                           fullWidth
                           variant='standard'
@@ -184,7 +198,7 @@ const ProfileForm: React.FC = () => {
                       <Grid item xs={12} sm={6}>
                         <Typography variant="subtitle2">Apellido: </Typography>
                         <TextField
-                          sx={useStyles.textField}
+                          sx={{ ...useStyles.textField, '& .MuiInputBase-input': { paddingLeft: '10px' } }}
                           required
                           fullWidth
                           variant='standard'
@@ -197,7 +211,7 @@ const ProfileForm: React.FC = () => {
                       <Grid item xs={12}>
                         <Typography variant="subtitle2">Correo: </Typography>
                         <TextField
-                          sx={useStyles.textFieldEmail}
+                          sx={{ ...useStyles.textFieldEmail, '& .MuiInputBase-input': { paddingLeft: '10px' } }}
                           required
                           fullWidth
                           variant='standard'
@@ -211,7 +225,7 @@ const ProfileForm: React.FC = () => {
                       <Grid item xs={12}>
                         <Typography variant="subtitle2">Apodo: </Typography>
                         <TextField
-                          sx={useStyles.textField}
+                          sx={{ ...useStyles.textField, '& .MuiInputBase-input': { paddingLeft: '10px' } }}
                           required
                           fullWidth
                           variant='standard'
@@ -227,7 +241,7 @@ const ProfileForm: React.FC = () => {
                       <Grid item xs={12}>
                         <Typography variant="subtitle2">Contraseña: </Typography>
                         <TextField
-                          sx={useStyles.textField}
+                          sx={{ ...useStyles.textField, '& .MuiInputBase-input': { paddingLeft: '10px' } }}
                           required
                           fullWidth
                           variant='standard'
