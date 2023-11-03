@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from '../materialUI-common';
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Alert, Avatar, Badge, Card, CardContent, CardHeader, CssBaseline, MenuItem, Modal, Stack, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { Alert, Avatar, Badge, Card, CardContent, CardHeader, CssBaseline, MenuItem, Modal, Stack, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Grid,
@@ -23,11 +23,13 @@ import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from '../loading_screen/LoadingScreen';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
+
+
+/*Configuración del textfield de tipo select option*/
 interface EventSelectProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
-
 const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
   const eventTypes = ['Evento tipo 1', 'Evento tipo 2', 'Evento tipo 3'];
 
@@ -49,8 +51,38 @@ const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
 };
 
 
+
 const EventsForm: React.FC = () => {
+
+  /*Configuración del LoaderScreen*/
   const [loading, setLoading] = useState<boolean>(true);
+  useEffect(() => {
+    // Simula una carga de datos con un retraso
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1400); // 1.4 segundos
+
+    // Limpia el temporizador al desmontar el componente
+    return () => clearTimeout(timer);
+  }, []);
+
+  /*Configuración de paginación para las tablas
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(2);
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 2));
+    setPage(0);
+  };
+
+  // Ejemplo de datos recuperados de la bd de contactos
+  const contacts = Array.from({ length: 100 }, (_, i) => ({ id: i + 1, name: `Contacto ${i + 1}`, email: `contacto${i + 1}@ejemplo.com`, profileImage: '' })); */
+
+
   /*
     // Slice recuperados de la store de user
     const user = useAppSelector((state) => state.user)
@@ -168,302 +200,290 @@ const EventsForm: React.FC = () => {
 
   return (
     <>
-      {/*loading ? (
-                <LoadingScreen />
-           ) : (*/}
       <CssBaseline />
-      <ThemeProvider theme={theme}>
-        <Grid container component="main" flexDirection='row' sx={{ width: "sm", height: "md" }}>
-          {/*Left Content*/}
-          <Grid item xs={8} sm={8} md={5} component={Paper} elevation={1}
-            sx={useStyles.paper}>
-            <Box
-              sx={useStyles.boxPaper}
-            >
-              <Typography variant='h4' sx={useStyles.bodyH2}>
-                Crear evento
-              </Typography>
-
-              <Divider variant="middle" />
-              <Avatar
-                sx={useStyles.profileImage}
-                /*    src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${user.profileImage}`}*/
-                alt={'Imagen del evento'}
-              />
-              <Grid item xs={12}>
-                <label htmlFor="image-upload">
-                  <Button
-                    component="span"
-                    variant="contained"
-                    startIcon={<CloudUploadIcon />}
-                    sx={{ mt: 2 }}
-                  >
-                    Imagen del Evento
-                  </Button>
-                </label>
-                <input
-                  type="file"
-                  id="image-upload"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                /* onChange={handleImageChange}*/
-                />
-              </Grid>
-
+      {loading ? (
+        <LoadingScreen />
+      ) : (
+        <ThemeProvider theme={theme}>
+          <Grid container component="main" flexDirection='row' sx={{ width: "sm", height: "md" }}>
+            {/*Left Content*/}
+            <Grid item xs={8} sm={8} md={5} component={Paper} elevation={1}
+              sx={useStyles.paper}>
               <Box
-                component="form"
-                noValidate
-                /*  onSubmit={handleSubmit(onSubmit)}*/
-                sx={{ mt: 3 }}
+                sx={useStyles.boxPaper}
               >
-                <Grid container spacing={2} >
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2">Nombre del evento </Typography>
-                    <TextField
-                      sx={useStyles.textField}
-                      required
-                      fullWidth
-                      variant='standard'
-                      id="event-name"
-                      label=""
-                      autoComplete=""
+                <Typography variant='h4' sx={useStyles.bodyH2}>
+                  Crear evento
+                </Typography>
 
-                    /*   {...register("email", { required: true, minLength: 4 })}*/
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2">Descripción del evento </Typography>
-                    <TextField
-                      sx={useStyles.textField}
-                      required
-                      fullWidth
-                      multiline
-                      rows={rows}
-                      variant='standard'
-                      id="description"
-                      label=""
-                      autoComplete=""
-                      onFocus={handleFocus}
-                      onBlur={handleBlur}
-                    /*   {...register("username", {
-                         required: true,
-                         minLength: 3,
-                       })}*/
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="subtitle2"> Tipo de evento </Typography>
-                    <EventSelect value={selectedEvent} onChange={handleEventChange} />
-                  </Grid>
+                <Divider variant="middle" />
+                <Avatar
+                  sx={useStyles.profileImage}
+                  /*    src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${user.profileImage}`}*/
+                  alt={'Imagen del evento'}
+                />
+                <Grid item xs={12}>
+                  <label htmlFor="image-upload">
+                    <Button
+                      component="span"
+                      variant="contained"
+                      startIcon={<CloudUploadIcon />}
+                      sx={{ mt: 2 }}
+                    >
+                      Imagen del Evento
+                    </Button>
+                  </label>
+                  <input
+                    type="file"
+                    id="image-upload"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                  /* onChange={handleImageChange}*/
+                  />
                 </Grid>
 
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  sx={useStyles.button}
-                ///  disabled={!isValid} 
+                <Box
+                  component="form"
+                  noValidate
+                  /*  onSubmit={handleSubmit(onSubmit)}*/
+                  sx={{ mt: 3 }}
                 >
-                  Crear evento
-                </Button>
+                  <Grid container spacing={2} >
+                    <Grid item xs={12}>
+                      <Typography variant="subtitle2">Nombre del evento </Typography>
+                      <TextField
+                        sx={useStyles.textField}
+                        required
+                        fullWidth
+                        variant='standard'
+                        id="event-name"
+                        label=""
+                        autoComplete=""
+
+                      /*   {...register("email", { required: true, minLength: 4 })}*/
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="subtitle2">Descripción del evento </Typography>
+                      <TextField
+                        sx={useStyles.textField}
+                        required
+                        fullWidth
+                        multiline
+                        rows={rows}
+                        variant='standard'
+                        id="description"
+                        label=""
+                        autoComplete=""
+                        onFocus={handleFocus}
+                        onBlur={handleBlur}
+                      /*   {...register("username", {
+                           required: true,
+                           minLength: 3,
+                         })}*/
+                      />
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="subtitle2"> Tipo de evento </Typography>
+                      <EventSelect value={selectedEvent} onChange={handleEventChange} />
+                    </Grid>
+                  </Grid>
+
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={useStyles.button}
+                  ///  disabled={!isValid} 
+                  >
+                    Crear evento
+                  </Button>
+                </Box>
+
+                <Grid item xs={12} width={"100%"} mt={4}>
+                  <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                    <Button variant="outlined" sx={useStyles.button3} >
+                      Buscar Contacto
+                    </Button>
+
+                    <Button variant="outlined" color='secondary' sx={useStyles.button2} >
+                      Crear Actividad
+                    </Button>
+                  </Stack>
+                </Grid>
+
               </Box>
+            </Grid>
 
-              <Grid item xs={12} width={"100%"} mt={4}>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Button variant="outlined" sx={useStyles.button3} >
-                    Buscar Contacto
-                  </Button>
+            {/*Right Content*/}
+            <Grid item xs={12} sm={8} md={5} component={Paper} sx={useStyles.paper2}>
 
-                  <Button variant="outlined" color='secondary' sx={useStyles.button2} >
-                    Crear Actividad
-                  </Button>
-                </Stack>
+              <Grid item xs={12} component={Paper} elevation={1} sx={useStyles.paper3}>
+                <Box sx={useStyles.boxPaper}>
+                  <Card>
+                    <CardHeader sx={{}} title={<><span>Contactos del evento</span><Badge badgeContent={/*contacts.length*/1} color="secondary" sx={{ ml: 3 }} /></>} />
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Id</TableCell>
+                          <TableCell>Nombre</TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Acciones</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {/*contacts.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{item.id}</TableCell>
+                          <TableCell>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <Avatar
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '50%',
+                                  marginRight: 1,
+                                }}
+                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
+                                alt={item.name}
+                              />
+                              {item.name}
+                            </div>
+                          </TableCell>
+                          <TableCell>{item.email}</TableCell>
+                          <TableCell>
+                            <Button variant="outlined" onClick={() => null}>
+                              <DeleteIcon />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                            ))*/}
+                      </TableBody>
+                    </Table>
+                    
+                  </Card>
+                </Box>
               </Grid>
 
-            </Box>
+              <Grid item xs={12} component={Paper} elevation={1}
+                sx={useStyles.paper3}>
+                <Box
+                  sx={useStyles.boxPaper}
+                >
+                  <Card >
+                    <CardHeader
+                      title={
+                        <>
+                          Actividades del evento
+                          <Badge badgeContent={/*activities.length*/ 1} color="secondary" sx={{ ml: 2 }}>
+                          </Badge>
+                        </>
+                      }
+                    />
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Id</TableCell>
+                          <TableCell>Nombre</TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Acciones</TableCell>
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody>
+                        {/*contacts.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{item.id}</TableCell>
+                          <TableCell>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <Avatar
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '50%',
+                                  marginRight: 1,
+                                }}
+                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
+                                alt={item.name}
+                              />
+                              {item.name}
+                            </div>
+                          </TableCell>
+                          <TableCell>{item.email}</TableCell>
+                          <TableCell>
+                            <Button variant="outlined" onClick={() => null}>
+                              <DeleteIcon />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                            ))*/}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} component={Paper} elevation={1} sx={useStyles.paper3}>
+                <Box
+                  sx={useStyles.boxPaper}
+                >
+                  <Card >
+                    <CardHeader
+                      title={
+                        <>
+                          Invitaciones pendientes
+                          <Badge badgeContent={/*contacts.length*/ 1} color="secondary" sx={{ ml: 2 }}>
+                          </Badge>
+                        </>
+                      }
+                    />
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Id</TableCell>
+                          <TableCell>Nombre</TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Acciones</TableCell>
+                        </TableRow>
+                      </TableHead>
+
+                      <TableBody>
+                        {/*contacts.map((item, index) => (
+                        <TableRow key={index}>
+                          <TableCell>{item.id}</TableCell>
+                          <TableCell>
+                            <div style={{ display: 'flex', alignItems: 'center' }}>
+                              <Avatar
+                                sx={{
+                                  width: 32,
+                                  height: 32,
+                                  borderRadius: '50%',
+                                  marginRight: 1,
+                                }}
+                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
+                                alt={item.name}
+                              />
+                              {item.name}
+                            </div>
+                          </TableCell>
+                          <TableCell>{item.email}</TableCell>
+                          <TableCell>
+                            <Button variant="outlined" onClick={() => null}>
+                              <DeleteIcon />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                            ))*/}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </Box>
+              </Grid>
+
+            </Grid>
           </Grid>
-
-          {/*Right Content*/}
-          <Grid item xs={12} sm={8} md={5} component={Paper} sx={useStyles.paper2}>
-
-            <Grid item xs={12} component={Paper} elevation={1} sx={useStyles.paper3}>
-              <Box
-                sx={useStyles.boxPaper}
-              >
-                <Card >
-                  <CardHeader
-                    title={
-                      <>
-                        Contactos del evento
-                        <Badge badgeContent={/*contacts.length*/ 1} color="secondary" sx={{ ml: 2 }}>
-                        </Badge>
-                      </>
-                    }
-                  />
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Id</TableCell>
-                        <TableCell>Nombre</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Acciones</TableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {/*contacts.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{item.id}</TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                              <Avatar
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '50%',
-                                  marginRight: 1,
-                                }}
-                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                                alt={item.name}
-                              />
-                              {item.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>{item.email}</TableCell>
-                          <TableCell>
-                            <Button variant="outlined" onClick={() => null}>
-                              <DeleteIcon />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                            ))*/}
-                    </TableBody>
-                  </Table>
-                </Card>
-
-
-              </Box>
-            </Grid>
-
-            <Grid item xs={12} component={Paper} elevation={1}
-              sx={useStyles.paper3}>
-              <Box
-                sx={useStyles.boxPaper}
-              >
-                <Card >
-                  <CardHeader
-                    title={
-                      <>
-                        Actividades del evento
-                        <Badge badgeContent={/*contacts.length*/ 1} color="secondary" sx={{ ml: 2 }}>
-                        </Badge>
-                      </>
-                    }
-                  />
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Id</TableCell>
-                        <TableCell>Nombre</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Acciones</TableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {/*contacts.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{item.id}</TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                              <Avatar
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '50%',
-                                  marginRight: 1,
-                                }}
-                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                                alt={item.name}
-                              />
-                              {item.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>{item.email}</TableCell>
-                          <TableCell>
-                            <Button variant="outlined" onClick={() => null}>
-                              <DeleteIcon />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                            ))*/}
-                    </TableBody>
-                  </Table>
-                </Card>
-              </Box>
-            </Grid>
-
-            <Grid item xs={12} component={Paper} elevation={1} sx={useStyles.paper3}>
-              <Box
-                sx={useStyles.boxPaper}
-              >
-                <Card >
-                  <CardHeader
-                    title={
-                      <>
-                        Invitaciones pendientes
-                        <Badge badgeContent={/*contacts.length*/ 1} color="secondary" sx={{ ml: 2 }}>
-                        </Badge>
-                      </>
-                    }
-                  />
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Id</TableCell>
-                        <TableCell>Nombre</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Acciones</TableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {/*contacts.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{item.id}</TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                              <Avatar
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '50%',
-                                  marginRight: 1,
-                                }}
-                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                                alt={item.name}
-                              />
-                              {item.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>{item.email}</TableCell>
-                          <TableCell>
-                            <Button variant="outlined" onClick={() => null}>
-                              <DeleteIcon />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                            ))*/}
-                    </TableBody>
-                  </Table>
-                </Card>
-              </Box>
-            </Grid>
-
-          </Grid>
-        </Grid>
-      </ThemeProvider>
-
+        </ThemeProvider>
+      )}
     </>
   );
 };

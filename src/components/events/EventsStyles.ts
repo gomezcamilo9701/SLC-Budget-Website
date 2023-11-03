@@ -33,7 +33,6 @@ export const useStyles = {
         borderRadius: "10px",
         justifyContent: "center",
         alignItems: "center",
-        padding: "10px",
         margin: " 0 auto",
         background: "rgba(217, 217, 217, 0.10)",
         mb: 2,
