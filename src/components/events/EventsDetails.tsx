@@ -29,19 +29,35 @@
 // // import { IUserWithId, TEditUser } from '../../types';
 // // import { useUserActions } from "../../store/user/useUserActions";
 // // import CONSTANTS from '../../constants';
-// // import { useAppSelector } from '../../hooks/store';
 // // import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 // import LoadingScreen from "../loading_screen/LoadingScreen";
 // import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 // import { IEvent } from "../../types";
 // import { SubmitHandler, useForm } from "react-hook-form";
+// import { useAppSelector } from "../../hooks/store";
 
 // /*Configuración del textfield de tipo select option*/
 // interface EventSelectProps {
 //   value: string;
 //   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
 // }
+
+// export type TEventForEdit = {
+//   name: string;
+//   description: string;
+//   type: ETypeEvent | null;
+// };
+
+// export type TEventDataEdit = {
+//   editForm: TEventForEdit;
+//   eventId: string;
+//   picture: File | null;
+// };
+
 // const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
+//   const event = useAppSelector((state) => state.event);
+//   console.log(event.event_id)
+  
 //   const eventTypes = ["VIAJE", "HOGAR", "PAREJA", "COMIDA", "OTRO"];
 
 //   return (
@@ -67,7 +83,7 @@
 //     </TextField>
 //   );
 // };
-// const EventsForm: React.FC = () => {
+// const EventsDetailForm: React.FC = () => {
 //   const [alert, setAlert] = useState({
 //     type: "",
 //     message: "",
@@ -185,7 +201,7 @@
 //           const fileExtension = selectedFile.name.split(".").pop();
 //           const newFileName = `${name}.${fileExtension}`;
 //           renamedFile = new File([selectedFile], newFileName);
-//           await createEvent(event, renamedFile); //Del service
+//           await editEvent(event, renamedFile); //Del service
 //         } else {
 //           console.error("No se seleccionó una imagen para tu evento");
 //         }
@@ -246,7 +262,7 @@
 //               <Box
 //                 component="form"
 //                 noValidate
-//                 onSubmit={handleSumbit(onSubmit)}
+//                 onSubmit={handleSubmit(onSubmit)}
 //                 // sx={{ mt: 3 }}
 //                 sx={useStyles.boxPaper}
 //               >
@@ -586,4 +602,4 @@
 //   );
 // };
 
-// export default EventsForm;
+// export default EventsDetailForm;
