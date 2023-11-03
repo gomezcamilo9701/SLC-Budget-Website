@@ -59,13 +59,13 @@ export default function ResponsiveDrawer(props: Props) {
       <Toolbar
         sx={useStyles.toolbarDrawer}
         >
-        <img src="src/assets/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
+        <img src="src/images/logo-slc.svg" alt="SLC Logo" style={useStyles.logo} />
         <IconButton onClick={handleDrawerToggle} sx={{ color: "#FFF" }}>
           <ChevronLeftIcon />
         </IconButton>
       </Toolbar>
       <Divider />
-      <List component="nav">
+      <List component="nav" >
         <MainListItems />
         <Divider sx={{ my: 1 }} />
         <SecondaryListItems />
@@ -150,6 +150,7 @@ export default function ResponsiveDrawer(props: Props) {
           sx={{
             display: { xs: 'none', sm: 'block' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            '& .MuiPaper-root': { backgroundColor: 'black', color: 'white' },
             border: '3px solid black'
           }}
           open

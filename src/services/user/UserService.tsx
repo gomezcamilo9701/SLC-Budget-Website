@@ -1,5 +1,5 @@
 import CONSTANTS from "../../constants";
-import { TLoginUser, IUser, TEditUser } from "../../types";
+import { TLoginUser, IUser, TEditUser, ContactPaginationResponse } from "../../types";
 import { TokenService } from "../token/TokenService";
 
 export const registerUser = async (user: IUser, profileImage: File) => {
@@ -165,7 +165,7 @@ export const addContact = async (contactId: string, userId: string) => {
   }
 
   try {
-    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}/add-contact`, {
+    const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -190,7 +190,7 @@ export const getContactsByUserId = async (userId: string) => {
   }
 
   try {
-    const url = `http://localhost:8080/user/users/${userId}/contacts`;
+    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.GET_CONTACTS}/${userId}`;
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -207,8 +207,10 @@ export const getContactsByUserId = async (userId: string) => {
       throw new Error("GET request failed");
     }
 
-    const data = await response.json();
-    return data;
+    const responseData: ContactPaginationResponse = await response.json();
+    const contacts = responseData.content;
+    const pageInfo = responseData.pageable;
+    return {contacts, pageInfo};
   } catch (error) {
     console.error("GET request error:", error);
     throw error;

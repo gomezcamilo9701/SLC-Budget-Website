@@ -1,10 +1,10 @@
 import React from 'react';
 import { theme } from '../materialUI-common';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PersonIcon from '@mui/icons-material/Person';
 import PeopleIcon from '@mui/icons-material/People';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import LayersIcon from '@mui/icons-material/Layers';
+import EventIcon from '@mui/icons-material/Event';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
@@ -24,9 +24,9 @@ export const MainListItems = () => {
       <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
       onClick={() => navigate('/profile')}>
         <ListItemIcon>
-          <ShoppingCartIcon sx={{color: theme.palette.primary.light}}/>
+          <PersonIcon sx={{color: theme.palette.primary.light}}/>
         </ListItemIcon>
-        <ListItemText primary="Mi Perfil" />
+        <ListItemText primary="Perfil de usuario" />
       </ListItemButton>
       
       <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
@@ -38,25 +38,17 @@ export const MainListItems = () => {
       </ListItemButton>
   
       <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/')}>
+      onClick={() => navigate('/event')}>
         <ListItemIcon>
-          <BarChartIcon sx={{color: theme.palette.primary.light}}/>
+          <EventIcon sx={{color: theme.palette.primary.light}}/>
         </ListItemIcon>
-        <ListItemText primary="Eventos" />
+        <ListItemText primary="Crear evento" />
       </ListItemButton>
-  
+    
       <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
       onClick={() => navigate('/')}>
         <ListItemIcon>
-          <LayersIcon sx={{color: theme.palette.primary.light}}/>
-        </ListItemIcon>
-        <ListItemText primary="Actividades" />
-      </ListItemButton>
-  
-      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/')}>
-        <ListItemIcon>
-          <LayersIcon sx={{color: theme.palette.primary.light}}/>
+          <AccountBalanceWalletIcon sx={{color: theme.palette.primary.light}}/>
         </ListItemIcon>
         <ListItemText primary="Saldos" />
       </ListItemButton>
