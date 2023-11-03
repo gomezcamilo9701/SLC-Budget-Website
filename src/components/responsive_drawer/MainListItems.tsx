@@ -38,11 +38,11 @@ export const MainListItems = () => {
       </ListItemButton>
   
       <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/events')}>
+      onClick={() => navigate('/event')}>
         <ListItemIcon>
           <EventIcon sx={{color: theme.palette.primary.light}}/>
         </ListItemIcon>
-        <ListItemText primary="Eventos" />
+        <ListItemText primary="Crear evento" />
       </ListItemButton>
     
       <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}

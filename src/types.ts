@@ -41,7 +41,7 @@ export type TContactState = {
 };
 
 // Event
-enum ETypeEvent {
+export enum ETypeEvent {
   VIAJE,
   HOGAR,
   PAREJA,
@@ -49,19 +49,22 @@ enum ETypeEvent {
   OTRO,
 }
 
-export type TEvent = {
-  event_id: string;
+export interface IEvent {
   name: string;
   description: string;
-  type: ETypeEvent | null;
+  type: string;
   owner_id: string;
-  imageUrl: string;
 };
+
+export interface IEventWithId extends IEvent {
+  event_id: string;
+  imageUrl: string;
+}
 
 export type TEventForEdit = {
   name: string;
   description: string;
-  type: ETypeEvent | null;
+  type: string;
 };
 
 export type TEventDataEdit = {
@@ -106,3 +109,12 @@ export type EventPaginationResponse = {
   first: boolean;
   empty: boolean;
 };
+
+// //Edit Event
+// export type TEventForEdit = {
+//   name: string;
+//   description: string;
+//   type: string;
+//   owner_id: number;
+//   imagen_url: File | null;
+// }

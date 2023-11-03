@@ -1,15 +1,28 @@
 import CONSTANTS from "../../constants";
-import { EventPaginationResponse, TEventDataEdit } from "../../types";
+import { EventPaginationResponse, IEvent, TEventDataEdit } from "../../types";
 import { TokenService } from "../token/TokenService";
 
-export const createEvent = async (eventData: any, picture: File) => {
+export const createEvent = async (eventData: IEvent, picture: File | null) => {
+  const token = TokenService.getToken();
+
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+
     try {
         const formData = new FormData();
         formData.append('eventData', new Blob([JSON.stringify(eventData)], { type: 'application/json' }));
-        formData.append('picture', picture);
+
+        if (picture !== null) {
+          formData.append('picture', picture);
+        }
 
         const response = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.CREATE_EVENT}`, {
             method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
             body: formData,
         });
 

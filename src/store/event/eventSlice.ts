@@ -1,16 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { TEvent } from "../../types";
+import { IEventWithId } from "../../types";
 
-export const DEFAULT_EVENT_STATE: TEvent = {
+export const DEFAULT_EVENT_STATE: IEventWithId = {
   event_id: "",
   name: "",
   description: "",
-  type: null,
+  type: "",
   owner_id: "",
   imageUrl: "",
 }
 
-const initialState: TEvent = (() => {
+const initialState: IEventWithId = (() => {
 	const persistedState = localStorage.getItem("__event__");
 	return persistedState ? JSON.parse(persistedState) : DEFAULT_EVENT_STATE;
 })();
