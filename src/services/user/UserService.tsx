@@ -158,7 +158,6 @@ export const getProfilePicture = async (pictureName: string) => {
 
 export const addContact = async (contactId: string, userId: string) => {
   const contactData = { contactId: contactId };
-  console.log('contactDATA', contactData);
   const token = TokenService.getToken();
   if (!token) {
     console.error("No se encontró un token de autenticación");

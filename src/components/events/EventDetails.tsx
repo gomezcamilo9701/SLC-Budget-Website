@@ -23,6 +23,8 @@ import {
   TableRow,
   TableContainer,
   TablePagination,
+  CardContent,
+  Modal,
 } from "@mui/material";
 // import DeleteIcon from '@mui/icons-material/Delete';
 import { Grid, TextField, Button } from "@mui/material";
@@ -34,13 +36,19 @@ import Divider from "@mui/material/Divider";
 // import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from "../loading_screen/LoadingScreen";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { IEvent, IEventWithId, TEventDataEdit } from "../../types";
+import { IEvent, IEventWithId, IUserWithId, TEventDataEdit, TInvitationCreate } from "../../types";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAppSelector } from "../../hooks/store";
 import { useEventActions } from "../../store/event/useEventActions";
 import { editEvent, getEventById } from "../../services/event/EventService";
-import { DEFAULT_EVENT_STATE } from "../../store/event/eventSlice";
 import CONSTANTS from "../../constants";
+import CloseIcon from '@mui/icons-material/Close';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { getContactsByUserId } from "../../services/user/UserService";
+import { useContactsActions } from "../../store/contacts/useContactsActions";
+import { useInvitationsActions } from "../../store/invitations/useInvitationsActions";
+import { createInvitationInBd } from "../../services/invitation/InvitationService";
+
 
 /*Configuración del textfield de tipo select option*/
 interface EventSelectProps {
@@ -49,8 +57,6 @@ interface EventSelectProps {
 }
 
 const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
-  const event = useAppSelector((state) => state.event);
-  console.log(event.event_id)
   
   const eventTypes = ["VIAJE", "HOGAR", "PAREJA", "COMIDA", "OTRO"];
   return (
@@ -78,6 +84,8 @@ const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
 };
 
 const EventDetails: React.FC = () => {
+  //Modal para invitaciones
+  const [openModalInvitation, setOpenModalInvitation] = useState(false);
   //Configuración de paginación para las tablas
   const [page, setPage] = useState(0);
   /*Configuración del textfield de tipo select option*/
@@ -99,9 +107,14 @@ const EventDetails: React.FC = () => {
   } = useForm<IEvent>();
 
   //STORE
-  const event = useAppSelector((state) => state.event)
-  const { updateEvent } = useEventActions();
+  const event = useAppSelector((state) => state.event);
+  const user = useAppSelector((state) => state.user);
+  const contacts = useAppSelector((state) => state.contacts);
+  const invitations = useAppSelector((state) => state.invitations);
 
+  const { updateEvent } = useEventActions();
+  const { refreshContacts } = useContactsActions();
+  const { createInvitation } = useInvitationsActions();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
@@ -131,8 +144,10 @@ const EventDetails: React.FC = () => {
 
   const fetchUserData = async () => {
     try {
+      const contactsData = await getContactsByUserId(user.id);
+      const contacts: IUserWithId[] | null | undefined = contactsData?.contacts;
+      refreshContacts(contacts);
       const eventData: IEventWithId = await getEventById(event.event_id);
-      console.log('eventData', eventData);
       updateEvent(eventData);
       setLoading(false);
       setSelectedEvent(event.type);
@@ -145,6 +160,30 @@ const EventDetails: React.FC = () => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  useEffect(() => {
+    console.log('cont', invitations);
+  }, [invitations]);
+
+  const handleInvitation = async (contactId: string) => {
+
+    const invitation: TInvitationCreate = {
+      eventId: event.event_id,
+      contactId: contactId,
+    }
+    try {
+      const response = await createInvitationInBd(invitation);
+      console.log(response);
+      if (response) {
+        createInvitation(response);
+      } else {
+        console.error('Error guardando o trayendo la info de invitación')
+      }
+    } catch (e) {
+      console.error('error', e);
+    }
+
+  }
   
   // botón Guardar Cambios, se edita en la bd y se actualiza el event en la store
   const onSubmit: SubmitHandler<IEvent> = async (data) => {
@@ -228,7 +267,7 @@ const EventDetails: React.FC = () => {
                 <Divider variant="middle" />
                 <Avatar
                   sx={useStyles.profileImage}
-                  src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${event.picture}`}
+                  src={previewImage ?? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${event.picture}`}
                   alt={'Imagen del evento'}
                   />
                 <Grid item xs={12}>
@@ -239,7 +278,7 @@ const EventDetails: React.FC = () => {
                       startIcon={<CloudUploadIcon />}
                       sx={useStyles.profileButton}
                     >
-                      Imagen del Evento
+                      {selectedFile?.name ?? 'Imagen del Evento'}
                     </Button>
                   </label>
                   <input
@@ -331,8 +370,12 @@ const EventDetails: React.FC = () => {
 
                 <Grid item xs={12} width={"100%"} mt={4}>
                   <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                    <Button variant="outlined" sx={useStyles.button3}>
-                      Buscar Contacto
+                    <Button
+                      variant="outlined"
+                      sx={useStyles.button3}
+                      onClick={() => setOpenModalInvitation(true)}
+                    >
+                      Enviar invitación
                     </Button>
 
                     <Button
@@ -561,6 +604,144 @@ const EventDetails: React.FC = () => {
                 </Box>
               </Grid>
             </Grid>
+
+            <Modal open={openModalInvitation} onClose={() => setOpenModalInvitation(false)}>
+              <Card style={{ width: '80%', margin: 'auto', marginTop: 100, padding: 16, textAlign: "center" }}>
+                <CardHeader
+                    title={
+                      <>
+                        Invita a tus amigos
+                      </>
+                    }
+                />
+                <CardContent>
+                  <Grid container>
+                    <Grid item xs={12} md={6} lg={6}>
+                      <TableContainer component={Paper}>
+                          <Typography variant="h6" component="div">
+                              Tus contactos
+                              <Badge badgeContent={contacts.length} color="secondary" sx={{ ml: 2 }}>
+                              </Badge>
+                          </Typography>
+                          
+                          <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Id</TableCell>
+                              <TableCell>Nombre</TableCell>
+                              <TableCell>Email</TableCell>
+                              <TableCell>Agregar</TableCell>
+                            </TableRow>
+                          </TableHead>
+
+                          <TableBody>
+                            {contacts
+                              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                              .map((contact, index) => (
+                              <TableRow key={index}>
+                                <TableCell>{contact.id}</TableCell>
+                                <TableCell>
+                                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <Avatar
+                                      sx={{
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: '50%',
+                                        marginRight: 1,
+                                      }}
+                                      src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contact.profileImage}`}
+                                      alt={contact.name}
+                                    />
+                                    {contact.name}
+                                  </div>
+                                </TableCell>
+                                <TableCell>{contact.email}</TableCell>
+                                <TableCell>
+                                  <Button variant="outlined" onClick={() => handleInvitation(contact.id)}>
+                                    <PersonAddIcon />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                          </Table>
+                          <TablePagination
+                            component="div"
+                            count={contacts.length}
+                            page={page}
+                            onPageChange={(_, newPage) => setPage(newPage)}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={(e) => {
+                              setRowsPerPage(parseInt(e.target.value, 10));
+                              setPage(0);
+                            }}
+                          />
+                      </TableContainer>
+                    </Grid>
+                    <Grid item xs={12} md={6} lg={6}>
+                      <TableContainer component={Paper}>
+                        <Typography variant="h6" component="div">
+                              Invitaciones a tu evento
+                              <Badge badgeContent={contacts.length} color="secondary" sx={{ ml: 2 }}>
+                              </Badge>
+                        </Typography>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Id Invitacion</TableCell>
+                              <TableCell>Nombre</TableCell>
+                              <TableCell>Email</TableCell>
+                              <TableCell>Estado</TableCell>
+                            </TableRow>
+                          </TableHead>
+
+                          <TableBody>
+                            {invitations
+                              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                              .map((invitation, index) => (
+                              <TableRow key={index}>
+                                <TableCell>{invitation?.invitation_id}</TableCell>
+                                <TableCell>
+                                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                                    <Avatar
+                                      sx={{
+                                        width: 32,
+                                        height: 32,
+                                        borderRadius: '50%',
+                                        marginRight: 1,
+                                      }}
+                                      src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${invitation?.contact?.profileImage}`}
+                                      alt={invitation?.contact?.name}
+                                    />
+                                    {invitation?.contact?.name}
+                                  </div>
+                                </TableCell>
+                                <TableCell>{invitation?.contact?.email}</TableCell>
+                                <TableCell>{invitation?.invitation_state}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                          </Table>
+                          <TablePagination
+                            component="div"
+                            count={contacts.length}
+                            page={page}
+                            onPageChange={(_, newPage) => setPage(newPage)}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={(e) => {
+                              setRowsPerPage(parseInt(e.target.value, 10));
+                              setPage(0);
+                            }}
+                          />
+                      </TableContainer>
+                    </Grid>
+                  </Grid>
+                  <Button variant="contained" onClick={() => setOpenModalInvitation(false)}>
+                    <CloseIcon />
+                  </Button>
+                </CardContent>
+              </Card>
+            </Modal>
           </Grid>
         </ThemeProvider>
       )}

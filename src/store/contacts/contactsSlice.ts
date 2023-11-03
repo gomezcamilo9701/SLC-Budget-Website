@@ -5,8 +5,8 @@ const DEFAULT_STATE: IUserWithId[] = [];
 
 
 const initialState: IUserWithId[] = (() => {
-	const persistedState = localStorage.getItem("__redux__state__");
-	return persistedState ? JSON.parse(persistedState).users : DEFAULT_STATE;
+	const persistedState = localStorage.getItem("__contacts__");
+	return persistedState ? JSON.parse(persistedState) : DEFAULT_STATE;
 })();
 
 export const contactsSlice = createSlice({
