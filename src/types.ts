@@ -82,8 +82,8 @@ export type TInvitationCreate = {
 
 export type TInvitationData = {
   invitation_id: string,
-  eventId: IEventWithId,
-  contactId: IUserWithId,
+  event: IEventWithId,
+  contact: IUserWithId,
   invitation_state: string;
 }
 
