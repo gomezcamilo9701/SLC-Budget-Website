@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Avatar, Badge, Button, Card, CardContent, CardHeader, Grid, Modal, Alert, Table, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardContent, CardHeader, Grid, Modal, Alert, Table, TablePagination, TableContainer, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useAppSelector } from '../../hooks/store'
 import { useContactsActions } from '../../store/contacts/useContactsActions'
@@ -15,6 +15,10 @@ import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../materialUI-common';
 
 function Contacts() {
+  // Para paginar
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   // Slices recuperados de la store
   const contacts = useAppSelector((state) => state.contacts)
   const user = useAppSelector((state) => state.user)
@@ -39,7 +43,8 @@ function Contacts() {
   // Fetch para recuperar de la bd y actualizar la store
   const fetchUserData = async () => {
     try {
-      const contacts: IUserWithId[] = await getContactsByUserId(user.id);
+      const contactsData = await getContactsByUserId(user.id);
+      const contacts: IUserWithId[] | null | undefined = contactsData?.contacts;
       refreshContacts(contacts);
       setContactState({
         ...contactState,
@@ -199,45 +204,61 @@ function Contacts() {
                       </>
                     }
                   />
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Id</TableCell>
-                        <TableCell>Nombre</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Acciones</TableCell>
-                      </TableRow>
-                    </TableHead>
-
-                    <TableBody>
-                      {contacts.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{item.id}</TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                              <Avatar
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '50%',
-                                  marginRight: 1,
-                                }}
-                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                                alt={item.name}
-                              />
-                              {item.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>{item.email}</TableCell>
-                          <TableCell>
-                            <Button variant="outlined" onClick={() => null}>
-                              <DeleteIcon />
-                            </Button>
-                          </TableCell>
+                  <TableContainer component={Paper}>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Id</TableCell>
+                          <TableCell>Nombre</TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Acciones</TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      </TableHead>
+
+                      <TableBody>
+                        {contacts
+                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .map((contact, index) => (
+                          <TableRow key={index}>
+                            <TableCell>{contact.id}</TableCell>
+                            <TableCell>
+                              <div style={{ display: 'flex', alignItems: 'center' }}>
+                                <Avatar
+                                  sx={{
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '50%',
+                                    marginRight: 1,
+                                  }}
+                                  src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contact.profileImage}`}
+                                  alt={contact.name}
+                                />
+                                {contact.name}
+                              </div>
+                            </TableCell>
+                            <TableCell>{contact.email}</TableCell>
+                            <TableCell>
+                              <Button variant="outlined" onClick={() => null}>
+                                <DeleteIcon />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      component="div"
+                      count={contacts.length}
+                      page={page}
+                      onPageChange={(_, newPage) => setPage(newPage)}
+                      rowsPerPage={rowsPerPage}
+                      onRowsPerPageChange={(e) => {
+                        setRowsPerPage(parseInt(e.target.value, 10));
+                        setPage(0);
+                      }}
+                    />
+                  </TableContainer>
+                  
                 </Card>
               </Box>
             </Grid>

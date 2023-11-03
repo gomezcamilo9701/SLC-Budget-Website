@@ -58,9 +58,13 @@ export const editEvent = async (eventDataEdit: TEventDataEdit) => {
     },
       body: formData,
     });
+
     if(!res.ok){
       throw new Error(`Edit event request failed: ${res.status} ${res.text}`);
     }
+
+    const data = await res.json();
+    return data;
   } catch(err) {
     console.error('Edit event request error',err);
     throw err;
