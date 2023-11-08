@@ -5,6 +5,15 @@ export type TLoginUser = {
 };
 
 //USER
+
+export interface IUserResponse {
+  id: string;
+  name: string;
+  email: string;
+  lastName: string;
+  username: string;
+  profileImage: string;
+}
 export interface IUser {
   email: string;
   name: string;
@@ -34,7 +43,6 @@ export type TEditUser = {
 
 //Componente Contacts
 export type TContactState = {
-  loading: boolean;
   email: string;
   contactInfo: IUserWithId | null;
   modalOpen: boolean;

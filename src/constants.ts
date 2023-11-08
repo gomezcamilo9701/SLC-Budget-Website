@@ -1,5 +1,5 @@
 const CONSTANTS = {
-  BASE_URL: 'http://ec2-54-221-52-14.compute-1.amazonaws.com',
+  BASE_URL: 'http://localhost:8080',
   USER_REGISTER: '/user/signup',
   USER_LOGIN: '/login',
   USER_EDIT: '/user/update',
@@ -14,5 +14,5 @@ const CONSTANTS = {
   GET_EVENT_BY_USER_ID: 'user/events',
   CREATE_INVITATION: '/invitation/create',
 };
-//http://localhost:8080
+//http://ec2-54-221-52-14.compute-1.amazonaws.com
 export default CONSTANTS;

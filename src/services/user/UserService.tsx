@@ -2,26 +2,29 @@ import CONSTANTS from "../../constants";
 import { TLoginUser, IUser, TEditUser, ContactPaginationResponse } from "../../types";
 import { TokenService } from "../token/TokenService";
 
-export const registerUser = async (user: IUser, profileImage: File) => {
-    try {
-        const formData = new FormData();
-        formData.append('createUserDTO', new Blob([JSON.stringify(user)], { type: 'application/json' }));
-        formData.append('profileImage', profileImage);
+export const registerUser = async (user: IUser, profileImage: File | null) => {
+  const formData = new FormData();
+  formData.append('createUserDTO', new Blob([JSON.stringify(user)], { type: 'application/json' }));
+  if (profileImage) {
+    formData.append('profileImage', profileImage);
+  }
+  console.log('formDat', formData);
+  try {
+      
+      const repoonse = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_REGISTER}`, {
+          method: 'POST',
+          body: formData,
+      });
 
-        const repoonse = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_REGISTER}`, {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!repoonse.ok) {
-            throw new Error('POST request failed');
-        }
-        const data = await repoonse.json();
-        return data;
-    } catch (err) {
-        console.error('POST request errror',err);
-        throw err;
-    }
+      if (!repoonse.ok) {
+          throw new Error('POST request failed');
+      }
+      const data = await repoonse.json();
+      return data;
+  } catch (err) {
+      console.error('POST request errror',err);
+      throw err;
+  }
 };
 
 export const loginUser = async (loginData: TLoginUser) => {
@@ -59,9 +62,11 @@ export const editUser = async (editData: TEditUser) => {
   const token = TokenService.getToken();
   const formData = new FormData();
   formData.append('updatedUser', new Blob([JSON.stringify(editData.editForm)], { type: 'application/json' }));
+  console.log('editD', editData.profileImage);
   if (editData.profileImage) {
     formData.append('profileImage', editData.profileImage);
   }
+  console.log('formDat', formData);
   if (!token) {
     console.error("No se encontró un token de autenticación");
     return null;
@@ -188,7 +193,6 @@ export const getContactsByUserId = async (userId: string) => {
     console.error("No se encontró un token de autenticación");
     return null;
   }
-
   try {
     const url = `${CONSTANTS.BASE_URL}${CONSTANTS.GET_CONTACTS}/${userId}`;
     const headers = {

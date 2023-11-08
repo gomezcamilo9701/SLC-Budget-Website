@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Avatar, Badge, Button, Card, CardContent, CardHeader, Grid, Modal, Alert, Table, TablePagination, TableContainer, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardContent, CardHeader, Grid, Modal, Table, TablePagination, TableContainer, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useAppSelector } from '../../hooks/store'
 import { useContactsActions } from '../../store/contacts/useContactsActions'
@@ -13,57 +13,59 @@ import { Box, Paper } from '@mui/material';
 import { useStyles } from './ContactsStyles';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from '../materialUI-common';
+import { Toaster, toast } from 'sonner';
+import { startLoading, stopLoading } from '../../store/loading/loadingSlice';
+import { useDispatch } from 'react-redux';
 
 function Contacts() {
-  // Para paginar
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  // Slices recuperados de la store
-  const contacts = useAppSelector((state) => state.contacts)
-  const user = useAppSelector((state) => state.user)
-
-  // Actions para actualizar slice contacts en la store
-  const { addContact, refreshContacts } = useContactsActions();
+  // #region Estados
+  //Configuración de paginación para las tablas
+  const [pagination, setPagination] = useState({
+    page: 0,
+    rowsPerPage: 2,
+  });
 
   // State para gestionar todo el componente
   const [contactState, setContactState] = useState<TContactState>({
-    loading: true,
     email: '',
     contactInfo: null,
     modalOpen: false,
   })
 
-  // State para manejar alertas
-  const [alert, setAlert] = useState({
-    type: "",
-    message: "",
-  });
+  // #endregion
 
-  // Fetch para recuperar de la bd y actualizar la store
+  // #region Store
+  // Slices
+  const contacts = useAppSelector((state) => state.contacts)
+  const user = useAppSelector((state) => state.user)
+  const isLoading = useAppSelector((state) => state.loading)
+
+  // Actions
+  const { addContact, refreshContacts } = useContactsActions();
+  const dispatch = useDispatch();
+
+  // #endregion
+
+  // #region Fetch inicial
   const fetchUserData = async () => {
     try {
       const contactsData = await getContactsByUserId(user.id);
       const contacts: IUserWithId[] | null | undefined = contactsData?.contacts;
       refreshContacts(contacts);
-      setContactState({
-        ...contactState,
-        loading: false,
-      })
     } catch (err) {
       console.error('Error al obetener los datos del servidor', err);
-      setContactState({
-        ...contactState,
-        loading: false,
-      })
+    } finally {
+      dispatch(stopLoading());
     }
   }
   useEffect(() => {
     fetchUserData();
   }, []);
+  // #endregion
 
   useEffect(() => {
-    console.log('store,', contacts);
+    console.log('contacts', contacts);
   }, [contacts]);
 
   const handleSearch = async () => {
@@ -71,10 +73,7 @@ function Contacts() {
       const foundContact: IUserWithId = await getUserByEmail(contactState.email);
       const foundEmail = contacts.find(contact => contact.email === contactState.email);
       if (foundEmail) {
-        setAlert({
-          type: "error",
-          message: "Este usuario ya está en tu lista de contactos"
-        })
+        toast.error("Este usuario ya está en tu lista de contactos")
       } else {
         setContactState({
           ...contactState,
@@ -88,16 +87,23 @@ function Contacts() {
         contactInfo: null,
         modalOpen: false,
       })
-      setAlert({
-        type: "error",
-        message: "Este usuario no existe"
-      })
+      toast.error("Este usuario no existe")
+
     }
   };
 
+  const handleAddContact = (contactState: TContactState) =>  {
+    dispatch(startLoading());
+    setContactState({
+      ...contactState,
+      modalOpen: false,
+    })
+    addContact(contactState.contactInfo);
+  }
+
   return (
     <>
-      {contactState.loading ? (
+      {isLoading ? (
         <LoadingScreen />
       ) : (
         <ThemeProvider theme={theme}>
@@ -156,18 +162,7 @@ function Contacts() {
                         <p>Nombre: {contactState.contactInfo.name}</p>
                         <p>Apellido: {contactState.contactInfo.lastName}</p>
                         <p>Correo electrónico: {contactState.contactInfo.email}</p>
-                        <Button variant="contained" onClick={
-                          () => {
-                            setAlert({
-                              type: "success",
-                              message: "Usuario agregado"
-                            })
-                            addContact(contactState.contactInfo)
-                            setContactState({
-                              ...contactState,
-                              modalOpen: false,
-                            })
-                          }}>
+                        <Button variant="contained" onClick={() => handleAddContact(contactState)}>
                           <PersonAddIcon />
                         </Button>
                         <Button variant="contained" onClick={() =>
@@ -182,12 +177,6 @@ function Contacts() {
                   </Card>
                 </Modal>
 
-                {alert.type === "success" && (
-                  <Alert severity="success">{alert.message}</Alert>
-                )}
-                {alert.type === "error" && (
-                  <Alert severity="error">{alert.message}</Alert>
-                )}
               </Box>
             </Grid>
 
@@ -221,7 +210,8 @@ function Contacts() {
 
                       <TableBody>
                         {contacts
-                          .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                          .slice(pagination.page * pagination.rowsPerPage, pagination.page
+                            * pagination.rowsPerPage + pagination.rowsPerPage)
                           .map((contact, index) => (
                           <TableRow key={index}>
                             <TableCell>{contact.id}</TableCell>
@@ -253,12 +243,18 @@ function Contacts() {
                     <TablePagination
                       component="div"
                       count={contacts.length}
-                      page={page}
-                      onPageChange={(_, newPage) => setPage(newPage)}
-                      rowsPerPage={rowsPerPage}
+                      page={pagination.page}
+                      onPageChange={(_, newPage) => setPagination({
+                        ...pagination,
+                        page: newPage
+                      })}
+                      rowsPerPage={pagination.rowsPerPage}
                       onRowsPerPageChange={(e) => {
-                        setRowsPerPage(parseInt(e.target.value, 10));
-                        setPage(0);
+                        setPagination({
+                          ...pagination,
+                          rowsPerPage: parseInt(e.target.value, 10),
+                          page: 0
+                        })
                       }}
                     />
                   </TableContainer>
@@ -267,6 +263,7 @@ function Contacts() {
               </Box>
             </Grid>
           </Grid>
+          <Toaster />
         </ThemeProvider>
       )}
     </>

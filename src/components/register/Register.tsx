@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Link } from "react-router-dom";
-import { Alert, IconButton, InputAdornment, Stack } from "@mui/material";
+import { Avatar, IconButton, InputAdornment, Stack } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import { Grid, TextField, Button } from "@mui/material";
@@ -14,8 +14,8 @@ import { IUser } from "../../types";
 import { registerUser } from "../../services/user/UserService";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { theme } from "../materialUI-common";
-
-
+import useImageUploader from "../../hooks/useImageUploader";
+import { Toaster, toast } from "sonner";
 
 const defaultValues: IUser = {
   email: "",
@@ -27,28 +27,15 @@ const defaultValues: IUser = {
 };
 
 const RegisterForm = () => {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const {selectedFile, previewImage, setSelectedFile, handleImageChange} = useImageUploader();
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [alert, setAlert] = useState({
-    type: "",
-    message: "",
-  });
   const {
     register,
     handleSubmit,
     formState: { errors, isValid },
     reset,
   } = useForm<IUser>({ defaultValues });
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-    } else {
-      setSelectedFile(null);
-    }
-  };
-
 
   const onSubmit: SubmitHandler<IUser> = async (data) => {
     const { email, name, lastName, username, password } = data;
@@ -63,30 +50,22 @@ const RegisterForm = () => {
           password,
           roles,
         };
+        let renamedFile = null;
         if (selectedFile) {
           const fileExtension = selectedFile.name.split('.').pop();
           const newFileName = `${email}.${fileExtension}`;
-          const renamedFile = new File([selectedFile], newFileName);
-          await registerUser(user, renamedFile);
-        } else {
-          console.error('No seleccionó imagen')
-        }
-        setAlert({
-          type: "success",
-          message: "Registro satisfactorio como usuario.",
-        });
+          renamedFile = new File([selectedFile], newFileName);
+        } 
+        await registerUser(user, renamedFile);
+        toast.success("Registro satisfactorio como usuario.");
       }
       reset();
       setSelectedFile(null);
     } catch (e) {
-      setAlert({
-        type: "error",
-        message: "Error en el registro.",
-      });
+      toast.error("Error en el registro")
     }
   };
 
-  const [showPassword, setShowPassword] = useState(false);
 
   // Función que cambia el valor de 'showPassword' al hacer clic en el icono
   const handleClickShowPassword = () => {
@@ -112,14 +91,37 @@ const RegisterForm = () => {
             <Typography component="h2" variant="h5">
               ¡Regístrate!
             </Typography>
+            <Avatar
+              sx={useStyles.profileImage}
+              src={previewImage ?? ''}
+              alt={'Imagen del usuario'}
+            />
+            <Grid item xs={12} sm={6} >
+              <label htmlFor="image-upload">
+                <Button
+                  component="span"
+                  variant="contained"
+                  startIcon={<CloudUploadIcon />}
+                  sx={useStyles.profileButton}
+                >
+                  {selectedFile ? 'Cargar de nuevo' : "Cargar foto"}
+                </Button>
+              </label>
+              <input
+                type="file"
+                id="image-upload"
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+              />
+            </Grid>
             <Box
               component="form"
               noValidate
               onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 3 }}
             >
-
-              <Grid container xs={12} >
+              <Grid container>
                 <Stack spacing={1}>
                   <Stack direction="row" spacing={1}>
                     <Grid item xs={12} sm={6} >
@@ -202,31 +204,13 @@ const RegisterForm = () => {
                       {...register("password", { required: true, minLength: 4 })}
                     />
                   </Grid>
-                  <Grid item xs={12}>
-                    <label htmlFor="image-upload">
-                      <Button
-                        component="span"
-                        variant="contained"
-                        startIcon={<CloudUploadIcon />}
-                      >
-                        {selectedFile ? selectedFile?.name : "Subir Imagen de Perfil"}
-                      </Button>
-                    </label>
-                    <input
-                      type="file"
-                      id="image-upload"
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                      onChange={handleImageChange}
-                    />
-                  </Grid>
                 </Stack>
                 <Button
                   fullWidth
                   type="submit"
                   variant="contained"
                   sx={useStyles.button}
-                  disabled={!isValid || (selectedFile == null)}
+                  disabled={!isValid}
                 >
                   Crear Cuenta
                 </Button>
@@ -235,13 +219,7 @@ const RegisterForm = () => {
                     <Link to="/Login">Regresar</Link>
                   </Grid>
                 </Grid>
-
-                {alert.type === "success" && (
-                  <Alert severity="success">{alert.message}</Alert>
-                )}
-                {alert.type === "error" && (
-                  <Alert severity="error">{alert.message}</Alert>
-                )}
+                <Toaster />
               </Grid>
             </Box>
           </Box>

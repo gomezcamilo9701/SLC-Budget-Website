@@ -82,7 +82,16 @@ export const useStyles = {
             backgroundColor: "#211f42"
         }
     },
-
-
-
+    profileImage: {
+        width: 100, 
+        height: 100, 
+        borderRadius: '50%'
+    },
+    profileButton: {
+        mt: 2,
+        '&:hover': {
+            backgroundColor: "#211f42",
+            color: "white",
+        }
+    },
 };
