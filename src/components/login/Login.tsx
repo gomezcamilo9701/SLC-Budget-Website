@@ -96,7 +96,7 @@ const LoginForm = () => {
               onSubmit={handleSubmit(onSubmit)}
               sx={{ mt: 3 }}
             >
-              <Grid container xs={12}>
+              <Grid container>
                 <Stack spacing={2}>
                 <Grid item xs={12}>
                   <TextField

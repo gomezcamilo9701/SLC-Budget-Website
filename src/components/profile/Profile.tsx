@@ -13,54 +13,42 @@ import {
   Button
 } from "@mui/material";
 import Divider from '@mui/material/Divider';
-import { editUser, getUserByEmail } from '../../services/user/UserService';
-import { IUserWithId, TEditUser } from '../../types';
+import { editUser } from '../../services/user/UserService';
+import { IUserResponse, IUserWithId, TEditUser } from '../../types';
 import { useUserActions } from "../../store/user/useUserActions";
 import CONSTANTS from '../../constants';
 import { useAppSelector } from '../../hooks/store';
-import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from '../loading_screen/LoadingScreen';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import useImageUploader from '../../hooks/useImageUploader';
 
 const ProfileForm: React.FC = () => {
   
-  /*Configuración del LoaderScreen*/
-  const [loading, setLoading] = useState<boolean>(true);
-  useEffect(() => {
-    // Simula una carga de datos con un retraso
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1400); // 1.4 segundos
-
-    // Limpia el temporizador al desmontar el componente
-    return () => clearTimeout(timer);
-  }, []);
+  // #region Estados
   
+  //Configuración del LoaderScreen
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Slice recuperados de la store de user
-  const user = useAppSelector((state) => state.user)
+  // Imagen
+  const {selectedFile, previewImage, handleImageChange} = useImageUploader();
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-    } else {
-      setSelectedFile(null);
-    }
-  };
-
-  // Actions para actualizar slice user en la store
-  const { updateUser } = useUserActions();
-
-  // State para manejar alertas
+  // Alertas
   const [alert, setAlert] = useState({
     type: "",
     message: "",
   });
+  // #endregion 
 
-  // React-hook-form
+  // #region Store
+
+  // Slice
+  const user = useAppSelector((state) => state.user)
+
+  // Actions
+  const { updateUser } = useUserActions();
+  // #endregion 
+
+  // #region React-hook-form y onSubmit
   const {
     register,
     handleSubmit,
@@ -68,37 +56,17 @@ const ProfileForm: React.FC = () => {
     reset,
   } = useForm<IUserWithId>();
 
-    // Fetch para recuperar de la bd y actualizar la store
-  const fetchUserData = async () => {
-    try {
-      const email = localStorage.getItem('email');
-      const userData: IUserWithId = email ? await getUserByEmail(email) : DEFAULT_USER_STATE;
-      const userWithoutPassword = { ...userData, password: '' };
-      updateUser(userWithoutPassword);
-      setLoading(false);
-      reset(userWithoutPassword);
-    } catch (err) {
-      console.error('Error al obetener los datos del servidor', err);
-      setLoading(false);
-    }
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
   // botón Guardar Cambios, se edita en la bd y se actualiza el user en la store
   const onSubmit: SubmitHandler<IUserWithId> = async (data) => {
-    const { id, name, lastName, username, password, email, roles, profileImage } = data;
+    const { id, name, lastName, username, password, email, profileImage } = data;
     try {
       if (data) {
-        const userForPersist: IUserWithId = {
+        const userForPersist: IUserResponse = {
           id,
           email,
           name,
           lastName,
           username,
-          password,
-          roles,
           profileImage,
         }
         let renamedFile = null;
@@ -131,6 +99,16 @@ const ProfileForm: React.FC = () => {
       });
     }
   };
+  // #endregion
+
+  // #region useEffect inicial
+  useEffect(() => {
+    setTimeout(() => {
+      reset(user);
+      setLoading(false);
+    }, 1000)
+  }, []);
+  // #endregion
 
   return (
     <>
@@ -150,9 +128,12 @@ const ProfileForm: React.FC = () => {
                   </Typography>
                   <Divider variant="middle"/>
                   <Avatar
-                      sx={useStyles.profileImage}
-                      src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${user.profileImage}`}
-                      alt={'Imagen de perfil'}
+                    sx={useStyles.profileImage}
+                    src={previewImage ??
+                      (user.profileImage
+                        ? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${user.profileImage}`
+                        : '')}
+                    alt={'Imagen del usuario'}
                   />
                   <Grid item xs={12}>
                     <label htmlFor="image-upload">
@@ -162,7 +143,7 @@ const ProfileForm: React.FC = () => {
                         startIcon={<CloudUploadIcon />}
                         sx={useStyles.profileButton}
                       >
-                        {selectedFile ? selectedFile?.name : "Cambiar Imagen de Perfil"}
+                        {selectedFile ? 'Mi nueva foto de perfil' : "Cambiar Imagen de Perfil"}
                       </Button>
                     </label>
                     <input

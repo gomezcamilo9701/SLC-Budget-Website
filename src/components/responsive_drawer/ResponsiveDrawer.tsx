@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -18,6 +18,11 @@ import { SecondaryListItems } from './SecondaryListItems';
 import { useStyles } from './ResponsiveDrawerStyles';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthActions } from '../../store/auth/useAuthActions';
+import { useUserActions } from '../../store/user/useUserActions';
+import { IUserResponse } from '../../types';
+import { getUserByEmail } from '../../services/user/UserService';
+import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
+import LoadingScreen from '../loading_screen/LoadingScreen';
 
 const drawerWidth = 240;
 
@@ -41,10 +46,36 @@ function Copyright(props: any) {
 export default function ResponsiveDrawer(props: Props) {
   const { window } = props;
   const container = window !== undefined ? () => window().document.body : undefined;
-  const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const { logoutUser } = useAuthActions();
 
+  // #region Estados
+  const [loading, setLoading] = useState<boolean>(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  // #endregion
+  
+  // #region Store
+  const { logoutUser } = useAuthActions();
+  // Actions
+  const { updateUser } = useUserActions();
+  // #endregion
+  
+  // #region Fetch inicial para cargar el usuario
+  const fetchUserData = async () => {
+    try {
+      const email = localStorage.getItem('email');
+      const userResponse: IUserResponse = email ? await getUserByEmail(email) : DEFAULT_USER_STATE;
+      updateUser(userResponse);
+      setLoading(false);
+    } catch (err) {
+      console.error('Error al obtener los datos de usuario desde servidor', err);
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+  // #endregion
+  
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -166,7 +197,11 @@ export default function ResponsiveDrawer(props: Props) {
         sx={{ flexGrow: 1, p: 3}}
       >
         <Toolbar />
-        <Outlet />
+          {loading ? (
+            <LoadingScreen />
+          ) : (
+            <Outlet />
+          )}
         <Copyright sx={{ pt: 4, color: "white" }} />
       </Box>
     </Box>

@@ -5,8 +5,6 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../materialUI-common";
-// import { useForm, SubmitHandler } from "react-hook-form";
-// import { Alert, Avatar, Badge, Card, CardContent, CardHeader, CssBaseline, MenuItem, Modal, Stack, Table, TableBody, TableCell, TableHead, TablePagination, TableRow } from "@mui/material";
 import {
   Alert,
   Avatar,
@@ -14,7 +12,6 @@ import {
   Card,
   CardHeader,
   CssBaseline,
-  MenuItem,
   Stack,
   Table,
   TableBody,
@@ -26,14 +23,8 @@ import {
   CardContent,
   Modal,
 } from "@mui/material";
-// import DeleteIcon from '@mui/icons-material/Delete';
 import { Grid, TextField, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
-// import { editUser, getUserByEmail } from '../../services/user/UserService';
-// import { IUserWithId, TEditUser } from '../../types';
-// import { useUserActions } from "../../store/user/useUserActions";
-// import CONSTANTS from '../../constants';
-// import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from "../loading_screen/LoadingScreen";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { IEvent, IEventWithId, IUserWithId, TEventDataEdit, TInvitationCreate } from "../../types";
@@ -48,57 +39,37 @@ import { getContactsByUserId } from "../../services/user/UserService";
 import { useContactsActions } from "../../store/contacts/useContactsActions";
 import { useInvitationsActions } from "../../store/invitations/useInvitationsActions";
 import { createInvitationInBd } from "../../services/invitation/InvitationService";
-
-
-/*Configuración del textfield de tipo select option*/
-interface EventSelectProps {
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
-  
-  const eventTypes = ["VIAJE", "HOGAR", "PAREJA", "COMIDA", "OTRO"];
-  return (
-    <TextField
-      select
-      value={value}
-      onChange={onChange}
-      sx={{
-        ...useStyles.textField,
-        "& .MuiInputBase-input": { paddingLeft: "10px" },
-      }}
-      required
-      fullWidth
-      variant="standard"
-      id="event-name"
-      label=""
-    >
-      {eventTypes.map((eventType) => (
-        <MenuItem key={eventType} value={eventType}>
-          {eventType}
-        </MenuItem>
-      ))}
-    </TextField>
-  );
-};
+import { SelectEventType } from "../select_event_type/SelectEventType";
+import useImageUploader from "../../hooks/useImageUploader";
 
 const EventDetails: React.FC = () => {
+
+  // #region Estados
+  //Imagen
+  const { selectedFile, previewImage, handleImageChange } = useImageUploader();
+
   //Modal para invitaciones
   const [openModalInvitation, setOpenModalInvitation] = useState(false);
+
   //Configuración de paginación para las tablas
-  const [page, setPage] = useState(0);
-  /*Configuración del textfield de tipo select option*/
+  const [pagination, setPagination] = useState({
+    page: 0,
+    rowsPerPage: 2,
+  });
+
+  // Select de evento
   const [selectedEvent, setSelectedEvent] = useState("");
-  const [rowsPerPage, setRowsPerPage] = useState(2);
-  /*Configuración del LoaderScreen*/
+
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  
   const [alert, setAlert] = useState({
     type: "",
     message: "",
   });
+
+  // #endregion
+
+  // #region react-hook-form y onSubmit
   const {
     register,
     handleSubmit,
@@ -106,85 +77,6 @@ const EventDetails: React.FC = () => {
     reset,
   } = useForm<IEvent>();
 
-  //STORE
-  const event = useAppSelector((state) => state.event);
-  const user = useAppSelector((state) => state.user);
-  const contacts = useAppSelector((state) => state.contacts);
-  const invitations = useAppSelector((state) => state.invitations);
-
-  const { updateEvent } = useEventActions();
-  const { refreshContacts } = useContactsActions();
-  const { createInvitation } = useInvitationsActions();
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setSelectedFile(null);
-      setPreviewImage(null);
-    }
-  };
-
-  useEffect(() => {
-    // Simula una carga de datos con un retraso
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1400); // 1.4 segundos
-
-    // Limpia el temporizador al desmontar el componente
-    return () => clearTimeout(timer);
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const contactsData = await getContactsByUserId(user.id);
-      const contacts: IUserWithId[] | null | undefined = contactsData?.contacts;
-      refreshContacts(contacts);
-      const eventData: IEventWithId = await getEventById(event.event_id);
-      updateEvent(eventData);
-      setLoading(false);
-      setSelectedEvent(event.type);
-      reset(eventData);
-    } catch (err) {
-      console.error('Error al obtener los datos de evento desde el servidor', err);
-      setLoading(false);
-    }
-  }
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  useEffect(() => {
-    console.log('cont', invitations);
-  }, [invitations]);
-
-  const handleInvitation = async (contactId: string) => {
-
-    const invitation: TInvitationCreate = {
-      eventId: event.event_id,
-      contactId: contactId,
-    }
-    try {
-      const response = await createInvitationInBd(invitation);
-      console.log(response);
-      if (response) {
-        createInvitation(response);
-      } else {
-        console.error('Error guardando o trayendo la info de invitación')
-      }
-    } catch (e) {
-      console.error('error', e);
-    }
-
-  }
-  
   // botón Guardar Cambios, se edita en la bd y se actualiza el event en la store
   const onSubmit: SubmitHandler<IEvent> = async (data) => {
     const { name, description, type } = data;
@@ -221,18 +113,57 @@ const EventDetails: React.FC = () => {
       });
     }
   };
+  // #endregion
 
-  const handleEventChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedEvent(event.target.value);
-  };
+  // #region Store
+  const event = useAppSelector((state) => state.event);
+  const user = useAppSelector((state) => state.user);
+  const contacts = useAppSelector((state) => state.contacts);
+  const invitations = useAppSelector((state) => state.invitations);
 
-  /*Configuración del textfield multiline de descripción */
-  const [rows, setRows] = useState(1);
+  const { updateEvent } = useEventActions();
+  const { refreshContacts } = useContactsActions();
+  const { createInvitation } = useInvitationsActions();
+  // #endregion
 
-  const handleFocus = () => {
-    setRows(3);
-  };
+  // #region useEffect inicial
+  const fetchUserData = async () => {
+    try {
+      const contactsData = await getContactsByUserId(user.id);
+      const contacts: IUserWithId[] | null | undefined = contactsData?.contacts;
+      refreshContacts(contacts);
+      const eventData: IEventWithId = await getEventById(event.event_id);
+      updateEvent(eventData);
+      setLoading(false);
+      setSelectedEvent(event.type);
+      reset(eventData);
+    } catch (err) {
+      console.error('Error al obtener los datos de evento desde el servidor', err);
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+  // #endregion
 
+  const handleInvitation = async (contactId: string) => {
+    const invitation: TInvitationCreate = {
+      eventId: event.event_id,
+      contactId: contactId,
+    }
+    try {
+      const response = await createInvitationInBd(invitation);
+      console.log(response);
+      if (response) {
+        createInvitation(response);
+      } else {
+        console.error('Error guardando o trayendo la info de invitación')
+      }
+    } catch (e) {
+      console.error('error', e);
+    }
+  }
 
   return (
     <>
@@ -269,7 +200,7 @@ const EventDetails: React.FC = () => {
                   sx={useStyles.profileImage}
                   src={previewImage ?? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${event.picture}`}
                   alt={'Imagen del evento'}
-                  />
+                />
                 <Grid item xs={12}>
                   <label htmlFor="image-upload">
                     <Button
@@ -327,12 +258,11 @@ const EventDetails: React.FC = () => {
                         required
                         fullWidth
                         multiline
-                        rows={rows}
+                        rows={3}
                         variant="standard"
                         id="description"
                         label=""
                         autoComplete=""
-                        onFocus={handleFocus}
                         {...register("description", {
                            required: true,
                            minLength: 3,
@@ -344,9 +274,9 @@ const EventDetails: React.FC = () => {
                         {" "}
                         Tipo de evento{" "}
                       </Typography>
-                      <EventSelect
+                      <SelectEventType
                         value={selectedEvent}
-                        onChange={handleEventChange}
+                        onChange={(e) => setSelectedEvent(e.target.value)}
                       />
                     </Grid>
                   </Grid>
@@ -636,7 +566,8 @@ const EventDetails: React.FC = () => {
 
                           <TableBody>
                             {contacts
-                              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                              .slice(pagination.page * pagination.rowsPerPage, pagination.page
+                                 * pagination.rowsPerPage + pagination.rowsPerPage)
                               .map((contact, index) => (
                               <TableRow key={index}>
                                 <TableCell>{contact.id}</TableCell>
@@ -668,12 +599,18 @@ const EventDetails: React.FC = () => {
                           <TablePagination
                             component="div"
                             count={contacts.length}
-                            page={page}
-                            onPageChange={(_, newPage) => setPage(newPage)}
-                            rowsPerPage={rowsPerPage}
+                            page={pagination.page}
+                            onPageChange={(_, newPage) => setPagination({
+                              ...pagination,
+                              page: newPage
+                            })}
+                            rowsPerPage={pagination.rowsPerPage}
                             onRowsPerPageChange={(e) => {
-                              setRowsPerPage(parseInt(e.target.value, 10));
-                              setPage(0);
+                              setPagination({
+                                ...pagination,
+                                rowsPerPage: parseInt(e.target.value, 10),
+                                page: 0
+                              })
                             }}
                           />
                       </TableContainer>
@@ -697,7 +634,8 @@ const EventDetails: React.FC = () => {
 
                           <TableBody>
                             {invitations
-                              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                              .slice(pagination.page * pagination.rowsPerPage, pagination.page
+                                * pagination.rowsPerPage + pagination.rowsPerPage)
                               .map((invitation, index) => (
                               <TableRow key={index}>
                                 <TableCell>{invitation?.invitation_id}</TableCell>
@@ -725,12 +663,18 @@ const EventDetails: React.FC = () => {
                           <TablePagination
                             component="div"
                             count={contacts.length}
-                            page={page}
-                            onPageChange={(_, newPage) => setPage(newPage)}
-                            rowsPerPage={rowsPerPage}
+                            page={pagination.page}
+                            onPageChange={(_, newPage) => setPagination({
+                              ...pagination,
+                              page: newPage
+                            })}
+                            rowsPerPage={pagination.rowsPerPage}
                             onRowsPerPageChange={(e) => {
-                              setRowsPerPage(parseInt(e.target.value, 10));
-                              setPage(0);
+                              setPagination({
+                                ...pagination,
+                                rowsPerPage: parseInt(e.target.value, 10),
+                                page: 0
+                              })
                             }}
                           />
                       </TableContainer>

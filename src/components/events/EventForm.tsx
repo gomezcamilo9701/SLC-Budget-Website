@@ -9,7 +9,6 @@ import {
   Alert,
   Avatar,
   CssBaseline,
-  MenuItem,
 } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
@@ -21,111 +20,45 @@ import { useEventActions } from "../../store/event/useEventActions";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { createEvent } from "../../services/event/EventService";
 import { useNavigate } from "react-router-dom";
-
-/*Configuración del textfield de tipo select option*/
-interface EventSelectProps {
-  value: string;
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-}
-const EventSelect: React.FC<EventSelectProps> = ({ value, onChange }) => {
-  const eventTypes = ["VIAJE", "HOGAR", "PAREJA", "COMIDA", "OTRO"];
-
-  return (
-    <TextField
-      select
-      value={value}
-      onChange={onChange}
-      sx={{
-        ...useStyles.textField,
-        "& .MuiInputBase-input": { paddingLeft: "10px" },
-      }}
-      required
-      fullWidth
-      variant="standard"
-      id="event-name"
-      label=""
-    >
-      {eventTypes.map((eventType) => (
-        <MenuItem key={eventType} value={eventType}>
-          {eventType}
-        </MenuItem>
-      ))}
-    </TextField>
-  );
-};
+import { SelectEventType } from "../select_event_type/SelectEventType";
+import useImageUploader from "../../hooks/useImageUploader";
 
 const EventForm: React.FC = () => {
   const navigate = useNavigate();
   
+  // #region Estados
   // Imagen
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files && e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
+  const { selectedFile, previewImage, handleImageChange } = useImageUploader();
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPreviewImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setSelectedFile(null);
-      setPreviewImage(null);
-    }
-  };
-
-  /*Configuración del textfield de tipo select option*/
+  // Selección de evento
   const [selectedEvent, setSelectedEvent] = useState("");
-  const handleEventChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSelectedEvent(event.target.value);
-  };
-  /*Configuración del textfield multiline de descripción */
-  const [rows, setRows] = useState(1);
-  const handleFocus = () => {
-    setRows(3);
-  };
-  // const handleBlur = () => {
-  //   setRows(1);
-  // };
 
-  /*Configuración del LoaderScreen*/
-  const [loading, setLoading] = useState<boolean>(true);
-  useEffect(() => {
-    // Simula una carga de datos con un retraso
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1400); // 1.4 segundos
-
-    // Limpia el temporizador al desmontar el componente
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Slice recuperados de la store de event y user
-  const user = useAppSelector((state) => state.user);
-  const event = useAppSelector((state) => state.event);
-
-  // Actions para actualizar slice event en la store
-  const { updateEvent } = useEventActions();
-
-  // State para manejar alertas
+  // Manejar alertas
   const [alert, setAlert] = useState({
     type: "",
     message: "",
   });
+  
+  // Manejar la pantalla de carga
+  const [loading, setLoading] = useState<boolean>(true);
+  // #endregion
+  
+  // #region Store
+  // Slice
+  const user = useAppSelector((state) => state.user);
+  //const event = useAppSelector((state) => state.event);
 
-  // React-hook-form
+  // Actions
+  const { updateEvent } = useEventActions();
+  // #endregion
+  
+  // #region React-hook-form con su onSubmit
   const {
     register,
     handleSubmit,
     formState: { isValid },
     reset,
   } = useForm<IEvent>();
-
-  useEffect(() => {
-    console.log('eventStore', event);
-  }, [event])
 
   // botón Guardar Cambios, se edita en la bd y se actualiza el event en la store
   const onSubmit: SubmitHandler<IEvent> = async (data) => {
@@ -148,14 +81,13 @@ const EventForm: React.FC = () => {
         };
 
         try {
-          const response = await createEvent(eventForm, renamedFile);
+          const response: IEvent = await createEvent(eventForm, renamedFile);
           updateEvent(response);
           setAlert({
             type: "success",
             message: "Creación de evento satisfactoria.",
           });
           reset();
-          setSelectedFile(null);
           setTimeout(() => {
             navigate('/event-details')
           }, 1000)
@@ -175,7 +107,20 @@ const EventForm: React.FC = () => {
       });
     }
   };
+  // #endregion
+  
+  // #region useEffect inicial
+  useEffect(() => {
+    // Simula una carga de datos con un retraso
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1400); // 1.4 segundos
 
+    // Limpia el temporizador al desmontar el componente
+    return () => clearTimeout(timer);
+  }, []);
+  // #endregion 
+  
   return (
     <>
       <CssBaseline />
@@ -266,13 +211,11 @@ const EventForm: React.FC = () => {
                         required
                         fullWidth
                         multiline
-                        rows={rows}
+                        rows={3}
                         variant="standard"
                         id="description"
                         label=""
                         autoComplete=""
-                        onFocus={handleFocus}
-                        // onBlur={handleBlur}
                         {...register("description", {
                           required: true,
                           minLength: 3,
@@ -284,9 +227,9 @@ const EventForm: React.FC = () => {
                         {" "}
                         Tipo de evento{" "}
                       </Typography>
-                      <EventSelect
+                      <SelectEventType
                         value={selectedEvent}
-                        onChange={handleEventChange}
+                        onChange={(e) => setSelectedEvent(e.target.value)}
                       />
                     </Grid>
                   </Grid>
