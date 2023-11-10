@@ -1,5 +1,5 @@
 import CONSTANTS from "../../constants";
-import { TLoginUser, IUser, TEditUser, ContactPaginationResponse } from "../../types";
+import { TLoginUser, IUser, TEditUser, ContactPaginationResponse, EventsPaginationResponse } from "../../types";
 import { TokenService } from "../token/TokenService";
 
 export const registerUser = async (user: IUser, profileImage: File | null) => {
@@ -168,7 +168,8 @@ export const addContact = async (contactId: string, userId: string) => {
     console.error("No se encontró un token de autenticación");
     return null;
   }
-
+  console.log('url', `${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}`);
+  console.log('contactDat', contactData);
   try {
     const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}`, {
       method: 'POST',
@@ -215,6 +216,39 @@ export const getContactsByUserId = async (userId: string) => {
     const contacts = responseData.content;
     const pageInfo = responseData.pageable;
     return {contacts, pageInfo};
+  } catch (error) {
+    console.error("GET request error:", error);
+    throw error;
+  }
+};
+
+export const getEventsByOwner = async (ownerId: string) => {
+  const token = TokenService.getToken();
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+  try {
+    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.GET_EVENTS_BY_OWNER}/${ownerId}`;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    const requestOptions = {
+      method: "GET",
+      headers: headers,
+    };
+
+    const response = await fetch(url, requestOptions);
+
+    if (!response.ok) {
+      throw new Error("GET request failed");
+    }
+
+    const responseData: EventsPaginationResponse = await response.json();
+    console.log('respon', responseData);
+    return responseData;
   } catch (error) {
     console.error("GET request error:", error);
     throw error;

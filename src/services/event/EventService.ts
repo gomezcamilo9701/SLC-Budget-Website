@@ -18,6 +18,7 @@ export const createEvent = async (eventData: IEvent, picture: File | null) => {
           formData.append('picture', picture);
         }
 
+        console.log('formadat', eventData, picture);
         const response = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.CREATE_EVENT}`, {
             method: 'POST',
             headers: {

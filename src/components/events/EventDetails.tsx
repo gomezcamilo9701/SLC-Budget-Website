@@ -6,7 +6,6 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../materialUI-common";
 import {
-  Alert,
   Avatar,
   Badge,
   Card,
@@ -19,28 +18,27 @@ import {
   TableHead,
   TableRow,
   TableContainer,
-  TablePagination,
-  CardContent,
   Modal,
 } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import LoadingScreen from "../loading_screen/LoadingScreen";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { IEvent, IEventWithId, IUserWithId, TEventDataEdit, TInvitationCreate } from "../../types";
+import { IEvent, IEventWithId, IUserWithId, TEventDataEdit, TInvitationCreate, TInvitationResponse } from "../../types";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAppSelector } from "../../hooks/store";
 import { useEventActions } from "../../store/event/useEventActions";
-import { editEvent, getEventById } from "../../services/event/EventService";
+import { editEvent } from "../../services/event/EventService";
 import CONSTANTS from "../../constants";
-import CloseIcon from '@mui/icons-material/Close';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { getContactsByUserId } from "../../services/user/UserService";
 import { useContactsActions } from "../../store/contacts/useContactsActions";
-import { useInvitationsActions } from "../../store/invitations/useInvitationsActions";
-import { createInvitationInBd } from "../../services/invitation/InvitationService";
+import { createInvitationInBd, getInvitationsByEvent, updateInvitation } from "../../services/invitation/InvitationService";
 import { SelectEventType } from "../select_event_type/SelectEventType";
 import useImageUploader from "../../hooks/useImageUploader";
+import { Toaster, toast } from "sonner";
+import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "../../store/loading/loadingSlice";
+import Invitations from "../invitations/Invitations";
 
 const EventDetails: React.FC = () => {
 
@@ -51,21 +49,10 @@ const EventDetails: React.FC = () => {
   //Modal para invitaciones
   const [openModalInvitation, setOpenModalInvitation] = useState(false);
 
-  //Configuración de paginación para las tablas
-  const [pagination, setPagination] = useState({
-    page: 0,
-    rowsPerPage: 2,
-  });
-
+  // Estado local para invitations recuperadas de la bd
+  const [invitations, setInvitations] = useState<TInvitationResponse[]>([]);
   // Select de evento
   const [selectedEvent, setSelectedEvent] = useState("");
-
-  const [loading, setLoading] = useState<boolean>(true);
-  
-  const [alert, setAlert] = useState({
-    type: "",
-    message: "",
-  });
 
   // #endregion
 
@@ -101,16 +88,11 @@ const EventDetails: React.FC = () => {
         }
         const responseEventEdited: IEventWithId = await editEvent(eventDataEdit);
         updateEvent(responseEventEdited);
-        setAlert({
-          type: "success",
-          message: "Actualización satisfactoria del evento.",
-        });
+        toast.success("Actualización satisfactoria del evento")
       }
     } catch (e) {
-      setAlert({
-        type: "error",
-        message: "Error en la edición del evento",
-      });
+      toast.error("Error en la edición del evento")
+
     }
   };
   // #endregion
@@ -119,27 +101,31 @@ const EventDetails: React.FC = () => {
   const event = useAppSelector((state) => state.event);
   const user = useAppSelector((state) => state.user);
   const contacts = useAppSelector((state) => state.contacts);
-  const invitations = useAppSelector((state) => state.invitations);
+  const isLoading = useAppSelector((state) => state.loading);
 
+  const dispatch = useDispatch();
   const { updateEvent } = useEventActions();
   const { refreshContacts } = useContactsActions();
-  const { createInvitation } = useInvitationsActions();
   // #endregion
 
   // #region useEffect inicial
   const fetchUserData = async () => {
+    dispatch(startLoading());
     try {
       const contactsData = await getContactsByUserId(user.id);
       const contacts: IUserWithId[] | null | undefined = contactsData?.contacts;
       refreshContacts(contacts);
-      const eventData: IEventWithId = await getEventById(event.event_id);
-      updateEvent(eventData);
-      setLoading(false);
+      const invitationsData = await getInvitationsByEvent(event.event_id);
+      const invitations: TInvitationResponse[] | null | undefined = invitationsData?.invitations;
+      if (invitations) {
+        setInvitations(invitations);
+      }
       setSelectedEvent(event.type);
-      reset(eventData);
+      reset(event);
     } catch (err) {
       console.error('Error al obtener los datos de evento desde el servidor', err);
-      setLoading(false);
+    } finally {
+      dispatch(stopLoading());
     }
   }
   useEffect(() => {
@@ -147,28 +133,49 @@ const EventDetails: React.FC = () => {
   }, []);
   // #endregion
 
-  const handleInvitation = async (contactId: string) => {
+  const handleInvitation = async (contactId: number) => {
     const invitation: TInvitationCreate = {
       eventId: event.event_id,
-      contactId: contactId,
+      contactId: `${contactId}`,
     }
+    const isAlreadyInvited = invitations.some(invitation => invitation.contactId === contactId);
+    if (isAlreadyInvited) toast.error("El contacto ya tiene una invitación pendiente o aceptada.");
     try {
-      const response = await createInvitationInBd(invitation);
-      console.log(response);
+      const response: TInvitationResponse | null = await createInvitationInBd(invitation);
       if (response) {
-        createInvitation(response);
+        setInvitations([...invitations, response]);
+        toast.success('Invitación enviada')
       } else {
-        console.error('Error guardando o trayendo la info de invitación')
+        console.error('Error enviando la invitación')
+        toast.error('Error enviando la invitación')
+      }
+    } catch (e) {
+      console.error('Error enviando la invitación', e)
+      toast.error('Error enviando la invitación')
+    }
+  }
+
+  const handleCancelInvitation = async (invitationId: number) => {
+    try {
+      const response: TInvitationResponse | null = await updateInvitation(invitationId, "REJECTED");
+      if (response) {
+        const updatedInvitations = invitations.filter(invitation => invitation.invitation_id !== invitationId);
+        setInvitations(updatedInvitations);
+        toast.success('Invitación eliminada')
+      } else {
+        console.error('Error eliminando la invitación')
+        toast.error('Error eliminando la invitación')
       }
     } catch (e) {
       console.error('error', e);
+      toast.error('Error eliminando la invitación');
     }
   }
 
   return (
     <>
       <CssBaseline />
-      {loading ? (
+      {isLoading ? (
         <LoadingScreen />
       ) : (
         <ThemeProvider theme={theme}>
@@ -198,7 +205,9 @@ const EventDetails: React.FC = () => {
                 <Divider variant="middle" />
                 <Avatar
                   sx={useStyles.profileImage}
-                  src={previewImage ?? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${event.picture}`}
+                  src={previewImage ?? (event.picture
+                    ? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${event.picture}`
+                    : '') }
                   alt={'Imagen del evento'}
                 />
                 <Grid item xs={12}>
@@ -288,14 +297,9 @@ const EventDetails: React.FC = () => {
                     sx={useStyles.button}
                     disabled={!isValid}
                   >
-                    Crear evento
+                    Editar evento
                   </Button>
-                  {alert.type === "success" && (
-                    <Alert severity="success">{alert.message}</Alert>
-                  )}
-                  {alert.type === "error" && (
-                    <Alert severity="error">{alert.message}</Alert>
-                  )}
+                  <Toaster />
                 </Box>
 
                 <Grid item xs={12} width={"100%"} mt={4}>
@@ -469,222 +473,18 @@ const EventDetails: React.FC = () => {
                   </Card>
                 </Box>
               </Grid>
-
-              <Grid
-                item
-                xs={12}
-                component={Paper}
-                elevation={1}
-                sx={useStyles.paper3}
-              >
-                <Box sx={useStyles.boxPaper}>
-                  <Card>
-                    <CardHeader
-                      title={
-                        <>
-                          Invitaciones pendientes
-                          <Badge
-                            badgeContent={/*contacts.length*/ 1}
-                            color="secondary"
-                            sx={{ ml: 2 }}
-                          ></Badge>
-                        </>
-                      }
-                    />
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Id</TableCell>
-                          <TableCell>Nombre</TableCell>
-                          <TableCell>Email</TableCell>
-                          <TableCell>Acciones</TableCell>
-                        </TableRow>
-                      </TableHead>
-
-                      <TableBody>
-                        {/*contacts.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{item.id}</TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                              <Avatar
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '50%',
-                                  marginRight: 1,
-                                }}
-                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                                alt={item.name}
-                              />
-                              {item.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>{item.email}</TableCell>
-                          <TableCell>
-                            <Button variant="outlined" onClick={() => null}>
-                              <DeleteIcon />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                            ))*/}
-                      </TableBody>
-                    </Table>
-                  </Card>
-                </Box>
-              </Grid>
             </Grid>
 
             <Modal open={openModalInvitation} onClose={() => setOpenModalInvitation(false)}>
-              <Card style={{ width: '80%', margin: 'auto', marginTop: 100, padding: 16, textAlign: "center" }}>
-                <CardHeader
-                    title={
-                      <>
-                        Invita a tus amigos
-                      </>
-                    }
+              <>
+                <Invitations
+                  contacts={contacts}
+                  invitations={invitations}
+                  handleInvitation={handleInvitation}
+                  setOpenModalInvitation={setOpenModalInvitation}
+                  handleCancelInvitation={handleCancelInvitation}
                 />
-                <CardContent>
-                  <Grid container>
-                    <Grid item xs={12} md={6} lg={6}>
-                      <TableContainer component={Paper}>
-                          <Typography variant="h6" component="div">
-                              Tus contactos
-                              <Badge badgeContent={contacts.length} color="secondary" sx={{ ml: 2 }}>
-                              </Badge>
-                          </Typography>
-                          
-                          <Table>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>Id</TableCell>
-                              <TableCell>Nombre</TableCell>
-                              <TableCell>Email</TableCell>
-                              <TableCell>Agregar</TableCell>
-                            </TableRow>
-                          </TableHead>
-
-                          <TableBody>
-                            {contacts
-                              .slice(pagination.page * pagination.rowsPerPage, pagination.page
-                                 * pagination.rowsPerPage + pagination.rowsPerPage)
-                              .map((contact, index) => (
-                              <TableRow key={index}>
-                                <TableCell>{contact.id}</TableCell>
-                                <TableCell>
-                                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <Avatar
-                                      sx={{
-                                        width: 32,
-                                        height: 32,
-                                        borderRadius: '50%',
-                                        marginRight: 1,
-                                      }}
-                                      src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contact.profileImage}`}
-                                      alt={contact.name}
-                                    />
-                                    {contact.name}
-                                  </div>
-                                </TableCell>
-                                <TableCell>{contact.email}</TableCell>
-                                <TableCell>
-                                  <Button variant="outlined" onClick={() => handleInvitation(contact.id)}>
-                                    <PersonAddIcon />
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                          </Table>
-                          <TablePagination
-                            component="div"
-                            count={contacts.length}
-                            page={pagination.page}
-                            onPageChange={(_, newPage) => setPagination({
-                              ...pagination,
-                              page: newPage
-                            })}
-                            rowsPerPage={pagination.rowsPerPage}
-                            onRowsPerPageChange={(e) => {
-                              setPagination({
-                                ...pagination,
-                                rowsPerPage: parseInt(e.target.value, 10),
-                                page: 0
-                              })
-                            }}
-                          />
-                      </TableContainer>
-                    </Grid>
-                    <Grid item xs={12} md={6} lg={6}>
-                      <TableContainer component={Paper}>
-                        <Typography variant="h6" component="div">
-                              Invitaciones a tu evento
-                              <Badge badgeContent={contacts.length} color="secondary" sx={{ ml: 2 }}>
-                              </Badge>
-                        </Typography>
-                        <Table>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell>Id Invitacion</TableCell>
-                              <TableCell>Nombre</TableCell>
-                              <TableCell>Email</TableCell>
-                              <TableCell>Estado</TableCell>
-                            </TableRow>
-                          </TableHead>
-
-                          <TableBody>
-                            {invitations
-                              .slice(pagination.page * pagination.rowsPerPage, pagination.page
-                                * pagination.rowsPerPage + pagination.rowsPerPage)
-                              .map((invitation, index) => (
-                              <TableRow key={index}>
-                                <TableCell>{invitation?.invitation_id}</TableCell>
-                                <TableCell>
-                                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    <Avatar
-                                      sx={{
-                                        width: 32,
-                                        height: 32,
-                                        borderRadius: '50%',
-                                        marginRight: 1,
-                                      }}
-                                      src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${invitation?.contact?.profileImage}`}
-                                      alt={invitation?.contact?.name}
-                                    />
-                                    {invitation?.contact?.name}
-                                  </div>
-                                </TableCell>
-                                <TableCell>{invitation?.contact?.email}</TableCell>
-                                <TableCell>{invitation?.invitation_state}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                          </Table>
-                          <TablePagination
-                            component="div"
-                            count={contacts.length}
-                            page={pagination.page}
-                            onPageChange={(_, newPage) => setPagination({
-                              ...pagination,
-                              page: newPage
-                            })}
-                            rowsPerPage={pagination.rowsPerPage}
-                            onRowsPerPageChange={(e) => {
-                              setPagination({
-                                ...pagination,
-                                rowsPerPage: parseInt(e.target.value, 10),
-                                page: 0
-                              })
-                            }}
-                          />
-                      </TableContainer>
-                    </Grid>
-                  </Grid>
-                  <Button variant="contained" onClick={() => setOpenModalInvitation(false)}>
-                    <CloseIcon />
-                  </Button>
-                </CardContent>
-              </Card>
+              </>
             </Modal>
           </Grid>
         </ThemeProvider>

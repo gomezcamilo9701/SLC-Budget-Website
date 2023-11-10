@@ -24,7 +24,7 @@ export interface IUser {
 }
 
 export interface IUserWithId extends IUser {
-  id: string;
+  id: number;
   profileImage: string;
 }
 
@@ -88,11 +88,15 @@ export type TInvitationCreate = {
   contactId: string,
 }
 
-export type TInvitationData = {
-  invitation_id: string,
-  event: IEventWithId,
-  contact: IUserWithId,
-  invitation_state: string;
+export type TInvitationResponse = {
+  contactName:         string;
+  contactLastName:     string;
+  contactUsername:     string;
+  contactId:           number;
+  contactEmail:        string;
+  contactProfileImage: string | null;
+  invitation_id:       number;
+  invitation_state:    string;
 }
 
 // Pagination
@@ -131,9 +135,8 @@ export type EventPaginationResponse = {
   first: boolean;
   empty: boolean;
 };
-
-export type ContactPaginationResponse = {
-  content: IUserWithId[] | null;
+export interface PaginationResponse<T> {
+  content: T[] | null;
   pageable: {
     pageNumber: number;
     pageSize: number;
@@ -159,7 +162,14 @@ export type ContactPaginationResponse = {
   numberOfElements: number;
   first: boolean;
   empty: boolean;
-};
+}
+
+export type ContactPaginationResponse = PaginationResponse<IUserWithId>;
+
+export type EventsPaginationResponse = PaginationResponse<IEventWithId>;
+export type InvitationsPaginationResponse = PaginationResponse<TInvitationResponse>;
+
+
 
 // //Edit Event
 // export type TEventForEdit = {
