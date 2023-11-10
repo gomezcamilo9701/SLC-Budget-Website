@@ -15,9 +15,11 @@ const contactsMiddleware: Middleware = store => next => async action => {
     const {user, contacts} = store.getState() as RootState
     const contactToAdd = contacts.find(contact => contact.id === payload.id)
     try {
+      console.log('entra try', payload.id, user.id);
       await addContact(payload.id, user.id)
       toast.success('Contacto agregador con éxito');
     } catch (error) {
+      console.log('entra error');
       if (contactToAdd) store.dispatch(rollbackContact(contactToAdd));
       toast.error('Error al agregar contacto');
     } finally {

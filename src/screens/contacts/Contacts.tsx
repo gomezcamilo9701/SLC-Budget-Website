@@ -7,12 +7,12 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { TContactState, IUserWithId } from '../../types';
 import { getContactsByUserId, getUserByEmail } from '../../services/user/UserService';
 import CONSTANTS from '../../constants';
-import LoadingScreen from '../loading_screen/LoadingScreen';
+import LoadingScreen from '../../components/loading_screen/LoadingScreen';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, Paper } from '@mui/material';
 import { useStyles } from './ContactsStyles';
 import { ThemeProvider } from '@mui/material/styles';
-import { theme } from '../materialUI-common';
+import { theme } from '../../components/materialUI-common';
 import { Toaster, toast } from 'sonner';
 import { startLoading, stopLoading } from '../../store/loading/loadingSlice';
 import { useDispatch } from 'react-redux';
@@ -49,10 +49,12 @@ function Contacts() {
 
   // #region Fetch inicial
   const fetchUserData = async () => {
+    dispatch(startLoading());
     try {
       const contactsData = await getContactsByUserId(user.id);
-      const contacts: IUserWithId[] | null | undefined = contactsData?.contacts;
-      refreshContacts(contacts);
+      const contactsToRefresh: IUserWithId[] | null | undefined = contactsData?.contacts;
+      console.log('fetchConta', contactsToRefresh);
+      refreshContacts(contactsToRefresh);
     } catch (err) {
       console.error('Error al obetener los datos del servidor', err);
     } finally {
@@ -64,42 +66,42 @@ function Contacts() {
   }, []);
   // #endregion
 
-  useEffect(() => {
-    console.log('contacts', contacts);
-  }, [contacts]);
-
-  const handleSearch = async () => {
-    try {
-      const foundContact: IUserWithId = await getUserByEmail(contactState.email);
-      const foundEmail = contacts.find(contact => contact.email === contactState.email);
-      if (foundEmail) {
-        toast.error("Este usuario ya está en tu lista de contactos")
-      } else {
+  // #region search y addContact
+  
+    const handleSearch = async () => {
+      try {
+        const foundContact: IUserWithId = await getUserByEmail(contactState.email);
+        const foundEmail = contacts.find(contact => contact.email === contactState.email);
+        if (foundEmail) {
+          toast.error("Este usuario ya está en tu lista de contactos")
+        } else {
+          setContactState({
+            ...contactState,
+            contactInfo: foundContact,
+            modalOpen: !!foundContact,
+          })
+        }
+      } catch (error) {
         setContactState({
           ...contactState,
-          contactInfo: foundContact,
-          modalOpen: !!foundContact,
+          contactInfo: null,
+          modalOpen: false,
         })
+        toast.error("Este usuario no existe")
+  
       }
-    } catch (error) {
+    };
+  
+    const handleAddContact = (contactState: TContactState) =>  {
+      dispatch(startLoading());
       setContactState({
         ...contactState,
-        contactInfo: null,
         modalOpen: false,
       })
-      toast.error("Este usuario no existe")
-
+      addContact(contactState.contactInfo);
     }
-  };
 
-  const handleAddContact = (contactState: TContactState) =>  {
-    dispatch(startLoading());
-    setContactState({
-      ...contactState,
-      modalOpen: false,
-    })
-    addContact(contactState.contactInfo);
-  }
+  // #endregion
 
   return (
     <>
@@ -156,7 +158,9 @@ function Contacts() {
                             borderRadius: '50%',
                             marginRight: 2,
                           }}
-                          src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contactState.contactInfo.profileImage}`}
+                          src={contactState.contactInfo.profileImage
+                            ? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contactState.contactInfo.profileImage}`
+                            : ''}
                           alt={contactState.contactInfo.name}
                         />
                         <p>Nombre: {contactState.contactInfo.name}</p>
@@ -204,7 +208,7 @@ function Contacts() {
                           <TableCell>Id</TableCell>
                           <TableCell>Nombre</TableCell>
                           <TableCell>Email</TableCell>
-                          <TableCell>Acciones</TableCell>
+                          <TableCell>Eliminar</TableCell>
                         </TableRow>
                       </TableHead>
 
@@ -224,7 +228,9 @@ function Contacts() {
                                     borderRadius: '50%',
                                     marginRight: 1,
                                   }}
-                                  src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contact.profileImage}`}
+                                  src={contact.profileImage
+                                    ? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${contact.profileImage}`
+                                    : ''}
                                   alt={contact.name}
                                 />
                                 {contact.name}

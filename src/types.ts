@@ -24,7 +24,7 @@ export interface IUser {
 }
 
 export interface IUserWithId extends IUser {
-  id: string;
+  id: number;
   profileImage: string;
 }
 
@@ -69,6 +69,13 @@ export interface IEventWithId extends IEvent {
   picture: string;
 }
 
+export interface IParticipantEvents extends IEventWithId {
+  ownerProfileImage: string | null;
+  ownerName: string;
+  ownerEmail: string;
+  ownerUsername: string;
+}
+
 export type TEventForEdit = {
   name: string;
   description: string;
@@ -88,23 +95,45 @@ export type TInvitationCreate = {
   contactId: string,
 }
 
-export type TInvitationData = {
-  invitation_id: string,
-  event: IEventWithId,
-  contact: IUserWithId,
-  invitation_state: string;
+export type TInvitationContactInfoResponse = {
+  contactName:         string;
+  contactLastName:     string;
+  contactUsername:     string;
+  contactId:           number;
+  contactEmail:        string;
+  contactProfileImage: string | null;
+  invitation_id:       number;
+  invitation_state:    string;
+}
+
+export interface TInvitationEventInfoResponse {
+  eventPicture:           string | null;
+  eventName:              string;
+  eventDescription:       string;
+  eventOwnerProfileImage: string | null;
+  eventOwnerId:           string;
+  eventOwnerName:         string;
+  eventOwnerEmail:        string;
+  invitation_id:          number;
+  eventType:              string;
+  event_id:               number;
+  invitation_state:       string;
+}
+
+// Event contacts
+export type TEventContactsResponse = {
+  contactEmail:        string;
+  contactName:         string;
+  contactId:           number;
+  contactProfileImage: string | null;
+  event_contact_id:    number;
+  contactLastName:     string;
+  contactUsername:     string;
 }
 
 // Pagination
 export type EventPaginationResponse = {
-  content: {
-    event_id: number;
-    name: string;
-    description: string;
-    type: string;
-    picture: string;
-    owner: IUserWithId;
-  }[];
+  content: IEventWithId[];
   pageable: {
     pageNumber: number;
     pageSize: number;
@@ -131,35 +160,44 @@ export type EventPaginationResponse = {
   first: boolean;
   empty: boolean;
 };
+export interface PaginationResponse<T> {
+  content: T[] | null;
+  pageable: {
+    pageNumber: number;
+    pageSize: number;
+    sort: {
+      empty: boolean;
+      unsorted: boolean;
+      sorted: boolean;
+    };
+    offset: number;
+    paged: boolean;
+    unpaged: boolean;
+  };
+  totalPages: number;
+  totalElements: number;
+  last: boolean;
+  size: number;
+  number: number;
+  sort: {
+    empty: boolean;
+    unsorted: boolean;
+    sorted: boolean;
+  };
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
+}
 
-export type ContactPaginationResponse = {
-  content: IUserWithId[] | null;
-  pageable: {
-    pageNumber: number;
-    pageSize: number;
-    sort: {
-      empty: boolean;
-      unsorted: boolean;
-      sorted: boolean;
-    };
-    offset: number;
-    paged: boolean;
-    unpaged: boolean;
-  };
-  totalPages: number;
-  totalElements: number;
-  last: boolean;
-  size: number;
-  number: number;
-  sort: {
-    empty: boolean;
-    unsorted: boolean;
-    sorted: boolean;
-  };
-  numberOfElements: number;
-  first: boolean;
-  empty: boolean;
-};
+export type ContactPaginationResponse = PaginationResponse<IUserWithId>;
+
+export type EventsPaginationResponse = PaginationResponse<IEventWithId>;
+export type ParticipantEventsPaginationResponse = PaginationResponse<IParticipantEvents>;
+export type InvitationsPaginationResponse = PaginationResponse<TInvitationContactInfoResponse>;
+export type InvitationsEventPaginationResponse = PaginationResponse<TInvitationEventInfoResponse>;
+export type EventContactsPaginationResponse = PaginationResponse<TEventContactsResponse>;
+
+
 
 // //Edit Event
 // export type TEventForEdit = {

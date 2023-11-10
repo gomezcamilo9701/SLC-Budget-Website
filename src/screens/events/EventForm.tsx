@@ -4,24 +4,26 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "../materialUI-common";
+import { theme } from "../../components/materialUI-common";
 import {
-  Alert,
   Avatar,
   CssBaseline,
 } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import LoadingScreen from "../loading_screen/LoadingScreen";
+import LoadingScreen from "../../components/loading_screen/LoadingScreen";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { IEvent } from "../../types";
+import { IEvent, IEventWithId } from "../../types";
 import { useAppSelector } from "../../hooks/store";
 import { useEventActions } from "../../store/event/useEventActions";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { createEvent } from "../../services/event/EventService";
 import { useNavigate } from "react-router-dom";
-import { SelectEventType } from "../select_event_type/SelectEventType";
+import { SelectEventType } from "../../components/select_event_type/SelectEventType";
 import useImageUploader from "../../hooks/useImageUploader";
+import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "../../store/loading/loadingSlice";
+import { Toaster, toast } from "sonner";
 
 const EventForm: React.FC = () => {
   const navigate = useNavigate();
@@ -32,23 +34,16 @@ const EventForm: React.FC = () => {
 
   // Selección de evento
   const [selectedEvent, setSelectedEvent] = useState("");
-
-  // Manejar alertas
-  const [alert, setAlert] = useState({
-    type: "",
-    message: "",
-  });
   
-  // Manejar la pantalla de carga
-  const [loading, setLoading] = useState<boolean>(true);
   // #endregion
   
   // #region Store
   // Slice
   const user = useAppSelector((state) => state.user);
-  //const event = useAppSelector((state) => state.event);
+  const isLoading = useAppSelector((state) => state.loading);
 
   // Actions
+  const dispatch = useDispatch();
   const { updateEvent } = useEventActions();
   // #endregion
   
@@ -81,42 +76,34 @@ const EventForm: React.FC = () => {
         };
 
         try {
-          const response: IEvent = await createEvent(eventForm, renamedFile);
+          const response: IEventWithId = await createEvent(eventForm, renamedFile);
           updateEvent(response);
-          setAlert({
-            type: "success",
-            message: "Creación de evento satisfactoria.",
-          });
+          toast.success("Creación de evento satisfactoria.");
           reset();
           setTimeout(() => {
             navigate('/event-details')
           }, 1000)
         } catch (e) {
           console.error(e);
-          setAlert({
-            type: "error",
-            message: "Error en la creación del evento.",
-          });
+          toast.error("Error en la creación del evento.");
+          console.error("Error en la creación del evento: ", e);
         }
 
       }
     } catch (e) {
-      setAlert({
-        type: "error",
-        message: "Error en la creación del evento.",
-      });
+      toast.success("Error en la creación del evento.");
+
     }
   };
   // #endregion
   
   // #region useEffect inicial
   useEffect(() => {
-    // Simula una carga de datos con un retraso
+    dispatch(startLoading());
     const timer = setTimeout(() => {
-      setLoading(false);
+      dispatch(stopLoading());
     }, 1400); // 1.4 segundos
 
-    // Limpia el temporizador al desmontar el componente
     return () => clearTimeout(timer);
   }, []);
   // #endregion 
@@ -124,7 +111,7 @@ const EventForm: React.FC = () => {
   return (
     <>
       <CssBaseline />
-      {loading ? (
+      {isLoading ? (
         <LoadingScreen />
       ) : (
         <ThemeProvider theme={theme}>
@@ -162,7 +149,7 @@ const EventForm: React.FC = () => {
                       startIcon={<CloudUploadIcon />}
                       sx={useStyles.profileButton}
                     >
-                      {selectedFile ? selectedFile.name : 'Seleccionar imagen'}
+                      {selectedFile ? 'Subir de nuevo' : 'Seleccionar imagen'}
                     </Button>
                   </label>
                   <input
@@ -244,12 +231,7 @@ const EventForm: React.FC = () => {
                     Crear evento
                   </Button>
                 </Box>
-                {alert.type === "success" && (
-                  <Alert severity="success">{alert.message}</Alert>
-                )}
-                {alert.type === "error" && (
-                  <Alert severity="error">{alert.message}</Alert>
-                )}
+                <Toaster />
               </Box>
             </Grid>
           </Grid>

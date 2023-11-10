@@ -1,5 +1,6 @@
 import CONSTANTS from "../../constants";
-import { TLoginUser, IUser, TEditUser, ContactPaginationResponse } from "../../types";
+import { TLoginUser, IUser, TEditUser, ContactPaginationResponse, EventsPaginationResponse } from "../../types";
+import { fetchPage } from "../UtilService";
 import { TokenService } from "../token/TokenService";
 
 export const registerUser = async (user: IUser, profileImage: File | null) => {
@@ -168,7 +169,8 @@ export const addContact = async (contactId: string, userId: string) => {
     console.error("No se encontró un token de autenticación");
     return null;
   }
-
+  console.log('url', `${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}`);
+  console.log('contactDat', contactData);
   try {
     const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}`, {
       method: 'POST',
@@ -217,6 +219,53 @@ export const getContactsByUserId = async (userId: string) => {
     return {contacts, pageInfo};
   } catch (error) {
     console.error("GET request error:", error);
+    throw error;
+  }
+};
+
+export const getEventsByOwner = async (ownerId: string) => {
+  const token = TokenService.getToken();
+  if (!token) {
+    console.error("No se encontró un token de autenticación");
+    return null;
+  }
+  try {
+    let url = `${CONSTANTS.BASE_URL}${CONSTANTS.GET_EVENTS_BY_OWNER}/${ownerId}?page=${0}`;
+    const initialResponse = await fetchPage(url, token);
+    const totalPages = initialResponse?.totalPages || 1;
+
+    const pagePromises = [];
+    for (let page = 1; page < totalPages; page++) {
+      url = `${CONSTANTS.BASE_URL}${CONSTANTS.GET_EVENTS_BY_OWNER}/${ownerId}?page=${page}`;
+      pagePromises.push(fetchPage(url, token));
+    }
+
+    const responses = await Promise.all(pagePromises);
+    const allEvents: EventsPaginationResponse = responses.reduce(
+      (accumulator, currentResponse) => {
+        if (accumulator.content && currentResponse.content) {
+          accumulator.content = accumulator.content.concat(currentResponse.content);
+        }
+        accumulator.totalElements = currentResponse.totalElements || 0;
+        return accumulator;
+      },
+      {
+        content: initialResponse?.content || [],
+        pageable: initialResponse?.pageable || {},
+        totalPages: totalPages,
+        totalElements: initialResponse?.totalElements || 0,
+        last: false,
+        size: 0,
+        number: 0,
+        sort: initialResponse?.sort || {},
+        numberOfElements: 0,
+        first: false,
+        empty: false,
+      }
+    );
+    return allEvents;
+  } catch (error) {
+    console.error("Get event contacts request error:", error);
     throw error;
   }
 };
