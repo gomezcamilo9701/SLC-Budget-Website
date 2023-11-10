@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "../materialUI-common";
+import { theme } from "../../components/materialUI-common";
 import {
   Avatar,
   Badge,
@@ -17,14 +17,15 @@ import {
   TableCell,
   TableHead,
   TableRow,
-  TableContainer,
   Modal,
+  Grid,
+  TextField,
+  Button
 } from "@mui/material";
-import { Grid, TextField, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import LoadingScreen from "../loading_screen/LoadingScreen";
+import LoadingScreen from "../../components/loading_screen/LoadingScreen";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { IEvent, IEventWithId, IUserWithId, TEventDataEdit, TInvitationCreate, TInvitationResponse } from "../../types";
+import { IEvent, IEventWithId, IUserWithId, TEventContactsResponse, TEventDataEdit, TInvitationCreate, TInvitationContactInfoResponse } from "../../types";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAppSelector } from "../../hooks/store";
 import { useEventActions } from "../../store/event/useEventActions";
@@ -33,12 +34,14 @@ import CONSTANTS from "../../constants";
 import { getContactsByUserId } from "../../services/user/UserService";
 import { useContactsActions } from "../../store/contacts/useContactsActions";
 import { createInvitationInBd, getInvitationsByEvent, updateInvitation } from "../../services/invitation/InvitationService";
-import { SelectEventType } from "../select_event_type/SelectEventType";
+import { SelectEventType } from "../../components/select_event_type/SelectEventType";
 import useImageUploader from "../../hooks/useImageUploader";
 import { Toaster, toast } from "sonner";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../store/loading/loadingSlice";
 import Invitations from "../invitations/Invitations";
+import { ContactsTable } from "../../components/contacts_table/ContactsTable";
+import { getEventContactsByEventId } from "../../services/eventContacts/EventContactsService";
 
 const EventDetails: React.FC = () => {
 
@@ -50,51 +53,15 @@ const EventDetails: React.FC = () => {
   const [openModalInvitation, setOpenModalInvitation] = useState(false);
 
   // Estado local para invitations recuperadas de la bd
-  const [invitations, setInvitations] = useState<TInvitationResponse[]>([]);
+
+  const [eventData, setEventData] = useState({
+    invitations: [] as TInvitationContactInfoResponse[],
+    eventContacts: [] as TEventContactsResponse[],
+  });
+
   // Select de evento
   const [selectedEvent, setSelectedEvent] = useState("");
 
-  // #endregion
-
-  // #region react-hook-form y onSubmit
-  const {
-    register,
-    handleSubmit,
-    formState: {isValid},
-    reset,
-  } = useForm<IEvent>();
-
-  // botón Guardar Cambios, se edita en la bd y se actualiza el event en la store
-  const onSubmit: SubmitHandler<IEvent> = async (data) => {
-    const { name, description, type } = data;
-    try {
-      if (data) {
-        let renamedFile = null;
-        if (selectedFile) {
-          const fileExtension = selectedFile.name.split(".").pop();
-          const newFileName = `${name}${type}.${fileExtension}`;
-          renamedFile = new File([selectedFile], newFileName);
-        } else {
-          console.error("No se seleccionó una imagen para tu evento");
-        }
-        const eventDataEdit: TEventDataEdit = {
-          editForm: {
-            name,
-            description,
-            type: selectedEvent,
-          },
-          eventId: event.event_id,
-          picture: renamedFile,
-        }
-        const responseEventEdited: IEventWithId = await editEvent(eventDataEdit);
-        updateEvent(responseEventEdited);
-        toast.success("Actualización satisfactoria del evento")
-      }
-    } catch (e) {
-      toast.error("Error en la edición del evento")
-
-    }
-  };
   // #endregion
 
   // #region Store
@@ -112,15 +79,30 @@ const EventDetails: React.FC = () => {
   const fetchUserData = async () => {
     dispatch(startLoading());
     try {
-      const contactsData = await getContactsByUserId(user.id);
-      const contacts: IUserWithId[] | null | undefined = contactsData?.contacts;
-      refreshContacts(contacts);
-      const invitationsData = await getInvitationsByEvent(event.event_id);
-      const invitations: TInvitationResponse[] | null | undefined = invitationsData?.invitations;
-      if (invitations) {
-        setInvitations(invitations);
-      }
       setSelectedEvent(event.type);
+      const contactsResponse = await getContactsByUserId(user.id);
+      const contacts: IUserWithId[] | null | undefined = contactsResponse?.contacts;
+      refreshContacts(contacts);
+
+      const invitationsResponse = await getInvitationsByEvent(event.event_id);
+      const updatedInvitations: TInvitationContactInfoResponse[] | null | undefined = invitationsResponse?.invitations;
+      if (updatedInvitations) {
+        setEventData(prevState => ({
+          ...prevState,
+          invitations: updatedInvitations,
+        }));
+      console.log('invi', contacts)
+      }
+
+      const eventContactsResponse = await getEventContactsByEventId(event.event_id);
+      const updatedEventContacts: TEventContactsResponse[] | null | undefined = eventContactsResponse?.content;
+      if (updatedEventContacts) {
+        setEventData(prevState => ({
+          ...prevState,
+          eventContacts: updatedEventContacts,
+        }));
+      }
+      console.log('contac', updatedEventContacts)
       reset(event);
     } catch (err) {
       console.error('Error al obtener los datos de evento desde el servidor', err);
@@ -133,34 +115,85 @@ const EventDetails: React.FC = () => {
   }, []);
   // #endregion
 
+  // #region react-hook-form y onSubmit
+    const {
+      register,
+      handleSubmit,
+      formState: {isValid},
+      reset,
+    } = useForm<IEvent>();
+  
+    // botón Guardar Cambios, se edita en la bd y se actualiza el event en la store
+    const onSubmit: SubmitHandler<IEvent> = async (data) => {
+      const { name, description, type } = data;
+      try {
+        if (data) {
+          let renamedFile = null;
+          if (selectedFile) {
+            const fileExtension = selectedFile.name.split(".").pop();
+            const newFileName = `${name}${type}.${fileExtension}`;
+            renamedFile = new File([selectedFile], newFileName);
+          } else {
+            console.error("No se seleccionó una imagen para tu evento");
+          }
+          const eventDataEdit: TEventDataEdit = {
+            editForm: {
+              name,
+              description,
+              type: selectedEvent,
+            },
+            eventId: event.event_id,
+            picture: renamedFile,
+          }
+          const responseEventEdited: IEventWithId = await editEvent(eventDataEdit);
+          updateEvent(responseEventEdited);
+          toast.success("Actualización satisfactoria del evento")
+        }
+      } catch (e) {
+        toast.error("Error en la edición del evento")
+  
+      }
+    };
+    // #endregion
+  
+  // #region funciones
   const handleInvitation = async (contactId: number) => {
     const invitation: TInvitationCreate = {
       eventId: event.event_id,
       contactId: `${contactId}`,
     }
-    const isAlreadyInvited = invitations.some(invitation => invitation.contactId === contactId);
-    if (isAlreadyInvited) toast.error("El contacto ya tiene una invitación pendiente o aceptada.");
-    try {
-      const response: TInvitationResponse | null = await createInvitationInBd(invitation);
+    const isAlreadyInvited = eventData.invitations.some(invitation => invitation.contactId === contactId);
+    if (isAlreadyInvited) {
+      toast.error("El contacto ya tiene una invitación pendiente o aceptada.");
+      return
+    }
+      try {
+      const response: TInvitationContactInfoResponse | null = await createInvitationInBd(invitation);
       if (response) {
-        setInvitations([...invitations, response]);
+        setEventData(prevState => ({
+          ...prevState,
+          invitations: [...eventData.invitations, response]
+        }))
         toast.success('Invitación enviada')
       } else {
         console.error('Error enviando la invitación')
-        toast.error('Error enviando la invitación')
+        toast.error('El contacto ya tiene una invitación pendiente o aceptada')
       }
     } catch (e) {
       console.error('Error enviando la invitación', e)
-      toast.error('Error enviando la invitación')
+      toast.error('El contacto ya tiene una invitación pendiente o aceptada')
     }
   }
 
   const handleCancelInvitation = async (invitationId: number) => {
     try {
-      const response: TInvitationResponse | null = await updateInvitation(invitationId, "REJECTED");
+      const response: TInvitationContactInfoResponse | null = await updateInvitation(invitationId, "REJECTED");
       if (response) {
-        const updatedInvitations = invitations.filter(invitation => invitation.invitation_id !== invitationId);
-        setInvitations(updatedInvitations);
+        const updatedInvitations = eventData.invitations.filter(invitation => invitation.invitation_id !== invitationId);
+        setEventData(prevState => ({
+          ...prevState,
+          invitations: updatedInvitations,
+        }));        
         toast.success('Invitación eliminada')
       } else {
         console.error('Error eliminando la invitación')
@@ -171,6 +204,12 @@ const EventDetails: React.FC = () => {
       toast.error('Error eliminando la invitación');
     }
   }
+
+  // #endregion
+
+  useEffect(() => {
+    console.log('eventData.eventContacts', eventData.eventContacts);
+  }, [eventData.eventContacts])
 
   return (
     <>
@@ -218,7 +257,7 @@ const EventDetails: React.FC = () => {
                       startIcon={<CloudUploadIcon />}
                       sx={useStyles.profileButton}
                     >
-                      {selectedFile?.name ?? 'Imagen del Evento'}
+                      {selectedFile ? 'Subir de nuevo' : 'Seleccionar imagen'}
                     </Button>
                   </label>
                   <input
@@ -333,82 +372,9 @@ const EventDetails: React.FC = () => {
               component={Paper}
               sx={useStyles.paper2}
             >
-              <Grid
-                item
-                xs={12}
-                component={Paper}
-                elevation={1}
-                sx={useStyles.paper3}
-              >
-                <Box sx={useStyles.boxPaper}>
-                  <Card>
-                    <CardHeader
-                      sx={{}}
-                      title={
-                        <>
-                          <span>Contactos del evento</span>
-                          <Badge
-                            badgeContent={/*contacts.length*/ 1}
-                            color="secondary"
-                            sx={{ ml: 3 }}
-                          />
-                        </>
-                      }
-                    />
-                    <TableContainer component={Paper}>
-                      <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Id</TableCell>
-                            <TableCell>Nombre</TableCell>
-                            <TableCell>Email</TableCell>
-                            <TableCell>Acciones</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {/*contacts.map((item, index) => (
-                          <TableRow key={index}>
-                            <TableCell>{item.id}</TableCell>
-                            <TableCell>
-                              <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <Avatar
-                                  sx={{
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '50%',
-                                    marginRight: 1,
-                                  }}
-                                  src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                                  alt={item.name}
-                                />
-                                {item.name}
-                              </div>
-                            </TableCell>
-                            <TableCell>{item.email}</TableCell>
-                            <TableCell>
-                              <Button variant="outlined" onClick={() => null}>
-                                <DeleteIcon />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                              ))*/}
-                        </TableBody>
-                      </Table>
-                      {/* <TablePagination
-                        component="div"
-                        count={contacts.length}
-                        page={page}
-                        onPageChange={(_, newPage) => setPage(newPage)}
-                        rowsPerPage={rowsPerPage}
-                        onRowsPerPageChange={(e) => {
-                          setRowsPerPage(parseInt(e.target.value, 10));
-                          setPage(0);
-                        }}
-                      /> */}
-                    </TableContainer>
-                  </Card>
-                </Box>
-              </Grid>
+              <ContactsTable
+                contacts={eventData.eventContacts}
+              />
 
               <Grid
                 item
@@ -479,7 +445,7 @@ const EventDetails: React.FC = () => {
               <>
                 <Invitations
                   contacts={contacts}
-                  invitations={invitations}
+                  invitations={eventData.invitations}
                   handleInvitation={handleInvitation}
                   setOpenModalInvitation={setOpenModalInvitation}
                   handleCancelInvitation={handleCancelInvitation}

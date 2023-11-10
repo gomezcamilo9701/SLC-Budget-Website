@@ -17,7 +17,7 @@ import {
   Button
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
-import { IUserWithId, TInvitationResponse } from '../../types';
+import { IUserWithId, TInvitationContactInfoResponse } from '../../types';
 import CONSTANTS from '../../constants';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import CloseIcon from '@mui/icons-material/Close';
@@ -27,7 +27,7 @@ import PendingSharpIcon from '@mui/icons-material/PendingSharp';
 type IInvitationsProps = {
   contacts: IUserWithId[];
   handleInvitation: (contactId: number) => Promise<void>;
-  invitations: TInvitationResponse[] | null;
+  invitations: TInvitationContactInfoResponse[] | null;
   setOpenModalInvitation: React.Dispatch<React.SetStateAction<boolean>>;
   handleCancelInvitation: (invitationId: number) => Promise<void>;
 }
@@ -39,7 +39,12 @@ const Invitations:React.FC<IInvitationsProps> = ({
   setOpenModalInvitation,
   handleCancelInvitation
 }) => {
-  const [pagination, setPagination] = useState({
+  const [paginationContacts, setPaginationContacts] = useState({
+    page: 0,
+    rowsPerPage: 2,
+  });
+
+  const [paginationInvitations, setPaginationInvitations] = useState({
     page: 0,
     rowsPerPage: 2,
   });
@@ -73,8 +78,8 @@ const Invitations:React.FC<IInvitationsProps> = ({
 
                   <TableBody>
                     {contacts
-                      .slice(pagination.page * pagination.rowsPerPage, pagination.page
-                          * pagination.rowsPerPage + pagination.rowsPerPage)
+                      .slice(paginationContacts.page * paginationContacts.rowsPerPage, paginationContacts.page
+                          * paginationContacts.rowsPerPage + paginationContacts.rowsPerPage)
                       .map((contact, index) => (
                       <TableRow key={index}>
                         <TableCell>{contact.id}</TableCell>
@@ -108,15 +113,15 @@ const Invitations:React.FC<IInvitationsProps> = ({
                   <TablePagination
                     component="div"
                     count={contacts.length}
-                    page={pagination.page}
-                    onPageChange={(_, newPage) => setPagination({
-                      ...pagination,
+                    page={paginationContacts.page}
+                    onPageChange={(_, newPage) => setPaginationContacts({
+                      ...paginationContacts,
                       page: newPage
                     })}
-                    rowsPerPage={pagination.rowsPerPage}
+                    rowsPerPage={paginationContacts.rowsPerPage}
                     onRowsPerPageChange={(e) => {
-                      setPagination({
-                        ...pagination,
+                      setPaginationContacts({
+                        ...paginationContacts,
                         rowsPerPage: parseInt(e.target.value, 10),
                         page: 0
                       })
@@ -127,8 +132,8 @@ const Invitations:React.FC<IInvitationsProps> = ({
             <Grid item xs={12} md={6} lg={6}>
               <TableContainer component={Paper}>
                 <Typography variant="h6" component="div">
-                      Invitaciones a tu evento
-                      <Badge badgeContent={contacts.length} color="secondary" sx={{ ml: 2 }}>
+                      Invitaciones pendientes
+                      <Badge badgeContent={invitations.length} color="secondary" sx={{ ml: 2 }}>
                       </Badge>
                 </Typography>
                 <Table>
@@ -143,8 +148,8 @@ const Invitations:React.FC<IInvitationsProps> = ({
 
                   <TableBody>
                     {invitations
-                      .slice(pagination.page * pagination.rowsPerPage, pagination.page
-                        * pagination.rowsPerPage + pagination.rowsPerPage)
+                      .slice(paginationInvitations.page * paginationInvitations.rowsPerPage, paginationInvitations.page
+                        * paginationInvitations.rowsPerPage + paginationInvitations.rowsPerPage)
                       .map((invitation, index) => (
                       <TableRow key={index}>
                         <TableCell>
@@ -180,15 +185,15 @@ const Invitations:React.FC<IInvitationsProps> = ({
                   <TablePagination
                     component="div"
                     count={contacts.length}
-                    page={pagination.page}
-                    onPageChange={(_, newPage) => setPagination({
-                      ...pagination,
+                    page={paginationInvitations.page}
+                    onPageChange={(_, newPage) => setPaginationInvitations({
+                      ...paginationInvitations,
                       page: newPage
                     })}
-                    rowsPerPage={pagination.rowsPerPage}
+                    rowsPerPage={paginationInvitations.rowsPerPage}
                     onRowsPerPageChange={(e) => {
-                      setPagination({
-                        ...pagination,
+                      setPaginationInvitations({
+                        ...paginationInvitations,
                         rowsPerPage: parseInt(e.target.value, 10),
                         page: 0
                       })

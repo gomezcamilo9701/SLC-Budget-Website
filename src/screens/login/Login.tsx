@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "../materialUI-common";
+import { theme } from "../../components/materialUI-common";
 import InputAdornment from "@mui/material/InputAdornment";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";

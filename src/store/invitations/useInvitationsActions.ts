@@ -1,11 +1,11 @@
 import { useAppDispatch } from "../../hooks/store";
-import { TInvitationResponse } from "../../types";
+import { TInvitationContactInfoResponse } from "../../types";
 import { addInvitation, editInvitation } from "./invitationsSlice";
 
 export const 	useInvitationsActions = () => {
 	const dispatch = useAppDispatch();
 
-	const createInvitation = (invitation: TInvitationResponse) => {
+	const createInvitation = (invitation: TInvitationContactInfoResponse) => {
 			dispatch(addInvitation(invitation));
 	};
 

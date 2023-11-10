@@ -52,6 +52,14 @@ export const MainListItems = () => {
         </ListItemIcon>
         <ListItemText primary="Mis eventos" />
       </ListItemButton>
+
+      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
+      onClick={() => navigate('/notifications')}>
+        <ListItemIcon>
+          <AccountBalanceWalletIcon sx={{color: theme.palette.primary.light}}/>
+        </ListItemIcon>
+        <ListItemText primary="Notificaciones" />
+      </ListItemButton>
     
       <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
       onClick={() => navigate('/')}>

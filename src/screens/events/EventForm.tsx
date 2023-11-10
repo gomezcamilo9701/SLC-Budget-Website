@@ -4,14 +4,14 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from "../materialUI-common";
+import { theme } from "../../components/materialUI-common";
 import {
   Avatar,
   CssBaseline,
 } from "@mui/material";
 import { Grid, TextField, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import LoadingScreen from "../loading_screen/LoadingScreen";
+import LoadingScreen from "../../components/loading_screen/LoadingScreen";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { IEvent, IEventWithId } from "../../types";
 import { useAppSelector } from "../../hooks/store";
@@ -19,7 +19,7 @@ import { useEventActions } from "../../store/event/useEventActions";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { createEvent } from "../../services/event/EventService";
 import { useNavigate } from "react-router-dom";
-import { SelectEventType } from "../select_event_type/SelectEventType";
+import { SelectEventType } from "../../components/select_event_type/SelectEventType";
 import useImageUploader from "../../hooks/useImageUploader";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../store/loading/loadingSlice";

@@ -1,9 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { TInvitationResponse } from "../../types";
+import { TInvitationContactInfoResponse } from "../../types";
 
-const DEFAULT_STATE: TInvitationResponse[] = [];
+const DEFAULT_STATE: TInvitationContactInfoResponse[] = [];
 
-const initialState: TInvitationResponse[] = (() => {
+const initialState: TInvitationContactInfoResponse[] = (() => {
   const persistedState = localStorage.getItem("__invitations__");
   return persistedState ? JSON.parse(persistedState) : DEFAULT_STATE;
 })();
@@ -12,13 +12,13 @@ export const invitationsSlice = createSlice({
   name: "invitations",
   initialState,
   reducers: {
-    addInvitation: (state, action: PayloadAction<TInvitationResponse>) => {
+    addInvitation: (state, action: PayloadAction<TInvitationContactInfoResponse>) => {
       state.push(action.payload);
     },
-    updateInvitations: (_, action: PayloadAction<TInvitationResponse[]>) => {
+    updateInvitations: (_, action: PayloadAction<TInvitationContactInfoResponse[]>) => {
       return action.payload;
     },
-    editInvitation: (_state, action: PayloadAction<TInvitationResponse[]>) => {
+    editInvitation: (_state, action: PayloadAction<TInvitationContactInfoResponse[]>) => {
       return action.payload;
     },
   },

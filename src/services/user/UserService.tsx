@@ -1,5 +1,6 @@
 import CONSTANTS from "../../constants";
 import { TLoginUser, IUser, TEditUser, ContactPaginationResponse, EventsPaginationResponse } from "../../types";
+import { fetchPage } from "../UtilService";
 import { TokenService } from "../token/TokenService";
 
 export const registerUser = async (user: IUser, profileImage: File | null) => {
@@ -229,28 +230,42 @@ export const getEventsByOwner = async (ownerId: string) => {
     return null;
   }
   try {
-    const url = `${CONSTANTS.BASE_URL}${CONSTANTS.GET_EVENTS_BY_OWNER}/${ownerId}`;
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
+    let url = `${CONSTANTS.BASE_URL}${CONSTANTS.GET_EVENTS_BY_OWNER}/${ownerId}?page=${0}`;
+    const initialResponse = await fetchPage(url, token);
+    const totalPages = initialResponse?.totalPages || 1;
 
-    const requestOptions = {
-      method: "GET",
-      headers: headers,
-    };
-
-    const response = await fetch(url, requestOptions);
-
-    if (!response.ok) {
-      throw new Error("GET request failed");
+    const pagePromises = [];
+    for (let page = 1; page < totalPages; page++) {
+      url = `${CONSTANTS.BASE_URL}${CONSTANTS.GET_EVENTS_BY_OWNER}/${ownerId}?page=${page}`;
+      pagePromises.push(fetchPage(url, token));
     }
 
-    const responseData: EventsPaginationResponse = await response.json();
-    console.log('respon', responseData);
-    return responseData;
+    const responses = await Promise.all(pagePromises);
+    const allEvents: EventsPaginationResponse = responses.reduce(
+      (accumulator, currentResponse) => {
+        if (accumulator.content && currentResponse.content) {
+          accumulator.content = accumulator.content.concat(currentResponse.content);
+        }
+        accumulator.totalElements = currentResponse.totalElements || 0;
+        return accumulator;
+      },
+      {
+        content: initialResponse?.content || [],
+        pageable: initialResponse?.pageable || {},
+        totalPages: totalPages,
+        totalElements: initialResponse?.totalElements || 0,
+        last: false,
+        size: 0,
+        number: 0,
+        sort: initialResponse?.sort || {},
+        numberOfElements: 0,
+        first: false,
+        empty: false,
+      }
+    );
+    return allEvents;
   } catch (error) {
-    console.error("GET request error:", error);
+    console.error("Get event contacts request error:", error);
     throw error;
   }
 };

@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider } from "@mui/material/styles";
-import { theme } from '../materialUI-common';
+import { theme } from '../../components/materialUI-common';
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Alert, Avatar, CssBaseline } from "@mui/material";
 import {
@@ -18,7 +18,7 @@ import { IUserResponse, IUserWithId, TEditUser } from '../../types';
 import { useUserActions } from "../../store/user/useUserActions";
 import CONSTANTS from '../../constants';
 import { useAppSelector } from '../../hooks/store';
-import LoadingScreen from '../loading_screen/LoadingScreen';
+import LoadingScreen from '../../components/loading_screen/LoadingScreen';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import useImageUploader from '../../hooks/useImageUploader';
 

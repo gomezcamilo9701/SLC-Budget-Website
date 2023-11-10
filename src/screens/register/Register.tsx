@@ -13,7 +13,7 @@ import { Grid, TextField, Button } from "@mui/material";
 import { IUser } from "../../types";
 import { registerUser } from "../../services/user/UserService";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { theme } from "../materialUI-common";
+import { theme } from "../../components/materialUI-common";
 import useImageUploader from "../../hooks/useImageUploader";
 import { Toaster, toast } from "sonner";
 
