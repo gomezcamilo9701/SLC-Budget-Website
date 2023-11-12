@@ -42,6 +42,7 @@ import { startLoading, stopLoading } from "../../store/loading/loadingSlice";
 import Invitations from "../invitations/Invitations";
 import { ContactsTable } from "../../components/contacts_table/ContactsTable";
 import { getEventContactsByEventId } from "../../services/eventContacts/EventContactsService";
+import { ActivityForm } from "../../components/activity_form/ActivityForm";
 
 const EventDetails: React.FC = () => {
 
@@ -51,6 +52,7 @@ const EventDetails: React.FC = () => {
 
   //Modal para invitaciones
   const [openModalInvitation, setOpenModalInvitation] = useState(false);
+  const [openModalActivity, setOpenModalActivity] = useState(false);
 
   // Estado local para invitations recuperadas de la bd
 
@@ -207,10 +209,6 @@ const EventDetails: React.FC = () => {
 
   // #endregion
 
-  useEffect(() => {
-    console.log('eventData.eventContacts', eventData.eventContacts);
-  }, [eventData.eventContacts])
-
   return (
     <>
       <CssBaseline />
@@ -355,6 +353,7 @@ const EventDetails: React.FC = () => {
                       variant="outlined"
                       color="secondary"
                       sx={useStyles.button2}
+                      onClick={() => setOpenModalActivity(true)}
                     >
                       Crear Actividad
                     </Button>
@@ -449,6 +448,16 @@ const EventDetails: React.FC = () => {
                   handleInvitation={handleInvitation}
                   setOpenModalInvitation={setOpenModalInvitation}
                   handleCancelInvitation={handleCancelInvitation}
+                />
+              </>
+            </Modal>
+
+            <Modal open={openModalActivity} onClose={() => setOpenModalActivity(false)}>
+              <>
+                <ActivityForm
+                  setOpenModalActivity={setOpenModalActivity}
+                  eventContacts={eventData.eventContacts}
+                  eventId={event.event_id}     
                 />
               </>
             </Modal>

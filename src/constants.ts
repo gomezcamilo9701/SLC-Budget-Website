@@ -1,5 +1,5 @@
 const CONSTANTS = {
-  BASE_URL: 'http://localhost:8090',
+  BASE_URL: 'http://localhost:8080',
   USER_REGISTER: '/user/signup',
   USER_LOGIN: '/login',
   PROFILE_PICTURE: '/media',
