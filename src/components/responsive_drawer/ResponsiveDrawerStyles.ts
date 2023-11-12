@@ -1,8 +1,8 @@
 export const useStyles = {
   toolbarDrawer: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
     px: [1],
   },
   logo: {
@@ -10,4 +10,9 @@ export const useStyles = {
     width: "2em",
     minWidth: "150px",
   },
-}
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: "50%",
+  }
+};

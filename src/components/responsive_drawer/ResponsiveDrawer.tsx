@@ -10,7 +10,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { theme } from '../materialUI-common';
-import { Badge, Button, Link, Paper, Stack } from '@mui/material';
+import { Avatar, Badge, Button, Link, Paper, Stack } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { MainListItems } from './MainListItems';
@@ -23,6 +23,8 @@ import { IUserResponse } from '../../types';
 import { getUserByEmail } from '../../services/user/UserService';
 import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from '../loading_screen/LoadingScreen';
+import { useAppSelector } from '../../hooks/store';
+import CONSTANTS from '../../constants';
 
 const drawerWidth = 240;
 
@@ -58,6 +60,9 @@ export default function ResponsiveDrawer(props: Props) {
   // Actions
   const { updateUser } = useUserActions();
   // #endregion
+
+  //Slice
+  const user = useAppSelector((state) => state.user);
   
   // #region Fetch inicial para cargar el usuario
   const fetchUserData = async () => {
@@ -105,7 +110,7 @@ export default function ResponsiveDrawer(props: Props) {
   );
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -113,30 +118,31 @@ export default function ResponsiveDrawer(props: Props) {
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
           color: theme.palette.primary.light,
-          backgroundColor: theme.palette.secondary.dark
+          backgroundColor: theme.palette.secondary.dark,
         }}
       >
         <Toolbar
           sx={{
-            pr: '24px',
-          }}>
+            pr: "24px",
+          }}
+        >
           <IconButton
             edge="start"
             color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
+            sx={{ mr: 2, display: { sm: "none" } }}
           >
             <MenuIcon />
           </IconButton>
           <Typography
-              component="h1"
-              variant="h6"
-              color="inherit"
-              noWrap
-              sx={{ flexGrow: 1 }}
-            >
-              Página de Inicio
+            component="h1"
+            variant="h6"
+            color="inherit"
+            noWrap
+            sx={{ flexGrow: 1 }}
+          >
+            Página de Inicio
           </Typography>
           <Stack direction="row" spacing={3}>
             <IconButton color="inherit">
@@ -144,7 +150,16 @@ export default function ResponsiveDrawer(props: Props) {
                 <NotificationsIcon />
               </Badge>
             </IconButton>
-            <Button variant='outlined' onClick={handleLogout}>
+            <Avatar
+              sx={useStyles.profileImage}
+              src={
+                (user.profileImage
+                  ? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${user.profileImage}`
+                  : "")
+              }
+              alt={"Imagen del usuario"}
+            />
+            <Button variant="outlined" onClick={handleLogout}>
               Cerrar sesión
             </Button>
           </Stack>
@@ -166,42 +181,41 @@ export default function ResponsiveDrawer(props: Props) {
             keepMounted: true,
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
           }}
         >
-          <Paper sx={{ backgroundColor: 'black', color: 'white' }}>
-              {drawer}
+          <Paper sx={{ backgroundColor: "black", color: "white" }}>
+            {drawer}
           </Paper>
         </Drawer>
-        
+
         {/**Drawer pc */}
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-            '& .MuiPaper-root': { backgroundColor: 'black', color: 'white' },
-            border: '3px solid black'
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+            "& .MuiPaper-root": { backgroundColor: "black", color: "white" },
+            border: "3px solid black",
           }}
           open
         >
-          <Paper sx={{ backgroundColor: 'black', color: 'white' }}>
+          <Paper sx={{ backgroundColor: "black", color: "white" }}>
             {drawer}
           </Paper>
         </Drawer>
       </Box>
-      
-      <Box
-        component="main"
-        sx={{ flexGrow: 1, p: 3}}
-      >
+
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
         <Toolbar />
-          {loading ? (
-            <LoadingScreen />
-          ) : (
-            <Outlet />
-          )}
+        {loading ? <LoadingScreen /> : <Outlet />}
         <Copyright sx={{ pt: 4, color: "white" }} />
       </Box>
     </Box>
