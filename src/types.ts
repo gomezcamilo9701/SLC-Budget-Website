@@ -24,7 +24,7 @@ export interface IUser {
 }
 
 export interface IUserWithId extends IUser {
-  id: number;
+  id: string;
   profileImage: string;
 }
 
@@ -131,6 +131,27 @@ export type TEventContactsResponse = {
   contactUsername:     string;
 }
 
+// Activities
+export type TParticipationData = {
+  [key: string]: {
+    participationPercentage: number;
+    staticValue: number;
+  };
+};
+
+export type TActivityCreate = {
+  description: string;
+  eventId: string;
+  value: number;
+  participationData: TParticipationData | null;
+}
+
+export type TActivityResponse = {
+  id:          number;
+  description: string;
+  value:       number;
+}
+
 // Pagination
 export type EventPaginationResponse = {
   content: IEventWithId[];
@@ -190,20 +211,9 @@ export interface PaginationResponse<T> {
 }
 
 export type ContactPaginationResponse = PaginationResponse<IUserWithId>;
-
 export type EventsPaginationResponse = PaginationResponse<IEventWithId>;
 export type ParticipantEventsPaginationResponse = PaginationResponse<IParticipantEvents>;
 export type InvitationsPaginationResponse = PaginationResponse<TInvitationContactInfoResponse>;
 export type InvitationsEventPaginationResponse = PaginationResponse<TInvitationEventInfoResponse>;
 export type EventContactsPaginationResponse = PaginationResponse<TEventContactsResponse>;
-
-
-
-// //Edit Event
-// export type TEventForEdit = {
-//   name: string;
-//   description: string;
-//   type: string;
-//   owner_id: number;
-//   imagen_url: File | null;
-// }
+export type ActivitiesPaginationResponse = PaginationResponse<TActivityResponse>;

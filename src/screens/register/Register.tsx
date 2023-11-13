@@ -16,6 +16,7 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import { theme } from "../../components/materialUI-common";
 import useImageUploader from "../../hooks/useImageUploader";
 import { Toaster, toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
 
 const defaultValues: IUser = {
   email: "",
@@ -53,7 +54,8 @@ const RegisterForm = () => {
         let renamedFile = null;
         if (selectedFile) {
           const fileExtension = selectedFile.name.split('.').pop();
-          const newFileName = `${email}.${fileExtension}`;
+          const uniqueId = uuidv4();
+          const newFileName = `${uniqueId}.${fileExtension}`;
           renamedFile = new File([selectedFile], newFileName);
         } 
         await registerUser(user, renamedFile);
