@@ -1,6 +1,6 @@
 import { Middleware } from "@reduxjs/toolkit";
 
-export const userLocalStorageMiddleware: Middleware = store => next => action => {
+export const userLocalStorageMiddleware: Middleware = () => next => action => {
   next(action);
   //localStorage.setItem("__redux__user__", JSON.stringify(store.getState()));
 }
