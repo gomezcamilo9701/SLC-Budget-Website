@@ -24,6 +24,7 @@ import useImageUploader from "../../hooks/useImageUploader";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "../../store/loading/loadingSlice";
 import { Toaster, toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
 
 const EventForm: React.FC = () => {
   const navigate = useNavigate();
@@ -64,7 +65,8 @@ const EventForm: React.FC = () => {
         let renamedFile = null;
         if (selectedFile) {
           const fileExtension = selectedFile.name.split(".").pop();
-          const newFileName = `${name}${selectedEvent}.${fileExtension}`;
+          const uniqueId = uuidv4();
+          const newFileName = `${uniqueId}.${fileExtension}`;
           renamedFile = new File([selectedFile], newFileName);
         }
 
@@ -217,6 +219,7 @@ const EventForm: React.FC = () => {
                       <SelectEventType
                         value={selectedEvent}
                         onChange={(e) => setSelectedEvent(e.target.value)}
+                        isEnableEditForm={true}
                       />
                     </Grid>
                   </Grid>

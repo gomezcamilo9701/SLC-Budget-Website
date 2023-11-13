@@ -63,11 +63,9 @@ export const editUser = async (editData: TEditUser) => {
   const token = TokenService.getToken();
   const formData = new FormData();
   formData.append('updatedUser', new Blob([JSON.stringify(editData.editForm)], { type: 'application/json' }));
-  console.log('editD', editData.profileImage);
   if (editData.profileImage) {
     formData.append('profileImage', editData.profileImage);
   }
-  console.log('formDat', formData);
   if (!token) {
     console.error("No se encontró un token de autenticación");
     return null;
@@ -150,8 +148,8 @@ export const getProfilePicture = async (pictureName: string) => {
     const blobData = await response.blob(); // Receive the image as a Blob
 
     if (blobData instanceof Blob) {
-      const imageUrl = URL.createObjectURL(blobData); // Convert Blob to a URL
-      return imageUrl;
+      const picture = URL.createObjectURL(blobData); // Convert Blob to a URL
+      return picture;
     } else {
       console.error("Invalid response format");
       return null;
