@@ -4,8 +4,9 @@ import { useStyles } from './SelectEventTypeStyles';
 interface EventSelectProps {
   value: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  isEnableEditForm: boolean;
 }
-export const SelectEventType: React.FC<EventSelectProps> = ({ value, onChange }) => {
+export const SelectEventType: React.FC<EventSelectProps> = ({ value, onChange, isEnableEditForm }) => {
   const eventTypes = ["VIAJE", "HOGAR", "PAREJA", "COMIDA", "OTRO"];
 
   return (
@@ -22,6 +23,7 @@ export const SelectEventType: React.FC<EventSelectProps> = ({ value, onChange })
       variant="standard"
       id="event-name"
       label=""
+      disabled={!isEnableEditForm}
     >
       {eventTypes.map((eventType) => (
         <MenuItem key={eventType} value={eventType}>
