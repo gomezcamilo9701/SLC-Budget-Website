@@ -7,16 +7,8 @@ import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../../components/materialUI-common";
 import {
   Avatar,
-  Badge,
-  Card,
-  CardHeader,
   CssBaseline,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Modal,
   Grid,
   TextField,
@@ -25,7 +17,7 @@ import {
 import Divider from "@mui/material/Divider";
 import LoadingScreen from "../../components/loading_screen/LoadingScreen";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { IEvent, IEventWithId, IUserWithId, TEventContactsResponse, TEventDataEdit, TInvitationCreate, TInvitationContactInfoResponse } from "../../types";
+import { IEvent, IEventWithId, IUserWithId, TEventContactsResponse, TEventDataEdit, TInvitationCreate, TInvitationContactInfoResponse, TActivityResponse } from "../../types";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAppSelector } from "../../hooks/store";
 import { useEventActions } from "../../store/event/useEventActions";
@@ -43,12 +35,18 @@ import Invitations from "../invitations/Invitations";
 import { ContactsTable } from "../../components/contacts_table/ContactsTable";
 import { getEventContactsByEventId } from "../../services/eventContacts/EventContactsService";
 import { ActivityForm } from "../../components/activity_form/ActivityForm";
+import { getActivitiesByEvent } from "../../services/activity/ActivityService";
+import { ActivitiesTable } from "../../components/activities_event/ActivitiesTable";
+import { v4 as uuidv4 } from 'uuid';
 
 const EventDetails: React.FC = () => {
 
   // #region Estados
   //Imagen
   const { selectedFile, previewImage, handleImageChange } = useImageUploader();
+  
+  //El formulario para editar está habilitado solo si no hay actividades en el evento
+  const [isEnableEditForm, setIsEnableEditForm] = useState(true);
 
   //Modal para invitaciones
   const [openModalInvitation, setOpenModalInvitation] = useState(false);
@@ -59,6 +57,7 @@ const EventDetails: React.FC = () => {
   const [eventData, setEventData] = useState({
     invitations: [] as TInvitationContactInfoResponse[],
     eventContacts: [] as TEventContactsResponse[],
+    activities: [] as TActivityResponse[],
   });
 
   // Select de evento
@@ -93,7 +92,6 @@ const EventDetails: React.FC = () => {
           ...prevState,
           invitations: updatedInvitations,
         }));
-      console.log('invi', contacts)
       }
 
       const eventContactsResponse = await getEventContactsByEventId(event.event_id);
@@ -104,7 +102,16 @@ const EventDetails: React.FC = () => {
           eventContacts: updatedEventContacts,
         }));
       }
-      console.log('contac', updatedEventContacts)
+
+      const activitiesResponse = await getActivitiesByEvent(event.event_id);
+      const updatedActivities: TActivityResponse[] | null | undefined = activitiesResponse?.content;
+      if (updatedActivities) {
+        setEventData(prevState => ({
+          ...prevState,
+          activities: updatedActivities,
+        }));
+      }
+
       reset(event);
     } catch (err) {
       console.error('Error al obtener los datos de evento desde el servidor', err);
@@ -114,6 +121,7 @@ const EventDetails: React.FC = () => {
   }
   useEffect(() => {
     fetchUserData();
+    console.log('event', event);
   }, []);
   // #endregion
 
@@ -121,19 +129,19 @@ const EventDetails: React.FC = () => {
     const {
       register,
       handleSubmit,
-      formState: {isValid},
       reset,
     } = useForm<IEvent>();
   
     // botón Guardar Cambios, se edita en la bd y se actualiza el event en la store
     const onSubmit: SubmitHandler<IEvent> = async (data) => {
-      const { name, description, type } = data;
+      const { name, description } = data;
       try {
         if (data) {
           let renamedFile = null;
           if (selectedFile) {
             const fileExtension = selectedFile.name.split(".").pop();
-            const newFileName = `${name}${type}.${fileExtension}`;
+            const uniqueId = uuidv4();
+            const newFileName = `${uniqueId}.${fileExtension}`;
             renamedFile = new File([selectedFile], newFileName);
           } else {
             console.error("No se seleccionó una imagen para tu evento");
@@ -158,6 +166,14 @@ const EventDetails: React.FC = () => {
     };
     // #endregion
   
+  // #region useEffects
+  useEffect(() => {
+    if (eventData.activities.length > 0) {
+      setIsEnableEditForm(false);
+    }
+  }, [eventData.activities])
+  // #endregion
+
   // #region funciones
   const handleInvitation = async (contactId: number) => {
     const invitation: TInvitationCreate = {
@@ -207,6 +223,13 @@ const EventDetails: React.FC = () => {
     }
   }
 
+  const handleAddActivity = (activity: TActivityResponse) => {
+    setEventData(prevState => ({
+      ...prevState,
+      activities: [...eventData.activities, activity]
+    }))
+  }
+
   // #endregion
 
   return (
@@ -254,6 +277,7 @@ const EventDetails: React.FC = () => {
                       variant="contained"
                       startIcon={<CloudUploadIcon />}
                       sx={useStyles.profileButton}
+                      disabled={!isEnableEditForm}
                     >
                       {selectedFile ? 'Subir de nuevo' : 'Seleccionar imagen'}
                     </Button>
@@ -290,6 +314,7 @@ const EventDetails: React.FC = () => {
                         label=""
                         autoComplete=""
                         {...register("name", { required: true, minLength: 4 })}
+                        disabled={!isEnableEditForm}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -313,6 +338,7 @@ const EventDetails: React.FC = () => {
                            required: true,
                            minLength: 3,
                          })}
+                        disabled={!isEnableEditForm}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -323,6 +349,7 @@ const EventDetails: React.FC = () => {
                       <SelectEventType
                         value={selectedEvent}
                         onChange={(e) => setSelectedEvent(e.target.value)}
+                        isEnableEditForm={isEnableEditForm}
                       />
                     </Grid>
                   </Grid>
@@ -332,7 +359,7 @@ const EventDetails: React.FC = () => {
                     fullWidth
                     variant="contained"
                     sx={useStyles.button}
-                    disabled={!isValid}
+                    disabled={!isEnableEditForm}
                   >
                     Editar evento
                   </Button>
@@ -375,69 +402,9 @@ const EventDetails: React.FC = () => {
                 contacts={eventData.eventContacts}
               />
 
-              <Grid
-                item
-                xs={12}
-                component={Paper}
-                elevation={1}
-                sx={useStyles.paper3}
-              >
-                <Box sx={useStyles.boxPaper}>
-                  <Card>
-                    <CardHeader
-                      title={
-                        <>
-                          Actividades del evento
-                          <Badge
-                            badgeContent={/*activities.length*/ 1}
-                            color="secondary"
-                            sx={{ ml: 2 }}
-                          ></Badge>
-                        </>
-                      }
-                    />
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>Id</TableCell>
-                          <TableCell>Nombre</TableCell>
-                          <TableCell>Email</TableCell>
-                          <TableCell>Acciones</TableCell>
-                        </TableRow>
-                      </TableHead>
-
-                      <TableBody>
-                        {/*contacts.map((item, index) => (
-                        <TableRow key={index}>
-                          <TableCell>{item.id}</TableCell>
-                          <TableCell>
-                            <div style={{ display: 'flex', alignItems: 'center' }}>
-                              <Avatar
-                                sx={{
-                                  width: 32,
-                                  height: 32,
-                                  borderRadius: '50%',
-                                  marginRight: 1,
-                                }}
-                                src={`${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${item.profileImage}`}
-                                alt={item.name}
-                              />
-                              {item.name}
-                            </div>
-                          </TableCell>
-                          <TableCell>{item.email}</TableCell>
-                          <TableCell>
-                            <Button variant="outlined" onClick={() => null}>
-                              <DeleteIcon />
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                            ))*/}
-                      </TableBody>
-                    </Table>
-                  </Card>
-                </Box>
-              </Grid>
+              <ActivitiesTable
+                activities={eventData.activities}
+              />
             </Grid>
 
             <Modal open={openModalInvitation} onClose={() => setOpenModalInvitation(false)}>
@@ -457,7 +424,8 @@ const EventDetails: React.FC = () => {
                 <ActivityForm
                   setOpenModalActivity={setOpenModalActivity}
                   eventContacts={eventData.eventContacts}
-                  eventId={event.event_id}     
+                  eventId={event.event_id}
+                  handleAddActivity={handleAddActivity}
                 />
               </>
             </Modal>

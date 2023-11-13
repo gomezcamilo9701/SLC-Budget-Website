@@ -7,38 +7,31 @@ import {
   TextField,
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
-import { TEventContactsResponse } from '../../types';
+import { TActivityCreate, TActivityResponse, TEventContactsResponse, TParticipationData } from '../../types';
 import ContactCard from '../contact_card/ContactCard';
 import { useStyles } from './ActivityFormStyle';
 import { ActivityParticipantsTable } from '../activity_participants/ActivityParticipantsTable';
+import { toast } from 'sonner';
+import { calculateTotalPercentages, calculateTotalStaticValues } from '../../utils/calculeValues';
+import { createActivity } from '../../services/activity/ActivityService';
 
 type ActivityFormProps = {
   setOpenModalActivity: (value: React.SetStateAction<boolean>) => void;
   eventContacts: TEventContactsResponse[];
   eventId: string;
-}
-
-export type TParticipationData = {
-  [key: string]: {
-    participationPercentage: number;
-    staticValue: number;
-  };
-};
-
-export type TActivityCreate = {
-  description: string;
-  eventId: string;
-  value: number;
-  participationData: TParticipationData | null;
+  handleAddActivity: (activity: TActivityResponse) => void
 }
 
 export const ActivityForm:React.FC<ActivityFormProps> = ({
   setOpenModalActivity,
   eventContacts,
   eventId,
+  handleAddActivity,
 }) => {
+
   // #region Estados
   const [selectedContacts, setSelectedContacts] = useState<TEventContactsResponse[]>([]);
+  const [isValueFilled, setIsValueFilled] = useState(false);
 
   const [activityForm, setActivityForm] = useState<TActivityCreate>({
     description: '',
@@ -47,40 +40,136 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
     participationData: null
   });
   // #endregion
+  
+  // #region useEffects
+
+  /**
+   * useEffect para iniciar el form repartiendo equitativamente los porcentajes dependiendo de
+    los participantes de la actividad
+   */
+  useEffect(() => {
+    const initializeForm = () => {
+      const initialValue = activityForm.value;
+
+      const initialParticipationData: TParticipationData = {};
+
+      if (selectedContacts.length > 0) {
+        const equalPercentage = 100 / selectedContacts.length;
+
+        selectedContacts.forEach((contact) => {
+          const equalStaticValue = (equalPercentage / 100) * initialValue;
+
+          initialParticipationData[contact.contactId] = {
+            participationPercentage: parseFloat(equalPercentage.toFixed(2)),
+            staticValue: parseFloat(equalStaticValue.toFixed(2)),
+          };
+        });
+      }
+
+      return {
+        description: activityForm.description,
+        eventId: activityForm.eventId,
+        value: initialValue,
+        participationData: initialParticipationData,
+      };
+    };
+    setActivityForm(initializeForm());
+  }, [selectedContacts, activityForm.value]);
+
+  /**
+   * useEffect para determinar si el valor de la actividad está diligenciado
+    usamos isValueFilled para dejar o no agregar participantes (tienen que asignar primero el valor
+    para que funcione)
+   */
+  useEffect(() => {
+    if (!isNaN(activityForm.value) && activityForm.value > 0) {
+      setIsValueFilled(true);
+    } else {
+      setIsValueFilled(false);
+    }
+  }, [activityForm, isValueFilled])
+
+  useEffect(() => {
+    console.log('act', activityForm);
+  }, [activityForm])
+
+  // #endregion
+
+  // #region handleParticipantsSelection, handleParticipation, handleSubmit
   const handleToggleSelection = (eventContact: TEventContactsResponse) => {
     const isSelected = selectedContacts.some((contact) => contact.contactId === eventContact.contactId);
 
     setSelectedContacts((prevSelectedContacts) =>
-      isSelected
-        ? prevSelectedContacts.filter((contact) => contact.contactId !== eventContact.contactId)
-        : [...prevSelectedContacts, eventContact]
-    );
+    isSelected
+      ? prevSelectedContacts.filter((contact) => contact.contactId !== eventContact.contactId)
+      : [
+          ...prevSelectedContacts,
+          {
+            ...eventContact,
+            description: activityForm.description,
+          },
+        ]
+  );
   };
-
-  useEffect(() => {
-    console.log('activityForm', activityForm);
-  }, [activityForm]);
-
-  const handleFormSubmit = () => {
-
-  };
-
+  
   const handleParticipationChange = (key: string, property: string, value: number) => {
     setActivityForm((prevForm) => {
-      const updatedParticipationData = prevForm.participationData || {};
-      const existingPercentage = updatedParticipationData[key]?.participationPercentage || 0;
-      const existingStaticValue = updatedParticipationData[key]?.staticValue || 0;
+      const updatedParticipationData = prevForm.participationData ? { ...prevForm.participationData } : {};
+
+      const parsedValue = parseFloat(value.toString());
+      const sanitizedValue = isNaN(parsedValue) ? 0 : parsedValue;
+      const roundedValue = parseFloat(sanitizedValue.toFixed(2));
       
-      updatedParticipationData[key] = {
-        ...updatedParticipationData[key],
-        [property]: value,
-      };
+      if (property === 'participationPercentage') {
+        const staticValue = (roundedValue / 100) * prevForm.value;
+
+        updatedParticipationData[key] = {
+          ...(updatedParticipationData[key] || {}),
+          participationPercentage: roundedValue,
+          staticValue: staticValue,
+        };
+      }  else if (property === 'staticValue') {
+        const participationPercentage = (roundedValue / prevForm.value) * 100;
+
+        updatedParticipationData[key] = {
+          ...(updatedParticipationData[key] || {}),
+          participationPercentage: participationPercentage,
+          staticValue: roundedValue,
+        };
+      }
+
+      const sumPercentValues = calculateTotalPercentages(updatedParticipationData);
+      const sumStaticValues = calculateTotalStaticValues(updatedParticipationData);
+
+      if (
+        (property === 'participationPercentage' && sumPercentValues > 100) ||
+        (property === 'staticValue' && sumStaticValues > prevForm.value)
+      ) {
+        toast.error('La asignación excede el límite del valor de la actividad')
+        console.error('La asignación excede el límite.');
+        return prevForm;
+      }
+
       return {
         ...prevForm,
         participationData: updatedParticipationData,
       };
     });
   };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); 
+    try {
+      const activity:TActivityResponse = await createActivity(activityForm);
+      handleAddActivity(activity);
+      toast.success('Actividad creada con éxito')
+      setOpenModalActivity(false);
+    } catch (e) {
+      toast.error('Error creando la actividad');
+      console.error('Error creando la actividad');
+    } 
+  };
+  // #endregion
 
   return (
     <Card sx={useStyles.principalCard}>
@@ -112,10 +201,12 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
                   margin="normal"
                   type="number"
                   value={activityForm.value}
-                  onChange={(e) => setActivityForm((prevForm) => ({
-                    ...prevForm,
-                    value: parseInt(e.target.value)
-                  }))}
+                  onChange={(e) => {
+                    setActivityForm((prevForm) => ({
+                      ...prevForm,
+                      value: parseInt(e.target.value)
+                    }))
+                  }}
                 />
               </Grid>
 
@@ -131,6 +222,7 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
                           eventContact={eventContact}
                           onAddClick={handleToggleSelection}
                           isSelected={selectedContacts.some((contact) => contact.contactId === eventContact.contactId)}
+                          isEnabled={isValueFilled}
                         />
                     </Grid>
                     ))}
@@ -146,19 +238,16 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
               </Grid>
 
               <Grid item xs={12} sm={12} md={12}>
-                <Button type="submit" variant="contained" color="primary">
+                <Button type="submit" variant="contained" color="primary" sx={{margin: 2}}>
                   Crear Actividad
+                </Button>
+                <Button variant="contained" onClick={() => setOpenModalActivity(false)}>
+                  <CloseIcon />
                 </Button>
               </Grid>
             </Grid>
           </form>
         </Grid>
-      </Grid>
-
-      <Grid item xs={12} sm={12} md={12}>
-        <Button variant="contained" onClick={() => setOpenModalActivity(false)}>
-          <CloseIcon />
-        </Button>
       </Grid>
     </Card>
   )

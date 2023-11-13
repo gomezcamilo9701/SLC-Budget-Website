@@ -17,9 +17,8 @@ import {
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import {useStyles} from './ActivityParticipantsTableStyle'
-import { TEventContactsResponse } from '../../types';
+import { TActivityCreate, TEventContactsResponse } from '../../types';
 import CONSTANTS from '../../constants';
-import { TActivityCreate } from '../activity_form/ActivityForm';
 
 
 type TActivityParticipantsTableProps = {
@@ -47,6 +46,8 @@ export const ActivityParticipantsTable:React.FC<TActivityParticipantsTableProps>
 
   const startIndex = page * rowsPerPage;
   const endIndex = Math.min(startIndex + rowsPerPage, participants.length);
+
+  
 
   return (
     <Grid
@@ -106,7 +107,7 @@ export const ActivityParticipantsTable:React.FC<TActivityParticipantsTableProps>
                   <TableCell>{contact.contactEmail}</TableCell>
                   <TableCell>
                     <TextField
-                    label="Porcentaje"
+                    label="Porcentaje %"
                     variant="outlined"
                     fullWidth
                     margin="normal"
@@ -115,7 +116,7 @@ export const ActivityParticipantsTable:React.FC<TActivityParticipantsTableProps>
                     inputProps={{
                       min: 0,
                       max: 100,
-                      step: 1,
+                      step: 0.01,
                     }}
                     />
                   </TableCell>

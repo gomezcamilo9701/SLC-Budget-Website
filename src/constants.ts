@@ -17,7 +17,9 @@ const CONSTANTS = {
   GET_INVITATIONS_BY_EVENT: '/invitation/by-event',
   GET_INVITATIONS_BY_USER: '/invitation/user',
   UPDATE_INVITATION: '/invitation/update',
-  GET_EVENT_CONTACTS_BY_EVENT: '/event-contacts/by-event'
+  GET_EVENT_CONTACTS_BY_EVENT: '/event-contacts/by-event',
+  CREATE_ACTIVITY: '/activity/create',
+  GET_ACTIVITY_BY_EVENT: '/event/activities',
 };
 //http://ec2-54-221-52-14.compute-1.amazonaws.com
 export default CONSTANTS;

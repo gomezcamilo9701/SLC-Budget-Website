@@ -3,7 +3,6 @@ export const useStyles = {
     width: 100,
     margin: 1,
     textAlign: 'center',
-    cursor: 'pointer',
     transition: 'background-color 0.2s ease-in-out, transform 0.6s ease-in-out',
     '&:hover': {
       backgroundColor: '#3cd590',

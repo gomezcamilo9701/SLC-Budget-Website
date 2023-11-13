@@ -21,14 +21,14 @@ import { useAppSelector } from '../../hooks/store';
 import LoadingScreen from '../../components/loading_screen/LoadingScreen';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import useImageUploader from '../../hooks/useImageUploader';
+import { v4 as uuidv4 } from 'uuid';
+import { useDispatch } from 'react-redux';
+import { startLoading, stopLoading } from '../../store/loading/loadingSlice';
 
 const ProfileForm: React.FC = () => {
   
   // #region Estados
   
-  //Configuración del LoaderScreen
-  const [loading, setLoading] = useState<boolean>(true);
-
   // Imagen
   const {selectedFile, previewImage, handleImageChange} = useImageUploader();
 
@@ -43,6 +43,8 @@ const ProfileForm: React.FC = () => {
 
   // Slice
   const user = useAppSelector((state) => state.user)
+  const isLoading = useAppSelector((state) => state.loading)
+  const dispatch = useDispatch();
 
   // Actions
   const { updateUser } = useUserActions();
@@ -60,6 +62,7 @@ const ProfileForm: React.FC = () => {
   const onSubmit: SubmitHandler<IUserWithId> = async (data) => {
     const { id, name, lastName, username, password, email, profileImage } = data;
     try {
+      dispatch(startLoading());
       if (data) {
         const userForPersist: IUserResponse = {
           id,
@@ -72,7 +75,8 @@ const ProfileForm: React.FC = () => {
         let renamedFile = null;
         if (selectedFile) {
           const fileExtension = selectedFile.name.split('.').pop();
-          const newFileName = `${email}.${fileExtension}`;
+          const uniqueId = uuidv4();
+          const newFileName = `${uniqueId}.${fileExtension}`;
           renamedFile = new File([selectedFile], newFileName);
         }
         const editData: TEditUser = {
@@ -82,10 +86,11 @@ const ProfileForm: React.FC = () => {
             username,
             password,
           },
-          id: id,
+          id: `${id}`,
           profileImage: renamedFile,
         }
-        await editUser(editData);
+        const edit = await editUser(editData);
+        console.log ('edit', edit);
         updateUser(userForPersist);
         setAlert({
           type: "success",
@@ -97,15 +102,18 @@ const ProfileForm: React.FC = () => {
         type: "error",
         message: "Error en la modificación de los datos.",
       });
+    } finally {
+      dispatch(stopLoading());
     }
   };
   // #endregion
 
   // #region useEffect inicial
   useEffect(() => {
+    dispatch(startLoading());
     setTimeout(() => {
       reset(user);
-      setLoading(false);
+      dispatch(stopLoading());
     }, 1000)
   }, []);
   // #endregion
@@ -113,7 +121,7 @@ const ProfileForm: React.FC = () => {
   return (
     <>
     <CssBaseline />
-      {loading ? (
+      {isLoading && user ? (
           <LoadingScreen />
         ) : (
           <ThemeProvider theme={theme}>
