@@ -33,9 +33,6 @@ import { startLoading, stopLoading } from '../../store/loading/loadingSlice';
 
 const ProfileForm: React.FC = () => {
   // #region Estados
-  
-  //Configuración del LoaderScreen
-  const [loading, setLoading] = useState<boolean>(true);
 
   // Imagen
   const { selectedFile, previewImage, handleImageChange } = useImageUploader();
@@ -67,7 +64,7 @@ const ProfileForm: React.FC = () => {
 
   const handleLogout = () => {
     logoutUser();
-    navigate("/login");
+    navigate("/register");
   };
   // #endregion
 
@@ -324,19 +321,20 @@ const ProfileForm: React.FC = () => {
                   )}
                   <Button
                     variant="contained"
-                    color="error" // Cambia a "error" para color rojo
+                    color="error"
                     onClick={handleClickOpen}
+                    style={{ marginTop: "10px" }}
                   >
                     Darse de baja
                   </Button>
                   <Dialog open={open} onClose={handleClose}>
                     <DialogTitle>Confirmar eliminación</DialogTitle>
                     <DialogContent>
-                      <p>¿Estás seguro/a de que quieres eliminar tu usuario?</p>
-                      <br /> {/* Cambiado a <br /> */}
                       <p>
-                        Al confirmar, se realizará el borrado lógico de tu
-                        cuenta.
+                        ¿Estás seguro/a de que quieres eliminar tu usuario?
+                        <br />
+                        Recuerda que se eliminará toda la información
+                        previamente guardada.
                       </p>
                     </DialogContent>
                     <DialogActions>
