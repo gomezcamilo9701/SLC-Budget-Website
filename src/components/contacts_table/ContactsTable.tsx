@@ -55,7 +55,7 @@ export const ContactsTable:React.FC<IContactsTableProps> = ({
       <Box sx={useStyles.boxPaper}>
         <Card>
           <CardHeader
-            sx={{}}
+            sx={{TextAlign:"center"}}
             title={
               <>
                 <span>Contactos del evento</span>
