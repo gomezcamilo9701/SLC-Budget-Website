@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Avatar, Badge, Button, Card, CardContent, CardHeader, Grid, Modal, Table, TablePagination, TableContainer, TableBody, TableCell, TableHead, TableRow, TextField, Typography } from '@mui/material'
+import { Avatar, Badge, Button, Card, CardContent, CardHeader, Grid, Modal, Table, TablePagination, TableContainer, TableBody, TableCell, TableHead, TableRow, TextField, Typography, Container } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useAppSelector } from '../../hooks/store'
 import { useContactsActions } from '../../store/contacts/useContactsActions'
@@ -109,6 +109,7 @@ function Contacts() {
         <LoadingScreen />
       ) : (
         <ThemeProvider theme={theme}>
+          <Container maxWidth="lg">
           <Grid container component="main" /*justifyContent={'space-between'} */ sx={{ width: "sm", height: "md" }}>
             <Grid item xs={12} sm={4} md={5} component={Paper} elevation={1}
               sx={useStyles.paperLeft}>
@@ -270,6 +271,7 @@ function Contacts() {
             </Grid>
           </Grid>
           <Toaster />
+          </Container>
         </ThemeProvider>
       )}
     </>

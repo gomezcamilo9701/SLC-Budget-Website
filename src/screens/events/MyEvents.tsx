@@ -3,9 +3,7 @@ import { useStyles } from "./EventsStyles";
 import Paper from "@mui/material/Paper";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "../../components/materialUI-common";
-import {
-  CssBaseline,
-} from "@mui/material";
+import { Container, CssBaseline } from "@mui/material";
 import { Grid } from "@mui/material";
 import LoadingScreen from "../../components/loading_screen/LoadingScreen";
 import { IEventWithId, IParticipantEvents } from "../../types";
@@ -23,8 +21,10 @@ const MyEvents: React.FC = () => {
 
   // #region Estados
   const [ownEvents, setOwnEvents] = useState<IEventWithId[] | null>(null);
-  const [participantEvents, setParticipantEvents] = useState<IParticipantEvents[] | null>(null);
-  
+  const [participantEvents, setParticipantEvents] = useState<
+    IParticipantEvents[] | null
+  >(null);
+
   // #endregion
 
   // #region Store
@@ -33,7 +33,7 @@ const MyEvents: React.FC = () => {
   const isLoading = useAppSelector((state) => state.loading);
 
   // Actions
-  const {updateEvent} = useEventActions();
+  const { updateEvent } = useEventActions();
   const dispatch = useDispatch();
   // #endregion
 
@@ -48,10 +48,9 @@ const MyEvents: React.FC = () => {
         const ownEvents: IEventWithId[] | null = content;
         setOwnEvents(ownEvents);
       }
-     
     } catch (err) {
       console.error("Error al obtener los eventos propios", err);
-    } 
+    }
     try {
       const responseParticipantEvents = await getEventsByUserId(user.id);
       if (responseParticipantEvents) {
@@ -60,9 +59,11 @@ const MyEvents: React.FC = () => {
         setParticipantEvents(participantEvents);
       }
     } catch (err) {
-      console.error("Error al obtener los eventos propios en los que el usuario es participante", err);
-    }
-    finally {
+      console.error(
+        "Error al obtener los eventos propios en los que el usuario es participante",
+        err
+      );
+    } finally {
       dispatch(stopLoading());
     }
   };
@@ -75,9 +76,9 @@ const MyEvents: React.FC = () => {
   const handleEditEvent = (event: IEventWithId) => {
     dispatch(startLoading());
     updateEvent(event);
-    navigate('/event-details');
+    navigate("/event-details");
     dispatch(stopLoading());
-  } 
+  };
   // #endregion
 
   return (
@@ -87,44 +88,46 @@ const MyEvents: React.FC = () => {
         <LoadingScreen />
       ) : (
         <ThemeProvider theme={theme}>
-          <Grid
-            container
-            component="main"
-            flexDirection="row"
-            sx={{ width: "sm", height: "md" }}
-          >
+          <Container maxWidth="lg">
             <Grid
-              item
-              xs={12}
-              sm={12}
-              md={6}
-              component={Paper}
-              elevation={1}
-              sx={useStyles.paper}
+              container
+              component="main"
+              flexDirection="row"
+              sx={{ width: "sm", height: "md" }}
             >
-              <EventsTable
-                events={ownEvents ?? []}
-                handleEditEvent={handleEditEvent}
-                ownOrParticipant="own"
-              />
-            </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={6}
+                component={Paper}
+                elevation={1}
+                sx={useStyles.paper}
+              >
+                <EventsTable
+                  events={ownEvents ?? []}
+                  handleEditEvent={handleEditEvent}
+                  ownOrParticipant="own"
+                />
+              </Grid>
 
-            <Grid
-              item
-              xs={12}
-              sm={12}
-              md={6}
-              component={Paper}
-              elevation={1}
-              sx={useStyles.paper}
-            >
-              <EventsTable 
-                events={participantEvents ?? []}
-                handleEditEvent={handleEditEvent}
-                ownOrParticipant="participant"
-              />
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={6}
+                component={Paper}
+                elevation={1}
+                sx={useStyles.paper}
+              >
+                <EventsTable
+                  events={participantEvents ?? []}
+                  handleEditEvent={handleEditEvent}
+                  ownOrParticipant="participant"
+                />
+              </Grid>
             </Grid>
-          </Grid>
+          </Container>
         </ThemeProvider>
       )}
     </>

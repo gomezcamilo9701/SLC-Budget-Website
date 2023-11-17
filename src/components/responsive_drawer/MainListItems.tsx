@@ -1,73 +1,91 @@
-import React from 'react';
-import { theme } from '../materialUI-common';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import PersonIcon from '@mui/icons-material/Person';
-import PeopleIcon from '@mui/icons-material/People';
-import EventIcon from '@mui/icons-material/Event';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import { ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { MyListItemButton, theme } from "../materialUI-common";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import PersonIcon from "@mui/icons-material/Person";
+import PeopleIcon from "@mui/icons-material/People";
+import EventIcon from "@mui/icons-material/Event";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export const MainListItems = () => {
   const navigate = useNavigate();
 
   return (
     <React.Fragment>
-      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-        onClick={() => navigate('/')}>
+      <MyListItemButton onClick={() => navigate("/create-event")}>
         <ListItemIcon>
-          <DashboardIcon sx={{color: theme.palette.primary.light}}/>
+          <ControlPointIcon
+            sx={{ color: theme.palette.primary.light, fontSize: "2rem" }}
+          />
+        </ListItemIcon>
+        <ListItemText primary="Crear evento" />
+      </MyListItemButton>
+
+      <ListItemButton
+        sx={{ "&:hover": { backgroundColor: theme.palette.primary.main } }}
+        onClick={() => navigate("/")}
+      >
+        <ListItemIcon>
+          <DashboardIcon sx={{ color: theme.palette.primary.light }} />
         </ListItemIcon>
         <ListItemText primary="Inicio" />
       </ListItemButton>
-  
-      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/profile')}>
+
+      <ListItemButton
+        sx={{ "&:hover": { backgroundColor: theme.palette.primary.main } }}
+        onClick={() => navigate("/profile")}
+      >
         <ListItemIcon>
-          <PersonIcon sx={{color: theme.palette.primary.light}}/>
+          <PersonIcon sx={{ color: theme.palette.primary.light }} />
         </ListItemIcon>
         <ListItemText primary="Perfil de usuario" />
       </ListItemButton>
-      
-      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/contacts')}>
+
+      <ListItemButton
+        sx={{ "&:hover": { backgroundColor: theme.palette.primary.main } }}
+        onClick={() => navigate("/contacts")}
+      >
         <ListItemIcon>
-          <PeopleIcon sx={{color: theme.palette.primary.light}}/>
+          <PeopleIcon sx={{ color: theme.palette.primary.light }} />
         </ListItemIcon>
         <ListItemText primary="Contactos" />
       </ListItemButton>
-  
-      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/create-event')}>
-        <ListItemIcon>
-          <EventIcon sx={{color: theme.palette.primary.light}}/>
-        </ListItemIcon>
-        <ListItemText primary="Crear evento" />
-      </ListItemButton>
 
-      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/my-events')}>
+      <ListItemButton
+        sx={{ "&:hover": { backgroundColor: theme.palette.primary.main } }}
+        onClick={() => navigate("/my-events")}
+      >
         <ListItemIcon>
-          <EventIcon sx={{color: theme.palette.primary.light}}/>
+          <EventIcon sx={{ color: theme.palette.primary.light }} />
         </ListItemIcon>
         <ListItemText primary="Mis eventos" />
       </ListItemButton>
 
-      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/notifications')}>
+      <ListItemButton
+        sx={{ "&:hover": { backgroundColor: theme.palette.primary.main } }}
+        onClick={() => navigate("/notifications")}
+      >
         <ListItemIcon>
-          <AccountBalanceWalletIcon sx={{color: theme.palette.primary.light}}/>
+          <AccountBalanceWalletIcon
+            sx={{ color: theme.palette.primary.light }}
+          />
         </ListItemIcon>
         <ListItemText primary="Notificaciones" />
       </ListItemButton>
-    
-      <ListItemButton sx={{'&:hover': {backgroundColor: theme.palette.primary.main}}}
-      onClick={() => navigate('/')}>
+
+      <ListItemButton
+        sx={{ "&:hover": { backgroundColor: theme.palette.primary.main } }}
+        onClick={() => navigate("/")}
+      >
         <ListItemIcon>
-          <AccountBalanceWalletIcon sx={{color: theme.palette.primary.light}}/>
+          <AccountBalanceWalletIcon
+            sx={{ color: theme.palette.primary.light }}
+          />
         </ListItemIcon>
         <ListItemText primary="Saldos" />
       </ListItemButton>
     </React.Fragment>
   );
-}
+};
