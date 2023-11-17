@@ -118,6 +118,7 @@ export interface TInvitationEventInfoResponse {
   eventType:              string;
   event_id:               number;
   invitation_state:       string;
+  viewed:                 boolean;
 }
 
 // Event contacts
