@@ -16,7 +16,6 @@ import { Avatar, Badge, Button, Link, Paper, Stack,
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { MainListItems } from './MainListItems';
-import { SecondaryListItems } from './SecondaryListItems';
 import { useStyles } from './ResponsiveDrawerStyles';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthActions } from '../../store/auth/useAuthActions';

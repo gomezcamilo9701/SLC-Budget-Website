@@ -102,7 +102,7 @@ const Invitations:React.FC<IInvitationsProps> = ({
                         </TableCell>
                         <TableCell>{contact.email}</TableCell>
                         <TableCell>
-                          <Button variant="outlined" onClick={() => handleInvitation(contact.id)}>
+                          <Button variant="outlined" onClick={() => handleInvitation(parseInt(contact.id))}>
                             <PersonAddIcon />
                           </Button>
                         </TableCell>
