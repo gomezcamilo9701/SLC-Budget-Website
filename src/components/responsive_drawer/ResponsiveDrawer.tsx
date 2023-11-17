@@ -104,7 +104,7 @@ export default function ResponsiveDrawer(props: Props) {
       <List component="nav" >
         <MainListItems />
         <Divider sx={{ my: 1 }} />
-        <SecondaryListItems />
+       {/* <SecondaryListItems />*/}
       </List>
     </div>
   );

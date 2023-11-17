@@ -15,6 +15,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+
 import { IEventWithId, IParticipantEvents } from '../../types';
 import Paper from "@mui/material/Paper";
 import CONSTANTS from '../../constants';
@@ -51,10 +52,10 @@ export const EventsTable:React.FC<TEventsTableProps> = ({
         <Card>
           {ownOrParticipant == "own" ? (
             <>
-              <CardHeader
+              <CardHeader sx={{textAlign:"center"}}
               title={
                 <>
-                  Eventos que creé
+                  Eventos creados
                   <Badge
                     badgeContent={events?.length}
                     color="secondary"
@@ -130,7 +131,7 @@ export const EventsTable:React.FC<TEventsTableProps> = ({
             </>
           ) : (
             <>
-              <CardHeader
+              <CardHeader sx={{textAlign:"center"}}
               title={
                 <>
                   Eventos de los que soy parte
@@ -145,7 +146,7 @@ export const EventsTable:React.FC<TEventsTableProps> = ({
               <TableContainer component={Paper}>
                 <Table>
                   <TableHead>
-                    <TableRow>
+                    <TableRow>  
                       <TableCell>Nombre</TableCell>
                       <TableCell>Descripción</TableCell>
                       <TableCell>Tipo de evento</TableCell>
@@ -185,7 +186,7 @@ export const EventsTable:React.FC<TEventsTableProps> = ({
                           <TableCell>{event.description}</TableCell>
                           <TableCell>{event.type}</TableCell>
                           <TableCell>
-                            <Button
+                            <Button sx={{whiteSpace: "nowrap"}}
                               variant="outlined"
                               onClick={() => null}
                             >
@@ -210,7 +211,7 @@ export const EventsTable:React.FC<TEventsTableProps> = ({
           )}
         </Card>
       ) : (
-        <Typography> No hay eventos </Typography>
+        <Typography sx={{color:"white"}}> No hay eventos para mostrar </Typography>
       )
       }
     </Box>

@@ -1,7 +1,63 @@
 import { Box, styled} from '@mui/material';
-import { createTheme } from '@mui/material/styles';
+import { TableCell, TableRow, createTheme } from '@mui/material';
+import { Theme } from '@mui/material/styles';
+
+export const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  '&.MuiTableCell-head': {
+    backgroundColor: theme.palette.common.black,
+    color: theme.palette.common.white,
+  },
+  '&.MuiTableCell-body': {
+    fontSize: 14,
+  },
+}));
+
+export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+}));
+
+
+const getStyles = (theme: Theme) => ({
+  MuiTableCell: {
+    styleOverrides: {
+      root: {
+        '&.MuiTableCell-head': {
+          backgroundColor: theme.palette.secondary.dark,
+          whiteSpace: 'nowrap',
+          color: theme.palette.common.white,
+        },
+        '&.MuiTableCell-body': {
+          maxWidth: '180px', 
+          wordWrap: 'break-word',
+          fontSize: 14,
+        },
+      },
+    },
+  },
+  MuiTableRow: {
+    styleOverrides: {
+      root: {
+        '&:nth-of-type(odd)': {
+          backgroundColor: theme.palette.action.hover,
+        },
+        // hide last border
+        '&:last-child td, &:last-child th': {
+          border: 0,
+        },
+      },
+    },
+  },
+});
+
 
 export const theme = createTheme({
+  components: getStyles(createTheme()),
   typography: {
     fontFamily: 'Nunito, Arial, sans-serif',
   },
@@ -22,10 +78,12 @@ export const theme = createTheme({
   },
 });
 
+
+
+
 export const Root = styled(Box)({
   minHeight: '100vh',
   minWidth: '100vw',
-  // backgroundImage: 'url("src/assets/imagen.jpg")', //Aquí iria la imagen de fondo q no se cual es
   backgroundSize: 'cover',
   backgroundRepeat: 'no-repeat',
   backgroundPosition: 'center',
