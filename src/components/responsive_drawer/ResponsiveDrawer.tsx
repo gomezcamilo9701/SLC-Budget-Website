@@ -10,7 +10,9 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { theme } from '../materialUI-common';
-import { Avatar, Badge, Button, Link, Paper, Stack } from '@mui/material';
+import { Avatar, Badge, Button, Link, Paper, Stack,
+  TableContainer,
+  Popover,} from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { MainListItems } from './MainListItems';
@@ -19,12 +21,17 @@ import { useStyles } from './ResponsiveDrawerStyles';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthActions } from '../../store/auth/useAuthActions';
 import { useUserActions } from '../../store/user/useUserActions';
-import { IUserResponse } from '../../types';
+import { IUserResponse, TInvitationEventInfoResponse } from '../../types';
 import { getUserByEmail } from '../../services/user/UserService';
 import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from '../loading_screen/LoadingScreen';
 import { useAppSelector } from '../../hooks/store';
 import CONSTANTS from '../../constants';
+import { getInvitationsByUserId, updateInvitation } from '../../services/invitation/InvitationService';
+import { toast } from 'sonner';
+import { startLoading, stopLoading } from '../../store/loading/loadingSlice';
+import { useDispatch } from 'react-redux';
+import { NotificationInvTable } from '../invitations_table/NotificationInvTable';
 
 const drawerWidth = 240;
 
@@ -63,6 +70,7 @@ export default function ResponsiveDrawer(props: Props) {
 
   //Slice
   const user = useAppSelector((state) => state.user);
+  const dispatch = useDispatch();
   
   // #region Fetch inicial para cargar el usuario
   const fetchUserData = async () => {
@@ -74,6 +82,25 @@ export default function ResponsiveDrawer(props: Props) {
     } catch (err) {
       console.error('Error al obtener los datos de usuario desde servidor', err);
       setLoading(false);
+    }
+    dispatch(startLoading());
+    try {
+      const invitationsResponse = await getInvitationsByUserId(user.id);
+      if (invitationsResponse) {
+        if (invitationsResponse.content) {
+          const updateInvitations = invitationsResponse.content.map(invitation =>({
+            ...invitation,
+            viewed: false,
+          }));
+          setInvitations(updateInvitations);
+        }
+      }
+     
+    } catch (err) {
+      console.error("Error al obtener los eventos propios", err);
+    } 
+    finally {
+      dispatch(stopLoading());
     }
   }
   useEffect(() => {
@@ -108,6 +135,41 @@ export default function ResponsiveDrawer(props: Props) {
       </List>
     </div>
   );
+
+  //Notification
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleNotificationsClick = (event: React.MouseEvent<HTMLElement>) => {
+    const updatedInvitations = invitations.map(invitation => ({
+      ...invitation,
+      viewed: true,
+    }));
+    setInvitations(updatedInvitations);
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationsClose = () => {
+    setAnchorEl(null);
+  };
+
+  const open = Boolean(anchorEl);
+  // #enregion
+
+  //Table Notifications
+  const [invitations, setInvitations] = useState<TInvitationEventInfoResponse[]>([]);
+
+  const handleAcceptInvitation = async (invitationId: number) => {
+    try {
+      await updateInvitation(invitationId, "ACCEPTED");
+      const updatedInvitations = invitations.filter(invitation => invitation.invitation_id !== invitationId);
+      setInvitations(updatedInvitations)
+      toast.success('Invitación aceptada, mira tus eventos');
+    } catch (e) {
+      console.error('Error aceptando la invitación', e);
+      toast.error('Error aceptando la invitación');
+    }
+  }
+  // #enregion
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -145,17 +207,44 @@ export default function ResponsiveDrawer(props: Props) {
             Página de Inicio
           </Typography>
           <Stack direction="row" spacing={3}>
-            <IconButton color="inherit">
-              <Badge badgeContent={4} color="secondary">
+            <IconButton color="inherit" onClick={handleNotificationsClick}>
+              <Badge
+                badgeContent={
+                  invitations.filter((invitation) => !invitation.viewed).length
+                }
+                color="secondary"
+              >
                 <NotificationsIcon />
               </Badge>
             </IconButton>
+            <Popover
+              open={open}
+              anchorEl={anchorEl}
+              onClose={handleNotificationsClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <Box p={2}>
+                <TableContainer component={Paper}>
+                  <NotificationInvTable
+                    invitations={invitations}
+                    handleAcceptInvitation={handleAcceptInvitation}
+                  />
+                </TableContainer>
+              </Box>
+            </Popover>
             <Avatar
               sx={useStyles.profileImage}
               src={
-                (user.profileImage
+                user.profileImage
                   ? `${CONSTANTS.BASE_URL}${CONSTANTS.PROFILE_PICTURE}/${user.profileImage}`
-                  : "")
+                  : ""
               }
               alt={"Imagen del usuario"}
             />
