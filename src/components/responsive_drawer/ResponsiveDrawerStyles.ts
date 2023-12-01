@@ -14,5 +14,10 @@ export const useStyles = {
     width: 50,
     height: 50,
     borderRadius: "50%",
-  }
+  },
+  logoutButton: {
+    background: "#060606", 
+    color: "#77EBEB", 
+    border:"#77EBEB 1px solid"
+  },
 };
