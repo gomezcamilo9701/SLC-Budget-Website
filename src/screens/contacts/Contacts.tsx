@@ -74,7 +74,8 @@ function Contacts() {
     dispatch(startLoading());
     try {
       const contactsData = await getContactsByUserId(user.id);
-      const contactsToRefresh: IUserWithId[] | null | undefined = contactsData?.contacts;
+      const contactsToRefresh: IUserWithId[] | null | undefined =
+        contactsData?.contacts;
       refreshContacts(contactsToRefresh);
     } catch (err) {
       console.error("Error al obetener los datos del servidor", err);
@@ -134,17 +135,10 @@ function Contacts() {
       ) : (
         <ThemeProvider theme={theme}>
           <Container maxWidth="lg">
-            <Grid
-              container
-              component="main"
-              /*justifyContent={'space-between'} */ sx={{
-                width: "sm",
-                height: "md",
-              }}
-            >
+            <Grid container component="main" sx={{ width: "sm", height: "md" }}>
               <Grid
                 item
-                xs={12}
+                xs={10}
                 sm={4}
                 md={4}
                 component={Paper}
@@ -265,7 +259,7 @@ function Contacts() {
 
               <Grid
                 item
-                xs={12}
+                xs={11}
                 sm={7}
                 md={7}
                 component={Paper}
@@ -274,23 +268,18 @@ function Contacts() {
               >
                 <Box sx={useStyles.boxPaperRight}>
                   <Card>
-                    <CardHeader
-                      title={
-                        <>
-                          Contactos
-                          <Badge
-                            badgeContent={contacts.length}
-                            color="secondary"
-                            sx={{ ml: 2 }}
-                          ></Badge>
-                        </>
-                      }
-                    />
+                    <Typography variant="h5" sx={useStyles.tableTitle}>
+                      Contactos
+                      <Badge
+                        badgeContent={contacts.length}
+                        color="secondary"
+                        sx={{ ml: 2 }}
+                      ></Badge>
+                    </Typography>
                     <TableContainer component={Paper}>
                       <Table>
                         <TableHead>
                           <TableRow>
-                            <TableCell>Id</TableCell>
                             <TableCell>Nombre</TableCell>
                             <TableCell>Apellido</TableCell>
                             <TableCell>Email</TableCell>
@@ -307,7 +296,6 @@ function Contacts() {
                             )
                             .map((contact, index) => (
                               <TableRow key={index}>
-                                <TableCell>{contact.id}</TableCell>
                                 <TableCell>
                                   <div
                                     style={{
@@ -369,8 +357,8 @@ function Contacts() {
                   </Card>
                 </Box>
               </Grid>
+              <Toaster />
             </Grid>
-            <Toaster />
           </Container>
         </ThemeProvider>
       )}

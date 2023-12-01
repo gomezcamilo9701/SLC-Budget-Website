@@ -23,6 +23,14 @@ export const useStyles = {
     textAlign: "center",
   },
 
+  tableTitle: {
+    color: "black",
+    padding: "5px",
+    mb: 1,
+    fontSize: "1.6rem",
+    fontWeight: "700",
+    textAlign: "center",
+  }, 
   bodyP: {
     color: "white",
     padding: "5px",
@@ -40,6 +48,7 @@ export const useStyles = {
     alignItems: "center",
     padding: "10px",
     margin: " 0 auto",
+    mt: 2,
 
   },
   paperRight: {
@@ -50,6 +59,7 @@ export const useStyles = {
     alignItems: "center",
     padding: "10px",
     margin: " 0 auto",
+    mt: 2,
 
   },
 
@@ -66,11 +76,11 @@ export const useStyles = {
     color: "white",
     display: "flex",
     width: "100%",
-    height: "80%",
+    height: "100%",
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    margin: "30px",
+    margin: "20px",
   },
 
   profileImage: {
