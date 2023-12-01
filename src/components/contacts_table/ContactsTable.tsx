@@ -12,13 +12,13 @@ import {
   TableContainer,
   Box,
   Grid,
-  Button,
+  //Button,
   TablePagination
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import {useStyles} from './ContactsTableStyle'
 import { TEventContactsResponse } from '../../types';
-import DeleteIcon from '@mui/icons-material/Delete';
+//import DeleteIcon from '@mui/icons-material/Delete';
 import CONSTANTS from '../../constants';
 
 
@@ -75,7 +75,6 @@ export const ContactsTable:React.FC<IContactsTableProps> = ({
                   <TableCell>Nombre</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell>Balance</TableCell>
-                  <TableCell>Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -102,12 +101,7 @@ export const ContactsTable:React.FC<IContactsTableProps> = ({
                     </div>
                   </TableCell>
                   <TableCell>{contact.contactEmail}</TableCell>
-                  <TableCell>{contact.balance}</TableCell>
-                  <TableCell>
-                    <Button variant="outlined" onClick={() => null}>
-                      <DeleteIcon />
-                    </Button>
-                  </TableCell>
+                  <TableCell>$ {contact.balance} (COP)</TableCell>
                 </TableRow>
                     ))}
               </TableBody>

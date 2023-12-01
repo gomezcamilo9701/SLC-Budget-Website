@@ -52,7 +52,7 @@ const LoginForm = () => {
           message: "Ingreso satisfactorio como usuario.",
         });
         setTimeout(() => {
-          navigate("/");
+          navigate("/home");
         }, 1000);
       }
       reset();

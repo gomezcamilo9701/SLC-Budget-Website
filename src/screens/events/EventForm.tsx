@@ -83,7 +83,7 @@ const EventForm: React.FC = () => {
           toast.success("Creación de evento satisfactoria.");
           reset();
           setTimeout(() => {
-            navigate('/event-details')
+            navigate(`/event-details/${true}`)
           }, 1000)
         } catch (e) {
           console.error(e);
@@ -109,7 +109,6 @@ const EventForm: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
   // #endregion 
-  
   return (
     <>
       <CssBaseline />
@@ -229,7 +228,7 @@ const EventForm: React.FC = () => {
                     fullWidth
                     variant="contained"
                     sx={useStyles.button}
-                    disabled={!isValid}
+                    disabled={!isValid || (selectedEvent === "")}
                   >
                     Crear evento
                   </Button>

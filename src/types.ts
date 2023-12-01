@@ -63,7 +63,7 @@ export interface IEvent {
   description: string;
   type: string;
   owner_id: string;
-};
+}
 
 export interface IEventWithId extends IEvent {
   event_id: string;
@@ -92,47 +92,47 @@ export type TEventDataEdit = {
 // Invitation
 
 export type TInvitationCreate = {
-  eventId: string,
-  contactId: string,
-}
+  eventId: string;
+  contactId: string;
+};
 
 export type TInvitationContactInfoResponse = {
-  contactName:         string;
-  contactLastName:     string;
-  contactUsername:     string;
-  contactId:           number;
-  contactEmail:        string;
+  contactName: string;
+  contactLastName: string;
+  contactUsername: string;
+  contactId: number;
+  contactEmail: string;
   contactProfileImage: string | null;
-  invitation_id:       number;
-  invitation_state:    string;
-}
+  invitation_id: number;
+  invitation_state: string;
+};
 
 export interface TInvitationEventInfoResponse {
-  eventPicture:           string | null;
-  eventName:              string;
-  eventDescription:       string;
+  eventPicture: string | null;
+  eventName: string;
+  eventDescription: string;
   eventOwnerProfileImage: string | null;
-  eventOwnerId:           string;
-  eventOwnerName:         string;
-  eventOwnerEmail:        string;
-  invitation_id:          number;
-  eventType:              string;
-  event_id:               number;
-  invitation_state:       string;
-  viewed:                 boolean;
+  eventOwnerId: string;
+  eventOwnerName: string;
+  eventOwnerEmail: string;
+  invitation_id: number;
+  eventType: string;
+  event_id: number;
+  invitation_state: string;
+  viewed: boolean;
 }
 
 // Event contacts
 export type TEventContactsResponse = {
-  contactEmail:        string;
-  contactName:         string;
-  contactId:           number;
+  contactEmail: string;
+  contactName: string;
+  contactId: number;
   contactProfileImage: string | null;
-  event_contact_id:    number;
-  contactLastName:     string;
-  contactUsername:     string;
+  event_contact_id: number;
+  contactLastName: string;
+  contactUsername: string;
   balance: number;
-}
+};
 
 // Activities
 export type TParticipationData = {
@@ -147,12 +147,41 @@ export type TActivityCreate = {
   eventId: string;
   value: number;
   participationData: TParticipationData | null;
-}
+};
 
 export type TActivityResponse = {
-  id:          number;
+  id: number;
   description: string;
-  value:       number;
+  value: number;
+  isPaid: boolean;
+};
+
+// Payments
+export interface TPaymentRequest {
+  activityId: number;
+  payerId: number;
+  eventId: number;
+  amount: number;
+}
+
+// Debts
+export interface TDebtsResponse {
+  userDebtorId:      number;
+  userDebtorName:      string;
+  userDebtorEmail:     string;
+  userCreditorId:      number;
+  userCreditorName:    string;
+  userCreditorEmail:   string;
+  userCreditorPicture: null;
+  amount:              number;
+  userDebtorPicture:   null;
+  isPaid:              boolean;
+}
+
+export interface TPayDebtRequest {
+  creditorId: number;
+  debtorId:   number;
+  amount:     number;
 }
 
 // Pagination
@@ -215,8 +244,15 @@ export interface PaginationResponse<T> {
 
 export type ContactPaginationResponse = PaginationResponse<IUserWithId>;
 export type EventsPaginationResponse = PaginationResponse<IEventWithId>;
-export type ParticipantEventsPaginationResponse = PaginationResponse<IParticipantEvents>;
-export type InvitationsPaginationResponse = PaginationResponse<TInvitationContactInfoResponse>;
-export type InvitationsEventPaginationResponse = PaginationResponse<TInvitationEventInfoResponse>;
-export type EventContactsPaginationResponse = PaginationResponse<TEventContactsResponse>;
-export type ActivitiesPaginationResponse = PaginationResponse<TActivityResponse>;
+export type ParticipantEventsPaginationResponse =
+  PaginationResponse<IParticipantEvents>;
+export type InvitationsPaginationResponse =
+  PaginationResponse<TInvitationContactInfoResponse>;
+export type InvitationsEventPaginationResponse =
+  PaginationResponse<TInvitationEventInfoResponse>;
+export type EventContactsPaginationResponse =
+  PaginationResponse<TEventContactsResponse>;
+export type ActivitiesPaginationResponse =
+  PaginationResponse<TActivityResponse>;
+export type DebtsPaginationResponse =
+  PaginationResponse<TDebtsResponse>;

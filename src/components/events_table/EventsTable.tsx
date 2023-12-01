@@ -23,7 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 type TEventsTableProps = {
   events: (IEventWithId | IParticipantEvents)[];
-  handleEditEvent: (event: IEventWithId) => void;
+  handleEditEvent:  (event: IEventWithId, isOwner: boolean) => void
   ownOrParticipant: "own" | "participant";
 }
 
@@ -109,7 +109,7 @@ export const EventsTable:React.FC<TEventsTableProps> = ({
                           <TableCell>
                             <Button
                               variant="outlined"
-                              onClick={() => handleEditEvent(event)}
+                              onClick={() => handleEditEvent(event, true)}
                             >
                               <EditIcon />
                             </Button>
@@ -188,7 +188,7 @@ export const EventsTable:React.FC<TEventsTableProps> = ({
                           <TableCell>
                             <Button sx={{whiteSpace: "nowrap"}}
                               variant="outlined"
-                              onClick={() => null}
+                              onClick={() => handleEditEvent(event, false)}
                             >
                               Ver detalles
                             </Button>
