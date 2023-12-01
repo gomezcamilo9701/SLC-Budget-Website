@@ -6,7 +6,6 @@ import PeopleIcon from "@mui/icons-material/People";
 import EventIcon from "@mui/icons-material/Event";
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
