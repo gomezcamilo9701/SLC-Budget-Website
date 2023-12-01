@@ -7,7 +7,8 @@ export const DEFAULT_USER_STATE: IUserResponse = {
   email: "",
   lastName: "",
   username: "",
-  profileImage: ""
+  profileImage: "",
+  balance: 0,
 }
 
 const initialState: IUserResponse = (() => {

@@ -5,7 +5,6 @@ import { TokenService } from "../token/TokenService";
 
 export const createActivity = async (activity: TActivityCreate) => {
   const token = TokenService.getToken();
-
   if (!token) {
     console.error("No se encontró un token de autenticación");
     return null;

@@ -102,6 +102,7 @@ const ProfileForm: React.FC = () => {
           lastName,
           username,
           profileImage,
+          balance: user.balance,
         };
         let renamedFile = null;
         if (selectedFile) {
@@ -120,8 +121,7 @@ const ProfileForm: React.FC = () => {
           id: `${id}`,
           profileImage: renamedFile,
         };
-        const edit = await editUser(editData);
-        console.log("edit", edit);
+        await editUser(editData);
         updateUser(userForPersist);
         setAlert({
           type: "success",

@@ -9,7 +9,6 @@ export const registerUser = async (user: IUser, profileImage: File | null) => {
   if (profileImage) {
     formData.append('profileImage', profileImage);
   }
-  console.log('formDat', formData);
   try {
       
       const repoonse = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.USER_REGISTER}`, {
@@ -167,8 +166,6 @@ export const addContact = async (contactId: string, userId: string) => {
     console.error("No se encontró un token de autenticación");
     return null;
   }
-  console.log('url', `${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}`);
-  console.log('contactDat', contactData);
   try {
     const res = await fetch(`${CONSTANTS.BASE_URL}${CONSTANTS.ADD_CONTACT}/${userId}`, {
       method: 'POST',
