@@ -20,13 +20,13 @@ import { useStyles } from './ResponsiveDrawerStyles';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthActions } from '../../store/auth/useAuthActions';
 import { useUserActions } from '../../store/user/useUserActions';
-import { IUserResponse, TInvitationEventInfoResponse } from '../../types';
+import { IUserResponse, InvitationsEventPaginationResponse, TInvitationEventInfoResponse } from '../../types';
 import { getUserByEmail } from '../../services/user/UserService';
 import { DEFAULT_USER_STATE } from '../../store/user/Userslice';
 import LoadingScreen from '../loading_screen/LoadingScreen';
 import { useAppSelector } from '../../hooks/store';
 import CONSTANTS from '../../constants';
-import { getInvitationsByUserId, updateInvitation } from '../../services/invitation/InvitationService';
+import { getInvitationsByUserId } from '../../services/invitation/InvitationService';
 import { toast } from 'sonner';
 import { startLoading, stopLoading } from '../../store/loading/loadingSlice';
 import { useDispatch } from 'react-redux';
@@ -159,7 +159,8 @@ export default function ResponsiveDrawer(props: Props) {
 
   const handleAcceptInvitation = async (invitationId: number) => {
     try {
-      await updateInvitation(invitationId, "ACCEPTED");
+      const invitationsResponse : InvitationsEventPaginationResponse | null = await getInvitationsByUserId(user.id);
+      console.log('invitation rEPSEOS', invitationsResponse?.content);
       const updatedInvitations = invitations.filter(invitation => invitation.invitation_id !== invitationId);
       setInvitations(updatedInvitations)
       toast.success('Invitación aceptada, mira tus eventos');
@@ -169,6 +170,19 @@ export default function ResponsiveDrawer(props: Props) {
     }
   }
   // #enregion
+
+  const getInvitations = async () => {
+    try {
+      const invitationsResponse : InvitationsEventPaginationResponse | null = await getInvitationsByUserId(user.id);
+      console.log('invitation rEPSEOS', invitationsResponse?.content);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    getInvitations();
+  }, []);
 
   return (
     <Box sx={{ display: "flex" }}>
