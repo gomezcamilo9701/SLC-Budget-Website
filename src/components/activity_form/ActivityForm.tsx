@@ -7,7 +7,7 @@ import {
   TextField,
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
-import { TActivityCreate, TActivityResponse, TEventContactsResponse, TParticipationData } from '../../types';
+import { IUserResponse, TActivityCreate, TActivityResponse, TEventContactsResponse, TParticipationData } from '../../types';
 import ContactCard from '../contact_card/ContactCard';
 import { useStyles } from './ActivityFormStyle';
 import { ActivityParticipantsTable } from '../activity_participants/ActivityParticipantsTable';
@@ -19,7 +19,8 @@ type ActivityFormProps = {
   setOpenModalActivity: (value: React.SetStateAction<boolean>) => void;
   eventContacts: TEventContactsResponse[];
   eventId: string;
-  handleAddActivity: (activity: TActivityResponse) => void
+  handleAddActivity: (activity: TActivityResponse) => void;
+  user: IUserResponse;
 }
 
 export const ActivityForm:React.FC<ActivityFormProps> = ({
@@ -27,6 +28,7 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
   eventContacts,
   eventId,
   handleAddActivity,
+  user,
 }) => {
 
   // #region Estados
@@ -43,6 +45,20 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
   
   // #region useEffects
 
+  useEffect(() => {
+    const owner : TEventContactsResponse = {
+      contactEmail: user.email,
+      contactName: user.name,
+      contactId: parseInt(user.id),
+      contactProfileImage: user.profileImage,
+      event_contact_id: 100,
+      contactLastName: user.lastName,
+      contactUsername: user.username,
+      balance: user.balance,
+    }  
+    selectedContacts.push(owner);
+  }, []);
+
   /**
    * useEffect para iniciar el form repartiendo equitativamente los porcentajes dependiendo de
     los participantes de la actividad
@@ -58,7 +74,6 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
 
         selectedContacts.forEach((contact) => {
           const equalStaticValue = (equalPercentage / 100) * initialValue;
-
           initialParticipationData[contact.contactId] = {
             participationPercentage: parseFloat(equalPercentage.toFixed(2)),
             staticValue: parseFloat(equalStaticValue.toFixed(2)),
@@ -89,9 +104,6 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
     }
   }, [activityForm, isValueFilled])
 
-  useEffect(() => {
-    console.log('act', activityForm);
-  }, [activityForm])
 
   // #endregion
 
@@ -161,9 +173,9 @@ export const ActivityForm:React.FC<ActivityFormProps> = ({
     e.preventDefault(); 
     try {
       const activity:TActivityResponse = await createActivity(activityForm);
-      handleAddActivity(activity);
-      toast.success('Actividad creada con éxito')
-      setOpenModalActivity(false);
+        handleAddActivity(activity);
+        toast.success('Actividad creada con éxito')
+        setOpenModalActivity(false);
     } catch (e) {
       toast.error('Error creando la actividad');
       console.error('Error creando la actividad');

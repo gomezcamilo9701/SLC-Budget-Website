@@ -53,7 +53,6 @@ function Contacts() {
     try {
       const contactsData = await getContactsByUserId(user.id);
       const contactsToRefresh: IUserWithId[] | null | undefined = contactsData?.contacts;
-      console.log('fetchConta', contactsToRefresh);
       refreshContacts(contactsToRefresh);
     } catch (err) {
       console.error('Error al obetener los datos del servidor', err);

@@ -18,7 +18,6 @@ const ContactCard: React.FC<ContactCardProps> = ({
   isSelected,
   isEnabled,
 }) => {
-  console.log('eventCont', eventContact);
   return (
     <Grid container>
       <Grid item xs={12} md={6}>

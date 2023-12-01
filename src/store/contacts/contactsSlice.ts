@@ -14,7 +14,6 @@ export const contactsSlice = createSlice({
 	initialState,
 	reducers: {
 		createContact: (state, action: PayloadAction<IUserWithId>) => {
-			console.log('pauload', action.payload);
 			state.push(action.payload);
 		},
 		deleteContactById: (state, action: PayloadAction<string>) => {

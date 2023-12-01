@@ -13,6 +13,7 @@ export interface IUserResponse {
   lastName: string;
   username: string;
   profileImage: string;
+  balance: number;
 }
 export interface IUser {
   email: string;
@@ -130,6 +131,7 @@ export type TEventContactsResponse = {
   event_contact_id:    number;
   contactLastName:     string;
   contactUsername:     string;
+  balance: number;
 }
 
 // Activities

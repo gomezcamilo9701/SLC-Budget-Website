@@ -74,6 +74,7 @@ export const ContactsTable:React.FC<IContactsTableProps> = ({
                   <TableCell>Username</TableCell>
                   <TableCell>Nombre</TableCell>
                   <TableCell>Email</TableCell>
+                  <TableCell>Balance</TableCell>
                   <TableCell>Acciones</TableCell>
                 </TableRow>
               </TableHead>
@@ -101,6 +102,7 @@ export const ContactsTable:React.FC<IContactsTableProps> = ({
                     </div>
                   </TableCell>
                   <TableCell>{contact.contactEmail}</TableCell>
+                  <TableCell>{contact.balance}</TableCell>
                   <TableCell>
                     <Button variant="outlined" onClick={() => null}>
                       <DeleteIcon />
