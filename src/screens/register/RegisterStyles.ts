@@ -4,6 +4,7 @@ export const useStyles = {
         height: '100vh',
         width: '95%',
         display: 'flex',
+        flexDirection: 'row',
         justifyContent: "center",
         alignItems: "center",
         margin: "0",
@@ -17,7 +18,6 @@ export const useStyles = {
         padding: "20px",
     },
     logo: {
-        padding: "18px",
         width: "30rem",
         minWidth: "300px",
     },
@@ -39,10 +39,19 @@ export const useStyles = {
     bodyH2: {
         color: "white",
         padding: "5px",
-        fontSize: "1.2rem",
-        fontWeight: 100,
+        fontSize: "1.3rem",
+        fontWeight: "700",
         textAlign: "center",
-        lineHeight: "1.7"
+        marginTop: "8px",
+        lineHeight: "1.5"
+    },
+    bodyH3: {
+        color: "white",
+        padding: "5px",
+        fontSize: "1rem",
+        fontWeight: 50,
+        textAlign: "center",
+        marginTop: "8px",
     },
 
     paper: {
