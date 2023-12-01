@@ -58,11 +58,13 @@ const getStyles = (theme: Theme) => ({
           backgroundColor: theme.palette.secondary.dark,
           whiteSpace: 'nowrap',
           color: theme.palette.common.white,
+          textAlign: 'center',
         },
         '&.MuiTableCell-body': {
           maxWidth: '180px', 
           wordWrap: 'break-word',
           fontSize: 14,
+          textAlign: 'center',
         },
       },
     },

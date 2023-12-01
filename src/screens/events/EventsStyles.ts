@@ -4,8 +4,8 @@ export const useStyles = {
         color: "white",
         padding: "5px",
         mb: 2,
-        fontSize: "1.2rem",
-        fontWeight: 100,
+        fontSize: "1.4rem",
+        fontWeight: "700",
         textAlign: "center",
     },
     paper: {

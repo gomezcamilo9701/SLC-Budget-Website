@@ -20,14 +20,18 @@ import {
   TableContainer,
   Popover,
 } from "@mui/material";
-import NotificationsIcon from "@mui/icons-material/Notifications";
+import CircleNotificationsRoundedIcon from "@mui/icons-material/CircleNotificationsRounded";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import { MainListItems } from "./MainListItems";
 import { useStyles } from "./ResponsiveDrawerStyles";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuthActions } from "../../store/auth/useAuthActions";
 import { useUserActions } from "../../store/user/useUserActions";
-import { IUserResponse, InvitationsEventPaginationResponse, TInvitationEventInfoResponse } from "../../types";
+import {
+  IUserResponse,
+  InvitationsEventPaginationResponse,
+  TInvitationEventInfoResponse,
+} from "../../types";
 import { getUserByEmail } from "../../services/user/UserService";
 import { DEFAULT_USER_STATE } from "../../store/user/Userslice";
 import LoadingScreen from "../loading_screen/LoadingScreen";
@@ -212,12 +216,13 @@ export default function ResponsiveDrawer(props: Props) {
 
   const getInvitations = async () => {
     try {
-      const invitationsResponse : InvitationsEventPaginationResponse | null = await getInvitationsByUserId(user.id);
-      console.log('invitation rEPSEOS', invitationsResponse?.content);
+      const invitationsResponse: InvitationsEventPaginationResponse | null =
+        await getInvitationsByUserId(user.id);
+      console.log("invitation rEPSEOS", invitationsResponse?.content);
     } catch (error) {
       console.error(error);
     }
-  }
+  };
 
   useEffect(() => {
     getInvitations();
@@ -266,7 +271,9 @@ export default function ResponsiveDrawer(props: Props) {
                 }
                 color="secondary"
               >
-                <NotificationsIcon />
+                <CircleNotificationsRoundedIcon
+                  sx={{ color: theme.palette.primary.main, fontSize: "2.5rem" }}
+                />
               </Badge>
             </IconButton>
             <Popover
