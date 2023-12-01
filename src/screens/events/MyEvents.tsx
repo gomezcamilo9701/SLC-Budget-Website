@@ -56,8 +56,18 @@ const MyEvents: React.FC = () => {
       if (responseParticipantEvents) {
         const { content } = responseParticipantEvents;
         const participantEvents: IParticipantEvents[] | null = content;
-        setParticipantEvents(participantEvents);
+      
+        // Asegurarse de que participantEvents no sea undefined
+        const filteredEvents = participantEvents
+          ? {
+              ownerEvents: participantEvents.filter(event => event.owner_id === user.id),
+              participantOnlyEvents: participantEvents.filter(event => event.owner_id !== user.id),
+            }
+          : { ownerEvents: [], participantOnlyEvents: [] };
+      
+        setParticipantEvents(filteredEvents.participantOnlyEvents);
       }
+      
     } catch (err) {
       console.error(
         "Error al obtener los eventos propios en los que el usuario es participante",
@@ -73,10 +83,10 @@ const MyEvents: React.FC = () => {
   // #endregion
 
   // #region handleEditEvent
-  const handleEditEvent = (event: IEventWithId) => {
+  const handleEditEvent = (event: IEventWithId, isOwner: boolean) => {
     dispatch(startLoading());
     updateEvent(event);
-    navigate("/event-details");
+    navigate(`/event-details/${isOwner}`);
     dispatch(stopLoading());
   };
   // #endregion

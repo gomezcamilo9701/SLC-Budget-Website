@@ -26,6 +26,7 @@ import {
   TInvitationCreate,
   TInvitationContactInfoResponse,
   TActivityResponse,
+  TPaymentRequest,
 } from "../../types";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useAppSelector } from "../../hooks/store";
@@ -51,8 +52,12 @@ import { ActivityForm } from "../../components/activity_form/ActivityForm";
 import { getActivitiesByEvent } from "../../services/activity/ActivityService";
 import { ActivitiesTable } from "../../components/activities_event/ActivitiesTable";
 import { v4 as uuidv4 } from "uuid";
+import { payActivity } from "../../services/payment/PaymentService";
+import { useParams } from "react-router-dom";
 
 const EventDetails: React.FC = () => {
+  const { isOwner } = useParams();
+  const isOwnerBoolean = !!isOwner && isOwner.toLowerCase() === "true";
   // #region Estados
   //Imagen
   const { selectedFile, previewImage, handleImageChange } = useImageUploader();
@@ -131,6 +136,7 @@ const EventDetails: React.FC = () => {
           activities: updatedActivities,
         }));
       }
+      console.log('actvrepsonse', activitiesResponse);
 
       reset(event);
     } catch (err) {
@@ -144,6 +150,7 @@ const EventDetails: React.FC = () => {
   };
   useEffect(() => {
     fetchUserData();
+    console.log('bool', isOwner, isOwnerBoolean);
   }, []);
   // #endregion
 
@@ -271,6 +278,45 @@ const EventDetails: React.FC = () => {
     }));
   };
 
+  const handlePayActivity = async (activityId: number, value: number) => {
+    const paymentRequest: TPaymentRequest = {
+      activityId,
+      payerId: parseInt(user.id),
+      eventId: parseInt(event.event_id),
+      amount: value,
+    }
+    dispatch(startLoading());
+    try {
+      await payActivity(paymentRequest);
+      const eventContactsResponse = await getEventContactsByEventId(
+        event.event_id
+      );
+      const updatedEventContacts: TEventContactsResponse[] | null | undefined =
+        eventContactsResponse?.content;
+      if (updatedEventContacts) {
+        setEventData((prevState) => ({
+          ...prevState,
+          eventContacts: updatedEventContacts,
+        }));
+      }
+
+      const activitiesResponse = await getActivitiesByEvent(event.event_id);
+      const updatedActivities: TActivityResponse[] | null | undefined =
+        activitiesResponse?.content;
+      if (updatedActivities) {
+        setEventData((prevState) => ({
+          ...prevState,
+          activities: updatedActivities,
+        }));
+      }
+    }
+    catch(e) {
+      console.error('error', e)
+    } finally {
+      dispatch(stopLoading());
+    }
+  }
+
   useEffect(() => {}, [eventData.activities]);
 
   // #endregion
@@ -323,7 +369,7 @@ const EventDetails: React.FC = () => {
                       sx={useStyles.profileButton}
                       disabled={!isEnableEditForm}
                     >
-                      {selectedFile ? "Subir de nuevo" : "Seleccionar imagen"}
+                      {selectedFile && isOwnerBoolean ? "Subir de nuevo" : "Seleccionar imagen"}
                     </Button>
                   </label>
                   <input
@@ -358,7 +404,7 @@ const EventDetails: React.FC = () => {
                         label=""
                         autoComplete=""
                         {...register("name", { required: true, minLength: 4 })}
-                        disabled={!isEnableEditForm}
+                        disabled={!isEnableEditForm || !isOwnerBoolean}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -382,7 +428,7 @@ const EventDetails: React.FC = () => {
                           required: true,
                           minLength: 3,
                         })}
-                        disabled={!isEnableEditForm}
+                        disabled={!isEnableEditForm || !isOwnerBoolean}
                       />
                     </Grid>
                     <Grid item xs={12}>
@@ -393,7 +439,7 @@ const EventDetails: React.FC = () => {
                       <SelectEventType
                         value={selectedEvent}
                         onChange={(e) => setSelectedEvent(e.target.value)}
-                        isEnableEditForm={isEnableEditForm}
+                        isEnableEditForm={isEnableEditForm && isOwnerBoolean}
                       />
                     </Grid>
                   </Grid>
@@ -403,7 +449,7 @@ const EventDetails: React.FC = () => {
                     fullWidth
                     variant="contained"
                     sx={useStyles.button}
-                    disabled={!isEnableEditForm}
+                    disabled={!isEnableEditForm || !isOwnerBoolean}
                   >
                     Editar evento
                   </Button>
@@ -416,6 +462,7 @@ const EventDetails: React.FC = () => {
                       variant="outlined"
                       sx={useStyles.button3}
                       onClick={() => setOpenModalInvitation(true)}
+                      disabled={!isOwnerBoolean}
                     >
                       Enviar invitación
                     </Button>
@@ -425,6 +472,7 @@ const EventDetails: React.FC = () => {
                       color="secondary"
                       sx={useStyles.button2}
                       onClick={() => setOpenModalActivity(true)}
+                      disabled={!isOwnerBoolean}
                     >
                       Crear Actividad
                     </Button>
@@ -444,7 +492,7 @@ const EventDetails: React.FC = () => {
             >
               <ContactsTable contacts={eventData.eventContacts} />
 
-              <ActivitiesTable activities={eventData.activities} />
+              <ActivitiesTable activities={eventData.activities} handlePayActivity={handlePayActivity} />
             </Grid>
 
             <Modal

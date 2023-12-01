@@ -26,12 +26,12 @@ export const MainListItems = () => {
 
       <ListItemButton
         sx={{ "&:hover": { backgroundColor: theme.palette.primary.main } }}
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/home")}
       >
         <ListItemIcon>
           <DashboardIcon sx={{ color: theme.palette.primary.light }} />
         </ListItemIcon>
-        <ListItemText primary="Inicio" />
+        <ListItemText primary="Inicio - Tus saldos" />
       </ListItemButton>
 
       <ListItemButton
@@ -76,17 +76,6 @@ export const MainListItems = () => {
         <ListItemText primary="Notificaciones" />
       </ListItemButton>
 
-      <ListItemButton
-        sx={{ "&:hover": { backgroundColor: theme.palette.primary.main } }}
-        onClick={() => navigate("/")}
-      >
-        <ListItemIcon>
-          <AccountBalanceWalletIcon
-            sx={{ color: theme.palette.primary.light }}
-          />
-        </ListItemIcon>
-        <ListItemText primary="Saldos" />
-      </ListItemButton>
     </React.Fragment>
   );
 };

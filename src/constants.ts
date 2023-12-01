@@ -20,6 +20,11 @@ const CONSTANTS = {
   GET_EVENT_CONTACTS_BY_EVENT: '/event-contacts/by-event',
   CREATE_ACTIVITY: '/activity/create',
   GET_ACTIVITY_BY_EVENT: '/event/activities',
+  PAY_ACTIVITY: '/payment/register',
+  GET_DEBTS_BY_DEBTOR: '/debts/debtor',
+  GET_DEBTS_BY_CREDITOR: '/debts/creditor',
+  PAY_DEBT: '/debts/pay'
+
 };
 //http://ec2-54-221-52-14.compute-1.amazonaws.com
 export default CONSTANTS;
