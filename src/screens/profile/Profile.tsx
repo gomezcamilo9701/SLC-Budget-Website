@@ -333,7 +333,8 @@ const ProfileForm: React.FC = () => {
                       variant="contained"
                       color="error"
                       onClick={handleClickOpen}
-                      style={{ marginTop: "10px" }}
+                      style={{ marginTop: "15px" }}
+                      size="small"
                     >
                       Darse de baja
                     </Button>
