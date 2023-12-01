@@ -19,7 +19,6 @@ import {
   Stack,
   TableContainer,
   Popover,
-  useScrollTrigger,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
@@ -28,7 +27,7 @@ import { useStyles } from "./ResponsiveDrawerStyles";
 import { Outlet, useNavigate } from "react-router-dom";
 import { useAuthActions } from "../../store/auth/useAuthActions";
 import { useUserActions } from "../../store/user/useUserActions";
-import { IUserResponse, TInvitationEventInfoResponse } from "../../types";
+import { IUserResponse, InvitationsEventPaginationResponse, TInvitationEventInfoResponse } from "../../types";
 import { getUserByEmail } from "../../services/user/UserService";
 import { DEFAULT_USER_STATE } from "../../store/user/Userslice";
 import LoadingScreen from "../loading_screen/LoadingScreen";
